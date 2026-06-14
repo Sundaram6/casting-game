@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Casting Office</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 3D Canvas -->
+    <div id="game-container">
+        <!-- Crosshair -->
+        <div id="crosshair">+</div>
+
+        <!-- HUD -->
+        <div id="hud">
+            <div class="hud-item">Score: <span id="hud-score">0</span></div>
+            <div class="hud-item">Offices Remaining: <span id="hud-offices">5</span></div>
+        </div>
+
+        <!-- UI Screens Layer -->
+        <div id="ui-layer">
+            
+            <!-- Start Screen -->
+            <div id="start-screen" class="screen active">
+                <h1>CASTING OFFICE 3D</h1>
+                <p class="subtitle">The Nepo Kid Simulator</p>
+                <div class="instructions">
+                    <p><strong>Controls:</strong></p>
+                    <p>WASD to Move | Mouse to Look</p>
+                    <p>Click the screen to start</p>
+                    <br>
+                    <p>Walk up to casting offices and type</p>
+                    <p><strong>"nepo kid"</strong></p>
+                    <p>before the timer runs out!</p>
+                </div>
+                <p class="click-to-start">(Click anywhere to play)</p>
+            </div>
+
+            <!-- Typing Minigame Screen -->
+            <div id="typing-screen" class="screen hidden">
+                <h2>TYPE FAST TO GET SELECTED!</h2>
+                <div id="typing-target">
+                    <span id="typed-text"></span><span id="untyped-text">nepo kid</span>
+                </div>
+                <div id="timer-bar-container">
+                    <div id="timer-bar"></div>
+                </div>
+                <p id="timer-text">7.0s</p>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="game-over-screen" class="screen hidden flashing">
+                <h1 class="huge-text">YOU ARE NOT A STAR KID</h1>
+                <p>Final Score: <span id="go-score">0</span></p>
+                <button id="restart-btn" class="btn">Try Again</button>
+            </div>
+
+            <!-- Victory Screen -->
+            <div id="victory-screen" class="screen hidden">
+                <h1>YOU GOT ALL THE ROLES!</h1>
+                <p>Nepotism wins again!</p>
+                <p>Final Score: <span id="vic-score">0</span></p>
+                <button id="play-again-btn" class="btn">Play Again</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Three.js and PointerLockControls from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+    
+    <script src="game.js"></script>
+</body>
+</html>

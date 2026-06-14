@@ -1,0 +1,247 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    overflow: hidden; /* Prevent scrolling */
+    width: 100vw;
+    height: 100vh;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Crosshair */
+#crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    pointer-events: none;
+    text-shadow: 0 0 2px black;
+    z-index: 5;
+}
+
+/* HUD */
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffda79;
+    text-shadow: 2px 2px 4px rgba(0,0,0,1);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* UI Screens */
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(10, 10, 20, 0.85);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.screen.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.screen.hidden {
+    display: none;
+}
+
+h1 {
+    font-size: 80px;
+    font-weight: 900;
+    color: #e94560;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    text-shadow: 0 4px 15px rgba(233, 69, 96, 0.6);
+    text-align: center;
+}
+
+.huge-text {
+    font-size: 100px;
+    line-height: 1.1;
+    color: white;
+    text-shadow: 0 0 20px red;
+}
+
+p {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #d1d8e0;
+}
+
+.click-to-start {
+    font-size: 20px;
+    color: #a5b1c2;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+/* Flashing Game Over */
+.flashing.active {
+    animation: flashScreen 0.2s infinite alternate;
+}
+
+@keyframes flashScreen {
+    0% { background: rgba(255, 0, 0, 0.9); }
+    100% { background: rgba(0, 0, 0, 0.9); }
+}
+
+.subtitle {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    color: #fff;
+    background: #e94560;
+    padding: 8px 20px;
+    border-radius: 30px;
+}
+
+.instructions {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 30px 50px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 40px;
+    border: 2px solid #e94560;
+}
+
+.instructions p {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #fff;
+}
+.instructions p:last-child { margin-bottom: 0; }
+.instructions strong { color: #ffda79; }
+
+.btn {
+    background: #e94560;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 20px;
+    pointer-events: auto;
+}
+
+.btn:hover {
+    background: #ff5271;
+    transform: scale(1.05);
+}
+
+/* Typing Minigame */
+#typing-screen {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+}
+
+#typing-screen h2 {
+    font-size: 48px;
+    color: #ffda79;
+    margin-bottom: 40px;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+}
+
+#typing-target {
+    font-size: 80px;
+    font-family: monospace;
+    font-weight: bold;
+    background: rgba(255,255,255,0.1);
+    padding: 20px 40px;
+    border-radius: 10px;
+    border: 3px solid #ffda79;
+    margin-bottom: 30px;
+    box-shadow: 0 0 30px rgba(255, 218, 121, 0.2);
+}
+
+#typed-text {
+    color: #2ecc71; /* Green for typed */
+    text-shadow: 0 0 10px #2ecc71;
+}
+
+#untyped-text {
+    color: #fff;
+}
+
+#timer-bar-container {
+    width: 600px;
+    height: 30px;
+    background: #333;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border: 2px solid #555;
+}
+
+#timer-bar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff4757, #ffa502, #2ed573);
+    transform-origin: left;
+    transition: width 0.1s linear;
+}
+
+#timer-text {
+    font-size: 36px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+}
