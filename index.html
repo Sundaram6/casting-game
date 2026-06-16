@@ -40,7 +40,11 @@
 
             <!-- Typing Minigame Screen -->
             <div id="typing-screen" class="screen hidden">
-                <h2>TYPE FAST TO GET SELECTED!</h2>
+                <div id="combo-container">
+                    <div style="font-size: 1.5rem; color: #fff;">COMBO</div>
+                    <div id="combo-text">x1.0</div>
+                </div>
+                <h2>TYPE TO AUDITION!</h2>
                 <div id="typing-target">
                     <span id="typed-text"></span><span id="untyped-text">nepo kid</span>
                 </div>
@@ -71,7 +75,11 @@
     <!-- Three.js and PointerLockControls from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
-    
-    <script src="game.js"></script>
-</body>
+        <!-- Win Message Overlay -->
+        <div id="win-message-overlay" class="hidden" style="position: absolute; top: 30%; left: 0; width: 100%; text-align: center; pointer-events: none; z-index: 100;">
+            <h1 id="win-message-text" style="color: #FFD700; font-size: 3rem; text-shadow: 0 0 20px #FFD700; animation: letterPop 0.5s ease-out;"></h1>
+        </div>
+
+        <script src="game.js"></script>
+    </body>
 </html>
