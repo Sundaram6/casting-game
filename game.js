@@ -611,8 +611,8 @@ scene.add(hemiLight);
 const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
 dirLight.position.set(20, 200, 40); // Top down angle
 dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = 4096; // Sharper shadows
-dirLight.shadow.mapSize.height = 4096;
+dirLight.shadow.mapSize.width = isMobile ? 512 : 4096;
+dirLight.shadow.mapSize.height = isMobile ? 512 : 4096;
 dirLight.shadow.camera.top = 250;
 dirLight.shadow.camera.bottom = -250;
 dirLight.shadow.camera.left = -250;
@@ -1907,8 +1907,13 @@ function animate() {
         camera.fov += ((isSprinting ? 90 : 75) - camera.fov) * 5 * dt;
         camera.updateProjectionMatrix();
 
-        if (moveForward || moveBackward) velocity.z -= direction.z * speed * dt;
-        if (moveLeft || moveRight) velocity.x -= direction.x * speed * dt;
+        if (isMobile) {
+            velocity.z -= direction.z * speed * dt;
+            velocity.x -= direction.x * speed * dt;
+        } else {
+            if (moveForward || moveBackward) velocity.z -= direction.z * speed * dt;
+            if (moveLeft || moveRight) velocity.x -= direction.x * speed * dt;
+        }
 
         controls.moveRight(-velocity.x * dt);
         controls.moveForward(-velocity.z * dt);
