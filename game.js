@@ -460,6 +460,20 @@ container.appendChild(renderer.domElement);
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
 const controls = new THREE.PointerLockControls(camera, document.body);
 
+if (isMobile) {
+    document.querySelector('#start-screen .instructions').innerHTML = `
+        <p><strong>Mobile Controls:</strong></p>
+        <p>Left Side: Joystick to Move</p>
+        <p>Right Side: Drag to Look</p>
+        <p>Tap the screen to start</p>
+        <br>
+        <p>Walk up to casting offices and type</p>
+        <p><strong>"nepo kid"</strong></p>
+        <p>before the timer runs out!</p>
+    `;
+    document.querySelector('#start-screen .click-to-start').innerText = "(Tap anywhere to play)";
+}
+
 function lockOrShowMobileControls() {
     if (isMobile) {
         document.getElementById('mobile-controls').classList.remove('hidden');
@@ -505,10 +519,20 @@ joyZone.addEventListener('touchstart', e => {
     if (touchJoystickId !== null || gameState !== 'PLAYING') return;
     const touch = e.changedTouches[0];
     touchJoystickId = touch.identifier;
-    touchJoystickOrigin = { x: touch.clientX, y: touch.clientY };
-    joyBase.style.left = touch.clientX + 'px';
-    joyBase.style.top = touch.clientY + 'px';
-    joyBase.style.display = 'block';
+    
+    const rect = joyBase.getBoundingClientRect();
+    touchJoystickOrigin = { 
+        x: rect.left + rect.width / 2, 
+        y: rect.top + rect.height / 2 
+    };
+    
+    const dx = touch.clientX - touchJoystickOrigin.x;
+    const dy = touch.clientY - touchJoystickOrigin.y;
+    const dist = Math.min(Math.sqrt(dx*dx + dy*dy), 50);
+    const angle = Math.atan2(dy, dx);
+    joyStick.style.transform = `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px))`;
+    analogJoystick.x = (Math.cos(angle)*dist) / 50;
+    analogJoystick.y = (Math.sin(angle)*dist) / 50;
 });
 joyZone.addEventListener('touchmove', e => {
     if (gameState !== 'PLAYING') return;
@@ -530,7 +554,6 @@ joyZone.addEventListener('touchend', e => {
     for (let i=0; i<e.changedTouches.length; i++) {
         if (e.changedTouches[i].identifier === touchJoystickId) {
             touchJoystickId = null;
-            joyBase.style.display = 'none';
             joyStick.style.transform = 'translate(-50%, -50%)';
             analogJoystick.x = 0;
             analogJoystick.y = 0;

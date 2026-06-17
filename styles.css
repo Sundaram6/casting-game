@@ -507,12 +507,13 @@ p {
     35%, 70% { opacity: 1; transform: scale(1.15); }
 }
  
- / *   M o b i l e   C o n t r o l s   * /  
- # m o b i l e - c o n t r o l s   {   p o s i t i o n :   a b s o l u t e ;   i n s e t :   0 ;   p o i n t e r - e v e n t s :   n o n e ;   z - i n d e x :   5 0 ;   }  
- # m o b i l e - c o n t r o l s . a c t i v e   {   d i s p l a y :   f l e x ;   }  
- # m o b i l e - j o y s t i c k - z o n e   {   w i d t h :   5 0 % ;   h e i g h t :   1 0 0 % ;   p o s i t i o n :   r e l a t i v e ;   p o i n t e r - e v e n t s :   a u t o ;   t o u c h - a c t i o n :   n o n e ;   }  
- # m o b i l e - l o o k - z o n e   {   w i d t h :   5 0 % ;   h e i g h t :   1 0 0 % ;   p o s i t i o n :   r e l a t i v e ;   p o i n t e r - e v e n t s :   a u t o ;   t o u c h - a c t i o n :   n o n e ;   }  
- # m o b i l e - j o y s t i c k - b a s e   {   p o s i t i o n :   a b s o l u t e ;   w i d t h :   1 2 0 p x ;   h e i g h t :   1 2 0 p x ;   b a c k g r o u n d :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 2 ) ;   b o r d e r :   2 p x   s o l i d   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 5 ) ;   b o r d e r - r a d i u s :   5 0 % ;   d i s p l a y :   n o n e ;   p o i n t e r - e v e n t s :   n o n e ;   t r a n s f o r m :   t r a n s l a t e ( - 5 0 % ,   - 5 0 % ) ;   }  
- # m o b i l e - j o y s t i c k - s t i c k   {   p o s i t i o n :   a b s o l u t e ;   t o p :   5 0 % ;   l e f t :   5 0 % ;   w i d t h :   5 0 p x ;   h e i g h t :   5 0 p x ;   t r a n s f o r m :   t r a n s l a t e ( - 5 0 % ,   - 5 0 % ) ;   b a c k g r o u n d :   r g b a ( 2 5 5 ,   2 5 5 ,   2 5 5 ,   0 . 6 ) ;   b o r d e r - r a d i u s :   5 0 % ;   }  
- # m o b i l e - t y p i n g - i n p u t   {   o p a c i t y :   0 ;   p o s i t i o n :   a b s o l u t e ;   z - i n d e x :   - 1 ;   p o i n t e r - e v e n t s :   n o n e ;   }  
- 
+ / *   
+
+/* Mobile Controls */
+#mobile-controls { position: absolute; inset: 0; pointer-events: none; z-index: 50; }
+#mobile-controls.active { display: flex; }
+#mobile-joystick-zone { width: 50%; height: 100%; position: relative; pointer-events: auto; touch-action: none; }
+#mobile-look-zone { width: 50%; height: 100%; position: relative; pointer-events: auto; touch-action: none; }
+#mobile-joystick-base { position: absolute; bottom: 40px; left: 40px; width: 120px; height: 120px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; pointer-events: none; }
+#mobile-joystick-stick { position: absolute; top: 50%; left: 50%; width: 50px; height: 50px; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.6); border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+#mobile-typing-input { opacity: 0; position: absolute; z-index: -1; pointer-events: none; }
