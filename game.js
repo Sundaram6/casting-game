@@ -457,19 +457,30 @@ container.appendChild(renderer.domElement);
 
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
 
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
 const controls = new THREE.PointerLockControls(camera, document.body);
+
+function lockOrShowMobileControls() {
+    if (isMobile) {
+        document.getElementById('mobile-controls').classList.remove('hidden');
+        document.getElementById('mobile-controls').classList.add('active');
+        controls.isLocked = true;
+    } else {
+        controls.lock();
+    }
+}
 
 screens.start.addEventListener('click', () => {
     if (gameState === 'START' || gameState === 'GAME_OVER' || gameState === 'VICTORY') {
         initGame();
-        controls.lock();
+        lockOrShowMobileControls();
     }
 });
 controls.addEventListener('unlock', () => {
     if (gameState === 'PLAYING') crosshair.style.display = 'none';
 });
-document.getElementById('restart-btn').addEventListener('click', () => { initGame(); controls.lock(); });
-document.getElementById('play-again-btn').addEventListener('click', () => { initGame(); controls.lock(); });
+document.getElementById('restart-btn').addEventListener('click', () => { initGame(); lockOrShowMobileControls(); });
+document.getElementById('play-again-btn').addEventListener('click', () => { initGame(); lockOrShowMobileControls(); });
 
 let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
 let isSprinting = false;
@@ -481,6 +492,87 @@ let direction = new THREE.Vector3();
 let prevTime = performance.now();
 
 
+
+let touchJoystickId = null;
+let touchJoystickOrigin = {x: 0, y: 0};
+let analogJoystick = {x: 0, y: 0};
+
+const joyZone = document.getElementById('mobile-joystick-zone');
+const joyBase = document.getElementById('mobile-joystick-base');
+const joyStick = document.getElementById('mobile-joystick-stick');
+
+joyZone.addEventListener('touchstart', e => {
+    if (touchJoystickId !== null || gameState !== 'PLAYING') return;
+    const touch = e.changedTouches[0];
+    touchJoystickId = touch.identifier;
+    touchJoystickOrigin = { x: touch.clientX, y: touch.clientY };
+    joyBase.style.left = touch.clientX + 'px';
+    joyBase.style.top = touch.clientY + 'px';
+    joyBase.style.display = 'block';
+});
+joyZone.addEventListener('touchmove', e => {
+    if (gameState !== 'PLAYING') return;
+    for (let i=0; i<e.changedTouches.length; i++) {
+        const touch = e.changedTouches[i];
+        if (touch.identifier === touchJoystickId) {
+            const dx = touch.clientX - touchJoystickOrigin.x;
+            const dy = touch.clientY - touchJoystickOrigin.y;
+            const dist = Math.min(Math.sqrt(dx*dx + dy*dy), 50);
+            const angle = Math.atan2(dy, dx);
+            joyStick.style.transform = `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px))`;
+            
+            analogJoystick.x = (Math.cos(angle)*dist) / 50;
+            analogJoystick.y = (Math.sin(angle)*dist) / 50;
+        }
+    }
+});
+joyZone.addEventListener('touchend', e => {
+    for (let i=0; i<e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === touchJoystickId) {
+            touchJoystickId = null;
+            joyBase.style.display = 'none';
+            joyStick.style.transform = 'translate(-50%, -50%)';
+            analogJoystick.x = 0;
+            analogJoystick.y = 0;
+        }
+    }
+});
+
+let touchLookId = null;
+let touchLookLast = {x: 0, y: 0};
+const lookZone = document.getElementById('mobile-look-zone');
+
+lookZone.addEventListener('touchstart', e => {
+    if (touchLookId !== null || gameState !== 'PLAYING') return;
+    const touch = e.changedTouches[0];
+    touchLookId = touch.identifier;
+    touchLookLast = { x: touch.clientX, y: touch.clientY };
+});
+lookZone.addEventListener('touchmove', e => {
+    if (gameState !== 'PLAYING') return;
+    for (let i=0; i<e.changedTouches.length; i++) {
+        const touch = e.changedTouches[i];
+        if (touch.identifier === touchLookId) {
+            const dx = touch.clientX - touchLookLast.x;
+            const dy = touch.clientY - touchLookLast.y;
+            touchLookLast = { x: touch.clientX, y: touch.clientY };
+            
+            const euler = new THREE.Euler(0, 0, 0, 'YXZ');
+            euler.setFromQuaternion(camera.quaternion);
+            euler.y -= dx * 0.005;
+            euler.x -= dy * 0.005;
+            euler.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, euler.x));
+            camera.quaternion.setFromEuler(euler);
+        }
+    }
+});
+lookZone.addEventListener('touchend', e => {
+    for (let i=0; i<e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === touchLookId) {
+            touchLookId = null;
+        }
+    }
+});
 
 // ─── LIGHTING ────────────────────────────────────────────────────────────────
 
@@ -1488,6 +1580,11 @@ function startTypingMinigame(office) {
     if(ct) ct.innerText = 'x1.0';
     updateTypingUI();
     changeScreen('typing-screen');
+    if (isMobile) {
+        const input = document.getElementById('mobile-typing-input');
+        input.value = '';
+        input.focus();
+    }
 }
 
 function updateTypingUI() {
@@ -1619,6 +1716,47 @@ function winMinigame() {
 
 // ─── INPUT ───────────────────────────────────────────────────────────────────
 
+function handleTypingCharacter(key) {
+    if (gameState !== 'TYPING') return;
+    if (key === ' ') return;
+    let targetChar = TARGET_WORD[typeIndex];
+    if (key.toLowerCase() === targetChar.toLowerCase()) {
+        typeIndex++;
+        
+        // Combo System
+        const now = performance.now();
+        if (now - lastTypeTime < 400) {
+            combo += 0.1;
+            const ct = document.getElementById('combo-text');
+            if(ct) {
+                ct.innerText = 'x' + combo.toFixed(1);
+                ct.classList.remove('combo-pop');
+                void ct.offsetWidth;
+                ct.classList.add('combo-pop');
+            }
+        } else {
+            combo = 1.0;
+            const ct = document.getElementById('combo-text');
+            if(ct) ct.innerText = 'x1.0';
+        }
+        lastTypeTime = now;
+        
+        sounds.type.playbackRate = Math.min(2.0, 1.0 + (combo - 1) * 0.1);
+        playSound(sounds.type);
+        
+        // Screen Shake
+        const gc = document.getElementById('game-container');
+        if(gc) {
+            gc.classList.remove('shake');
+            void gc.offsetWidth;
+            gc.classList.add('shake');
+        }
+        
+        updateTypingUI();
+        if (typeIndex >= TARGET_WORD.length) winMinigame();
+    }
+}
+
 document.addEventListener('keydown', (e) => {
     if (gameState === 'PLAYING') {
         switch (e.code) {
@@ -1633,42 +1771,17 @@ document.addEventListener('keydown', (e) => {
         }
     } else if (gameState === 'TYPING') {
         if (e.key === ' ') e.preventDefault();
-        let targetChar = TARGET_WORD[typeIndex];
-        if (e.key.toLowerCase() === targetChar.toLowerCase()) {
-            typeIndex++;
-            
-            // Combo System
-            const now = performance.now();
-            if (now - lastTypeTime < 400) {
-                combo += 0.1;
-                const ct = document.getElementById('combo-text');
-                if(ct) {
-                    ct.innerText = 'x' + combo.toFixed(1);
-                    ct.classList.remove('combo-pop');
-                    void ct.offsetWidth;
-                    ct.classList.add('combo-pop');
-                }
-            } else {
-                combo = 1.0;
-                const ct = document.getElementById('combo-text');
-                if(ct) ct.innerText = 'x1.0';
-            }
-            lastTypeTime = now;
-            
-            sounds.type.playbackRate = Math.min(2.0, 1.0 + (combo - 1) * 0.1);
-            playSound(sounds.type);
-            
-            // Screen Shake
-            const gc = document.getElementById('game-container');
-            if(gc) {
-                gc.classList.remove('shake');
-                void gc.offsetWidth;
-                gc.classList.add('shake');
-            }
-            
-            updateTypingUI();
-            if (typeIndex >= TARGET_WORD.length) winMinigame();
-        }
+        handleTypingCharacter(e.key);
+    }
+});
+
+const mobileInput = document.getElementById('mobile-typing-input');
+mobileInput.addEventListener('input', (e) => {
+    if (gameState !== 'TYPING') return;
+    const val = e.target.value;
+    if (val.length > 0) {
+        handleTypingCharacter(val.slice(-1));
+        e.target.value = ''; // keep clearing it
     }
 });
 
@@ -1757,9 +1870,15 @@ function animate() {
     if (gameState === 'PLAYING' && controls.isLocked) {
         velocity.x -= velocity.x * 10.0 * dt;
         velocity.z -= velocity.z * 10.0 * dt;
-        direction.z = Number(moveForward) - Number(moveBackward);
-        direction.x = Number(moveRight) - Number(moveLeft);
-        direction.normalize();
+        
+        if (isMobile) {
+            direction.x = analogJoystick.x;
+            direction.z = analogJoystick.y;
+        } else {
+            direction.z = Number(moveForward) - Number(moveBackward);
+            direction.x = Number(moveRight) - Number(moveLeft);
+            direction.normalize();
+        }
 
         const speed = isSprinting ? 800.0 : 400.0;
         camera.fov += ((isSprinting ? 90 : 75) - camera.fov) * 5 * dt;
