@@ -457,9 +457,9 @@ container.appendChild(renderer.domElement);
 // GTA/Saints Row style Post-processing (Bloom for neon signs and realistic glow)
 const renderScene = new THREE.RenderPass(scene, camera);
 const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-bloomPass.threshold = 0.1;
-bloomPass.strength = 1.6;
-bloomPass.radius = 0.5;
+bloomPass.threshold = 0.95;
+bloomPass.strength = 1.0;
+bloomPass.radius = 0.8;
 
 composer = new THREE.EffectComposer(renderer);
 composer.addPass(renderScene);
