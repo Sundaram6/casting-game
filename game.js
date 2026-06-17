@@ -426,7 +426,7 @@ const NEPO_HOUSES = [
 // ─── THREE.JS SETUP ──────────────────────────────────────────────────────────
 
 const container = document.getElementById('game-container');
-const scene = new THREE.Scene();
+scene = new THREE.Scene();
 
 // High noon sky gradient
 const skyCanvas = document.createElement('canvas');
@@ -441,10 +441,10 @@ skyCtx.fillRect(0, 0, 2, 512);
 scene.background = new THREE.CanvasTexture(skyCanvas);
 scene.fog = new THREE.FogExp2(0xa8d5e8, 0.008);
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.y = 2;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.shadowMap.enabled = true;
