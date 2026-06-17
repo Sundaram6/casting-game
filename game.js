@@ -21,7 +21,7 @@ const vicScore = document.getElementById('vic-score');
 
 // --- Game State ---
 let gameState = 'START';
-let camera, scene, renderer, composer;
+let camera, scene, renderer;
 let score = 0;
 let totalOffices = 15;
 let officesCompleted = 0;
@@ -454,16 +454,6 @@ renderer.toneMappingExposure = 1.1;
 renderer.outputEncoding = THREE.sRGBEncoding;
 container.appendChild(renderer.domElement);
 
-// GTA/Saints Row style Post-processing (Bloom for neon signs and realistic glow)
-const renderScene = new THREE.RenderPass(scene, camera);
-const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-bloomPass.threshold = 0.95;
-bloomPass.strength = 1.0;
-bloomPass.radius = 0.8;
-
-composer = new THREE.EffectComposer(renderer);
-composer.addPass(renderScene);
-composer.addPass(bloomPass);
 
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
 
@@ -1906,15 +1896,12 @@ function animate() {
     });
 
     renderer.render(scene, camera);
-    // composer.render() replaces renderer.render() for post-processing
-    composer.render();
 }
 
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    composer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 });
 
