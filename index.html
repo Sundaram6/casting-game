@@ -9,6 +9,11 @@
 </head>
 <body>
     <!-- 3D Canvas -->
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            fetch('/log_error?msg=' + encodeURIComponent(message + ' at ' + lineno + ':' + colno));
+        };
+    </script>
     <div id="game-container">
         <!-- Crosshair -->
         <div id="crosshair">+</div>
@@ -18,6 +23,7 @@
             <div class="hud-item">Score: <span id="hud-score">0</span></div>
             <div class="hud-item">Offices Remaining: <span id="hud-offices">5</span></div>
         </div>
+        <div id="buzz-layer"></div>
 
         <!-- UI Screens Layer -->
         <div id="ui-layer">
@@ -67,6 +73,31 @@
                 <p>Nepotism wins again!</p>
                 <p>Final Score: <span id="vic-score">0</span></p>
                 <button id="play-again-btn" class="btn">Play Again</button>
+            </div>
+
+            <div id="celebration-screen" class="screen hidden">
+                <div id="celebration-stage">
+                    <div id="producer-scene" class="celebration-scene hidden">
+                        <div class="hallway">
+                            <div class="hall-light"></div>
+                            <div class="door-frame">
+                                <div class="door-left"></div>
+                                <div class="door-right"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="entourage-scene" class="celebration-scene hidden">
+                        <div class="entourage-person coffee">Coffee</div>
+                        <div class="entourage-person script">Script</div>
+                        <div class="entourage-person umbrella">Umbrella</div>
+                        <div class="entourage-person manager">Sir! Sir!</div>
+                    </div>
+                    <h1 id="celebration-title"></h1>
+                    <p id="celebration-subtitle"></p>
+                    <div id="sir-chorus">
+                        <span>Sir!</span><span>Sir!</span><span>Sir!</span><span>Sir!</span>
+                    </div>
+                </div>
             </div>
 
         </div>

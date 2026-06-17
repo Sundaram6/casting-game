@@ -3,11 +3,13 @@ const screens = {
     start: document.getElementById('start-screen'),
     typing: document.getElementById('typing-screen'),
     gameOver: document.getElementById('game-over-screen'),
-    victory: document.getElementById('victory-screen')
+    victory: document.getElementById('victory-screen'),
+    celebration: document.getElementById('celebration-screen')
 };
 
 const crosshair = document.getElementById('crosshair');
 const hud = document.getElementById('hud');
+const buzzLayer = document.getElementById('buzz-layer');
 const hudScore = document.getElementById('hud-score');
 const hudOffices = document.getElementById('hud-offices');
 const typedTextEl = document.getElementById('typed-text');
@@ -46,6 +48,8 @@ sounds.bgm.loop = true;
 sounds.bgm.volume = 0.2;
 sounds.chatter.loop = true;
 sounds.chatter.volume = 0.4;
+sounds.sensual.volume = 0.85;
+sounds.victorious.volume = 0.75;
 
 function playSound(snd) {
     snd.currentTime = 0;
@@ -154,6 +158,98 @@ function createNeonSignTexture(text, neonColor = '#ff0055', bgColor = '#0a0010')
     const cvs = document.createElement('canvas');
     cvs.width = 1024; cvs.height = 256;
     const ctx = cvs.getContext('2d');
+    
+    // Parody Logos for specific production houses
+    if (text === 'Dharma Prod.') {
+        ctx.fillStyle = '#0a1a3a'; // Deep blue
+        ctx.fillRect(0, 0, 1024, 256);
+        ctx.fillStyle = '#FFD700'; // Gold
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 110px "Times New Roman", serif';
+        ctx.fillText('DHARMA', 512, 110);
+        ctx.font = 'italic 40px "Times New Roman", serif';
+        ctx.fillText('PRODUCTIONS', 512, 180);
+        ctx.font = '50px Arial';
+        ctx.fillText('★', 512, 35);
+        return new THREE.CanvasTexture(cvs);
+    } else if (text === 'YRF Studios') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 1024, 256);
+        ctx.fillStyle = '#cc0000'; // Red stroke
+        ctx.fillRect(300, 60, 424, 136);
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'italic bold 110px Arial';
+        ctx.fillText('Y R F', 512, 135);
+        return new THREE.CanvasTexture(cvs);
+    } else if (text === 'Netflex') {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, 1024, 256);
+        ctx.fillStyle = '#E50914'; // Netflix Red
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 140px "Impact", sans-serif';
+        ctx.fillText('NETFLEX', 512, 128);
+        return new THREE.CanvasTexture(cvs);
+    } else if (text === 'Warner Bros') {
+        ctx.fillStyle = '#008ae6';
+        ctx.fillRect(0, 0, 1024, 256);
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 90px "Times New Roman", serif';
+        ctx.fillText('WARNER BROS.', 512, 128);
+        // Add a shield outline
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 8;
+        ctx.strokeRect(10, 10, 1004, 236);
+        return new THREE.CanvasTexture(cvs);
+    } else if (text === 'Excel Ent') {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, 1024, 256);
+        ctx.fillStyle = '#cc0000';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 150px Arial';
+        ctx.fillText('E', 220, 128);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '50px Arial';
+        ctx.fillText('EXCEL', 340, 90);
+        ctx.fillText('ENTERTAINMENT', 340, 160);
+        return new THREE.CanvasTexture(cvs);
+    } else if (text === 'A25') {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, 1024, 256);
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 160px sans-serif';
+        ctx.fillText('A25', 512, 128);
+        return new THREE.CanvasTexture(cvs);
+    } else if (text === 'Pear TV') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 1024, 256);
+        ctx.fillStyle = '#000000';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 100px sans-serif';
+        ctx.fillText('🍐 tv+', 512, 128);
+        return new THREE.CanvasTexture(cvs);
+    } else if (text === 'Paramount') {
+        ctx.fillStyle = '#003366';
+        ctx.fillRect(0, 0, 1024, 256);
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = 'bold 80px "Times New Roman", serif';
+        ctx.fillText('Paramount', 512, 140);
+        ctx.font = '50px Arial';
+        ctx.fillText('🏔️', 512, 60);
+        return new THREE.CanvasTexture(cvs);
+    }
+
     ctx.fillStyle = bgColor;
     ctx.fillRect(0, 0, 1024, 256);
 
@@ -182,24 +278,28 @@ function createNeonSignTexture(text, neonColor = '#ff0055', bgColor = '#0a0010')
 
 function createNepoSignTexture() {
     const cvs = document.createElement('canvas');
-    cvs.width = 512; cvs.height = 200;
+    cvs.width = 768; cvs.height = 300;
     const ctx = cvs.getContext('2d');
 
     // Deep velvet background
     ctx.fillStyle = '#1a0008';
-    ctx.fillRect(0, 0, 512, 200);
+    ctx.fillRect(0, 0, 768, 300);
 
     // Gold border
     ctx.strokeStyle = '#FFD700';
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 10;
     ctx.shadowColor = '#FFD700';
-    ctx.shadowBlur = 15;
-    ctx.strokeRect(6, 6, 500, 188);
+    ctx.shadowBlur = 18;
+    ctx.strokeRect(8, 8, 752, 284);
     ctx.shadowBlur = 0;
 
     // Crown emoji at top
-    ctx.font = '40px Arial';
+    ctx.font = 'bold 48px Arial Black, Arial';
     ctx.textAlign = 'center';
+    ctx.fillStyle = '#1a0008';
+    ctx.fillRect(40, 36, 688, 48);
+    ctx.fillStyle = '#FFD700';
+    ctx.fillText('VIP BLOODLINE ENTRY', 384, 68);
     ctx.fillText('👑', 256, 52);
 
     // Main text — gold neon
@@ -223,6 +323,58 @@ function createNepoSignTexture() {
     ctx.font = '18px Arial';
     ctx.fillText('(nepo dogs welcome)', 256, 175);
 
+    ctx.fillStyle = '#1a0008';
+    ctx.fillRect(28, 28, 712, 244);
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(34, 34, 700, 232);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#FFD700';
+    ctx.shadowColor = '#FFD700';
+    ctx.shadowBlur = 20;
+    ctx.font = 'bold 46px Arial Black, Arial';
+    ctx.fillText('ONLY STAR KIDS', 384, 92);
+    ctx.shadowColor = '#ff0033';
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = '#ff4466';
+    ctx.font = 'bold 32px Arial Black, Arial';
+    ctx.fillText('AND THEIR DOGS ALLOWED', 384, 154);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#f8f3d4';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText('No audition. No queue. No problem.', 384, 218);
+
+    return new THREE.CanvasTexture(cvs);
+}
+
+function createAllowedSignTexture() {
+    const cvs = document.createElement('canvas');
+    cvs.width = 512; cvs.height = 512;
+    const ctx = cvs.getContext('2d');
+    ctx.fillStyle = '#071014';
+    ctx.fillRect(0, 0, 512, 512);
+    ctx.fillStyle = '#ffd700';
+    ctx.fillRect(18, 18, 476, 476);
+    ctx.fillStyle = '#13080d';
+    ctx.fillRect(34, 34, 444, 444);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 44px Arial Black, Arial';
+    ctx.fillText('ENTRY', 256, 96);
+    ctx.fillText('RESTRICTED', 256, 148);
+    ctx.fillStyle = '#ff4466';
+    ctx.font = 'bold 31px Arial Black, Arial';
+    ctx.fillText('STAR KIDS ONLY', 256, 236);
+    ctx.fillText('+ THEIR DOGS', 256, 286);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 26px Arial';
+    ctx.fillText('regular actors wait outside', 256, 362);
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(180, 420, 22, 0, Math.PI * 2);
+    ctx.arc(326, 420, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillRect(180, 410, 146, 20);
     return new THREE.CanvasTexture(cvs);
 }
 
@@ -293,10 +445,12 @@ camera.position.y = 2;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.1;
+renderer.outputEncoding = THREE.sRGBEncoding;
 container.appendChild(renderer.domElement);
 
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
@@ -323,6 +477,8 @@ let headBobTimer = 0;
 let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
 let prevTime = performance.now();
+
+
 
 // ─── LIGHTING ────────────────────────────────────────────────────────────────
 
@@ -510,6 +666,21 @@ function createOfficeBuilding(config, isNepo = false) {
         nepoSign.position.set(0, bh / 2 - 2, bd / 2 + 0.15);
         group.add(nepoSign);
 
+        const gateSignGeo = new THREE.PlaneGeometry(5.2, 5.2);
+        const gateSignMat = new THREE.MeshBasicMaterial({ map: createAllowedSignTexture(), transparent: true });
+        const gateSign = new THREE.Mesh(gateSignGeo, gateSignMat);
+        gateSign.position.set(-5.8, -bh / 2 + 3.5, bd / 2 + 4.2);
+        gateSign.rotation.y = -0.12;
+        group.add(gateSign);
+
+        const gatePost = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.1, 0.1, 3.6, 8),
+            new THREE.MeshStandardMaterial({ color: 0x1b1b1b, metalness: 0.6, roughness: 0.3 })
+        );
+        gatePost.position.set(-5.8, -bh / 2 + 1.2, bd / 2 + 4.1);
+        gatePost.castShadow = true;
+        group.add(gatePost);
+
         // Gold light halo above
         const haloLight = new THREE.PointLight(0xFFD700, 2.5, 40);
         haloLight.position.y = bh / 2 + 6;
@@ -572,6 +743,77 @@ function createOfficeBuilding(config, isNepo = false) {
     const entryLight = new THREE.PointLight(isNepo ? 0xFFD700 : 0xfffa65, isNepo ? 2 : 1, isNepo ? 45 : 30);
     entryLight.position.set(0, -bh / 2 + 5, bd / 2 + 5);
     group.add(entryLight);
+
+    const propDark = new THREE.MeshStandardMaterial({ color: 0x111820, roughness: 0.65, metalness: 0.25 });
+    const propMetal = new THREE.MeshStandardMaterial({ color: 0x889099, roughness: 0.3, metalness: 0.7 });
+    const propGold = new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.2, metalness: 0.85 });
+    const barrierMat = new THREE.MeshStandardMaterial({ color: isNepo ? 0xffd700 : 0xd9d9d9, roughness: 0.45, metalness: 0.4 });
+
+    [-1, 1].forEach(side => {
+        const barrier = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.22, 0.22), barrierMat);
+        barrier.position.set(side * 5.2, -bh / 2 + 1.15, bd / 2 + 8.4);
+        barrier.rotation.y = side * 0.26;
+        barrier.castShadow = true;
+        group.add(barrier);
+
+        for (let j = 0; j < 2; j++) {
+            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 1.4, 8), barrierMat);
+            post.position.set(side * (3.2 + j * 3), -bh / 2 + 0.72, bd / 2 + 7.9 + j * 0.75);
+            post.castShadow = true;
+            group.add(post);
+        }
+    });
+
+    if (isNepo) {
+        [-1, 1].forEach(side => {
+            const tripod = new THREE.Group();
+            const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.4, 8), propMetal);
+            stand.position.y = 1.2;
+            tripod.add(stand);
+            [-0.45, 0, 0.45].forEach((rx, i) => {
+                const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.5, 6), propMetal);
+                leg.position.set(rx, 0.35, i === 1 ? 0.45 : -0.3);
+                leg.rotation.z = rx * 0.8;
+                leg.rotation.x = i === 1 ? 0.45 : -0.35;
+                tripod.add(leg);
+            });
+            const cameraBody = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.42, 0.5), propDark);
+            cameraBody.position.y = 2.55;
+            tripod.add(cameraBody);
+            const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.22, 0.45, 16), propDark);
+            lens.position.set(0, 2.55, -0.42);
+            lens.rotation.x = Math.PI / 2;
+            tripod.add(lens);
+            const flash = new THREE.PointLight(0xffffff, 1.4, 18);
+            flash.position.set(0, 2.95, -0.8);
+            tripod.add(flash);
+            tripod.position.set(side * 8.2, -bh / 2 + 0.1, bd / 2 + 9.8);
+            tripod.rotation.y = side * -0.7;
+            group.add(tripod);
+        });
+
+        const star = new THREE.Mesh(new THREE.TorusGeometry(1.1, 0.08, 8, 5), propGold);
+        star.position.set(0, -bh / 2 + 0.18, bd / 2 + 14.3);
+        star.rotation.x = -Math.PI / 2;
+        star.castShadow = true;
+        group.add(star);
+    } else {
+        const noticeBoard = new THREE.Mesh(
+            new THREE.BoxGeometry(3.4, 2.2, 0.16),
+            new THREE.MeshStandardMaterial({ color: 0x213547, roughness: 0.7 })
+        );
+        noticeBoard.position.set(4.8, -bh / 2 + 2.1, bd / 2 + 3.4);
+        noticeBoard.rotation.y = -0.28;
+        noticeBoard.castShadow = true;
+        group.add(noticeBoard);
+        const paper = new THREE.Mesh(
+            new THREE.BoxGeometry(2.5, 1.45, 0.03),
+            new THREE.MeshBasicMaterial({ color: 0xf6f1df })
+        );
+        paper.position.set(4.8, -bh / 2 + 2.1, bd / 2 + 3.5);
+        paper.rotation.y = -0.28;
+        group.add(paper);
+    }
 
     // Studio name sign
     const signGeo = new THREE.PlaneGeometry(isNepo ? 16 : 12, isNepo ? 4 : 3);
@@ -642,96 +884,218 @@ function createBouncerMesh() {
     return g;
 }
 
+const skinPalette = [0xf0c7a1, 0xd9a16e, 0xb97a52, 0x8f563b, 0x5c3528, 0x3b241c];
+const hairPalette = [0x14100d, 0x2a1b13, 0x4a2c18, 0x6a4a2f, 0xb48a54, 0xeeeeee];
+const actorClothes = [0x1f6f8b, 0xe76f51, 0x2a9d8f, 0xf4a261, 0x6d597a, 0x355070, 0x7f5539, 0x3a5a40];
+const nepoClothes = [0xffd166, 0xf72585, 0x7209b7, 0x0d1b2a, 0xffffff, 0x06d6a0];
+const mutedPants = [0x20242b, 0x2f3e46, 0x4a4e69, 0x3d405b, 0x22223b, 0x5c677d];
+
+function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function createCapsuleLikeGeometry(radius, length, radialSegments = 14) {
+    if (THREE.CapsuleGeometry) {
+        return new THREE.CapsuleGeometry(radius, length, 8, radialSegments);
+    }
+    return new THREE.CylinderGeometry(radius, radius, length + radius * 2, radialSegments);
+}
+
+function addRoundedCapsule(group, radius, length, material, position, rotation = [0, 0, 0], name = '') {
+    const geo = createCapsuleLikeGeometry(radius, length, 14);
+    const mesh = new THREE.Mesh(geo, material);
+    mesh.position.set(position[0], position[1], position[2]);
+    mesh.rotation.set(rotation[0], rotation[1], rotation[2]);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    if (name) mesh.name = name;
+    group.add(mesh);
+    return mesh;
+}
+
 function createPersonMesh(isNepo = false) {
     const person = new THREE.Group();
 
-    const skinHue = 0.06 + Math.random() * 0.08;
-    const skinColor = new THREE.Color().setHSL(skinHue, 0.4, 0.3 + Math.random() * 0.5);
-    const shirtColor = isNepo
-        ? new THREE.Color().setHSL(0.13, 0.9, 0.55)
-        : new THREE.Color().setHSL(Math.random(), 0.8, 0.5);
-    const pantsColor = isNepo
-        ? new THREE.Color(0.9, 0.8, 0.1)
-        : new THREE.Color().setHSL(Math.random(), 0.8, 0.3);
+    const bodyScale = 0.88 + Math.random() * 0.26;
+    const heightScale = 0.9 + Math.random() * 0.22;
+    person.scale.set(bodyScale, heightScale, bodyScale);
 
-    const skinMat = new THREE.MeshStandardMaterial({ color: skinColor, roughness: 0.5 });
-    const shirtMat = new THREE.MeshStandardMaterial({ color: shirtColor, roughness: 0.6, metalness: isNepo ? 0.3 : 0 });
-    const pantsMat = new THREE.MeshStandardMaterial({ color: pantsColor, roughness: 0.8 });
+    const skinMat = new THREE.MeshStandardMaterial({ color: pick(skinPalette), roughness: 0.58 });
+    const hairMat = new THREE.MeshStandardMaterial({ color: pick(hairPalette), roughness: 0.86 });
+    const shirtMat = new THREE.MeshStandardMaterial({
+        color: pick(isNepo ? nepoClothes : actorClothes),
+        roughness: isNepo ? 0.35 : 0.66,
+        metalness: isNepo ? 0.18 : 0.02
+    });
+    const jacketMat = new THREE.MeshStandardMaterial({
+        color: isNepo ? pick([0xffffff, 0xffd700, 0x111111, 0x581845]) : pick([0x222831, 0x3c4048, 0x6b705c, 0x264653]),
+        roughness: 0.72,
+        metalness: isNepo ? 0.08 : 0.02
+    });
+    const pantsMat = new THREE.MeshStandardMaterial({
+        color: isNepo ? pick([0xf8f3d4, 0x111111, 0x2b2d42, 0xffd166]) : pick(mutedPants),
+        roughness: 0.82
+    });
+    const shoeMat = new THREE.MeshStandardMaterial({ color: pick([0x0d0d0d, 0xffffff, 0x5a3e2b, 0x222222]), roughness: 0.62 });
+    const darkMat = new THREE.MeshStandardMaterial({ color: 0x101014, roughness: 0.5, metalness: isNepo ? 0.35 : 0.05 });
+    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+    const bagMat = new THREE.MeshStandardMaterial({ color: pick([0x5c4033, 0x111111, 0x8d5524, 0xb5651d]), roughness: 0.75 });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.85, roughness: 0.18 });
 
-    // Head (Sphere)
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.6, 16, 16), skinMat);
-    head.position.y = 4.2;
+    const torsoY = 2.35;
+    const headY = 4.25;
+
+    const torso = addRoundedCapsule(person, 0.58, 1.35, shirtMat, [0, torsoY, 0], [0, 0, 0], 'torso');
+    torso.scale.set(1.05, 1.08, 0.68);
+
+    const chest = new THREE.Mesh(new THREE.SphereGeometry(0.76, 18, 12), shirtMat);
+    chest.position.set(0, 3.02, 0);
+    chest.scale.set(1.0, 0.42, 0.58);
+    chest.castShadow = true;
+    person.add(chest);
+
+    const hips = new THREE.Mesh(new THREE.SphereGeometry(0.62, 16, 10), pantsMat);
+    hips.position.set(0, 1.62, 0);
+    hips.scale.set(1.0, 0.36, 0.58);
+    hips.castShadow = true;
+    person.add(hips);
+
+    const shoulderBar = new THREE.Mesh(createCapsuleLikeGeometry(0.16, 1.25, 12), jacketMat);
+    shoulderBar.position.set(0, 3.2, 0);
+    shoulderBar.rotation.z = Math.PI / 2;
+    shoulderBar.castShadow = true;
+    person.add(shoulderBar);
+
+    if (Math.random() > (isNepo ? 0.15 : 0.45)) {
+        const jacket = new THREE.Mesh(new THREE.BoxGeometry(1.18, 1.45, 0.08), jacketMat);
+        jacket.position.set(0, 2.42, 0.43);
+        jacket.castShadow = true;
+        person.add(jacket);
+    }
+
+    const neck = addRoundedCapsule(person, 0.18, 0.18, skinMat, [0, 3.56, 0]);
+
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.52, 24, 18), skinMat);
+    head.position.y = headY;
+    head.scale.set(0.88 + Math.random() * 0.2, 1.08, 0.92);
     head.castShadow = true;
     person.add(head);
 
-    // Hair (Hemisphere)
-    const hairGeo = new THREE.SphereGeometry(0.62, 16, 16, 0, Math.PI * 2, 0, Math.PI / 1.8);
-    const hairMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+    const hairStyle = Math.floor(Math.random() * 4);
+    const hairGeo = new THREE.SphereGeometry(0.54, 18, 12, 0, Math.PI * 2, 0, Math.PI / (hairStyle === 0 ? 1.75 : 1.35));
     const hair = new THREE.Mesh(hairGeo, hairMat);
-    hair.position.y = 4.2;
+    hair.position.set(0, headY + (hairStyle === 3 ? 0.02 : 0.08), -0.02);
+    hair.scale.set(1.04, hairStyle === 2 ? 0.72 : 0.9, 1.02);
+    hair.castShadow = true;
     person.add(hair);
-
-    if (isNepo) {
-        // Crown
-        const crownGeo = new THREE.CylinderGeometry(0.3, 0.4, 0.4, 6);
-        const crownMat = new THREE.MeshStandardMaterial({ color: 0xFFD700, metalness: 0.9, roughness: 0.1 });
-        const crown = new THREE.Mesh(crownGeo, crownMat);
-        crown.position.y = 5.0;
-        person.add(crown);
-        // Shades
-        const shadesMat = new THREE.MeshStandardMaterial({ color: 0x000000, metalness: 0.8, roughness: 0.1 });
-        const shades = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.25, 0.15), shadesMat);
-        shades.position.set(0, 4.3, 0.55);
-        person.add(shades);
+    if (hairStyle === 1 || hairStyle === 3) {
+        const bun = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 10), hairMat);
+        bun.position.set(0, headY + 0.02, -0.52);
+        bun.castShadow = true;
+        person.add(bun);
     }
 
-    // Torso (Cylinder, tapered)
-    const torsoGeo = new THREE.CylinderGeometry(0.7, 0.6, 2.2, 12);
-    const torso = new THREE.Mesh(torsoGeo, shirtMat);
-    torso.position.y = 2.5;
-    torso.castShadow = true;
-    person.add(torso);
+    const eyeGeo = new THREE.SphereGeometry(0.045, 8, 6);
+    [-0.16, 0.16].forEach(x => {
+        const eye = new THREE.Mesh(eyeGeo, darkMat);
+        eye.position.set(x, headY + 0.08, 0.48);
+        person.add(eye);
+    });
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.16, 8), skinMat);
+    nose.position.set(0, headY - 0.04, 0.52);
+    nose.rotation.x = Math.PI / 2;
+    person.add(nose);
+    const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.025, 0.025), darkMat);
+    mouth.position.set(0, headY - 0.22, 0.5);
+    person.add(mouth);
 
-    // Limbs
-    const armGeo = new THREE.CylinderGeometry(0.2, 0.15, 2.0, 8);
-    armGeo.translate(0, -0.8, 0); // Pivot at shoulder
-    
-    const armL = new THREE.Mesh(armGeo, skinMat);
+    if (isNepo) {
+        const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.38, 0.26, 8), goldMat);
+        crown.position.y = 4.98;
+        crown.castShadow = true;
+        person.add(crown);
+        const shades = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.18, 0.08), darkMat);
+        shades.position.set(0, 4.3, 0.55);
+        person.add(shades);
+        const chain = new THREE.Mesh(new THREE.TorusGeometry(0.33, 0.025, 8, 20), goldMat);
+        chain.position.set(0, 3.55, 0.16);
+        chain.rotation.x = Math.PI / 2.25;
+        person.add(chain);
+    }
+
+    const upperArmGeo = createCapsuleLikeGeometry(0.13, 0.72, 10);
+    upperArmGeo.translate(0, -0.45, 0);
+    const foreArmGeo = createCapsuleLikeGeometry(0.11, 0.62, 10);
+    foreArmGeo.translate(0, -0.4, 0);
+
+    const armL = new THREE.Group();
     armL.position.set(-0.9, 3.4, 0);
-    armL.castShadow = true;
+    const armLTop = new THREE.Mesh(upperArmGeo, shirtMat);
+    armLTop.castShadow = true;
+    armL.add(armLTop);
+    const foreL = new THREE.Mesh(foreArmGeo, skinMat);
+    foreL.position.set(0, -0.84, 0.03);
+    foreL.rotation.x = 0.08;
+    foreL.castShadow = true;
+    armL.add(foreL);
     person.add(armL);
     
-    const armR = new THREE.Mesh(armGeo, skinMat);
+    const armR = new THREE.Group();
     armR.position.set(0.9, 3.4, 0);
-    armR.castShadow = true;
+    const armRTop = new THREE.Mesh(upperArmGeo, shirtMat);
+    armRTop.castShadow = true;
+    armR.add(armRTop);
+    const foreR = new THREE.Mesh(foreArmGeo, skinMat);
+    foreR.position.set(0, -0.84, 0.03);
+    foreR.rotation.x = -0.08;
+    foreR.castShadow = true;
+    armR.add(foreR);
     person.add(armR);
 
-    const legGeo = new THREE.CylinderGeometry(0.25, 0.2, 2.2, 8);
-    legGeo.translate(0, -1.0, 0); // Pivot at hip
+    const legGeo = createCapsuleLikeGeometry(0.18, 1.18, 10);
+    legGeo.translate(0, -0.75, 0);
     
     const legL = new THREE.Mesh(legGeo, pantsMat);
-    legL.position.set(-0.35, 1.4, 0);
+    legL.position.set(-0.28, 1.42, 0);
     legL.castShadow = true;
     person.add(legL);
     
     const legR = new THREE.Mesh(legGeo, pantsMat);
-    legR.position.set(0.35, 1.4, 0);
+    legR.position.set(0.28, 1.42, 0);
     legR.castShadow = true;
     person.add(legR);
 
-    // Feet
-    const shoeGeo = new THREE.BoxGeometry(0.3, 0.2, 0.6);
-    const shoeMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
+    const shoeGeo = new THREE.BoxGeometry(0.34, 0.18, 0.7);
     const shoeL = new THREE.Mesh(shoeGeo, shoeMat);
-    shoeL.position.set(0, -2.1, 0.1);
+    shoeL.position.set(0, -1.46, 0.16);
     legL.add(shoeL);
     const shoeR = new THREE.Mesh(shoeGeo, shoeMat);
-    shoeR.position.set(0, -2.1, 0.1);
+    shoeR.position.set(0, -1.46, 0.16);
     legR.add(shoeR);
 
+    if (!isNepo && Math.random() > 0.35) {
+        const portfolio = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.72, 0.08), bagMat);
+        portfolio.position.set(-1.18, 2.35, 0.12);
+        portfolio.rotation.z = 0.08;
+        portfolio.castShadow = true;
+        person.add(portfolio);
+    }
+    if (Math.random() > 0.58) {
+        const phone = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.32, 0.035), darkMat);
+        phone.position.set(0.98, 2.45, 0.28);
+        phone.rotation.set(-0.45, 0.1, -0.18);
+        person.add(phone);
+    }
+    if (!isNepo && Math.random() > 0.72) {
+        const auditionTag = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.24, 0.02), whiteMat);
+        auditionTag.position.set(0.28, 2.82, 0.46);
+        person.add(auditionTag);
+    }
+
     person.userData = {
-        legL, legR, armL, armR,
+        legL, legR, armL, armR, head, chest,
         walkTime: Math.random() * 100,
+        idleOffset: Math.random() * Math.PI * 2,
         isNepo
     };
 
@@ -824,6 +1188,8 @@ function createDogMesh() {
 function createOffices() {
     offices.forEach(o => scene.remove(o.group));
     offices = [];
+    nepoDogs.forEach(d => scene.remove(d.mesh));
+    nepoDogs = [];
 
     // Normal offices
     for (let i = 0; i < totalOffices; i++) {
@@ -901,16 +1267,49 @@ function createCrowds() {
     crowds.forEach(c => scene.remove(c.mesh));
     crowds = [];
 
-    for (let i = 0; i < 50; i++) {
+    const spawnCrowdMember = (x, z, vx, vz, mood = 'wander') => {
         const mesh = createPersonMesh(false);
-        mesh.position.set((Math.random() - 0.5) * 200, 1, (Math.random() - 0.5) * 200);
+        mesh.position.set(x, 1, z);
         scene.add(mesh);
         crowds.push({
             mesh,
-            vx: (Math.random() - 0.5) * 8,
-            vz: (Math.random() - 0.5) * 8,
+            vx,
+            vz,
+            mood,
+            baseX: x,
+            baseZ: z,
             changeTimer: Math.random() * 2
         });
+    };
+
+    offices.slice(0, 10).forEach((office, officeIndex) => {
+        const base = office.group.position;
+        const forward = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), office.group.rotation.y);
+        const side = new THREE.Vector3(forward.z, 0, -forward.x);
+        for (let i = 0; i < 5; i++) {
+            const offset = 9 + i * 2.1 + Math.random() * 0.6;
+            const lane = (i % 2 === 0 ? -0.7 : 0.7) + (Math.random() - 0.5) * 0.4;
+            const x = base.x + forward.x * offset + side.x * lane;
+            const z = base.z + forward.z * offset + side.z * lane;
+            spawnCrowdMember(x, z, (Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 1.5, 'queue');
+        }
+        if (officeIndex % 2 === 0) {
+            for (let i = 0; i < 3; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = 14 + Math.random() * 8;
+                spawnCrowdMember(base.x + Math.cos(angle) * dist, base.z + Math.sin(angle) * dist, (Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3, 'cluster');
+            }
+        }
+    });
+
+    for (let i = 0; i < 45; i++) {
+        spawnCrowdMember(
+            (Math.random() - 0.5) * 240,
+            (Math.random() - 0.5) * 240,
+            (Math.random() - 0.5) * 6,
+            (Math.random() - 0.5) * 6,
+            'wander'
+        );
     }
 }
 
@@ -941,10 +1340,26 @@ function spawnFireworks(x, y, z) {
 const actorPhrases = [
     "I am an actor", "My height is six foot", "I can cry on cue",
     "Do you have a role for me?", "I have done theatre for five years",
-    "I am very passionate"
+    "I am very passionate", "Sir, one chance please", "I can do villain also",
+    "My profile is updated", "I brought my portfolio"
 ];
 const officePhrases = ["Fit", "Not fit"];
 const nepoPhrases = ["Papa called them", "VIP entry bhai", "Straight to the director", "No audition needed"];
+
+function spawnBuzzBubble(text, nearCenter = false) {
+    if (!buzzLayer || (gameState !== 'PLAYING' && gameState !== 'CELEBRATING')) return;
+    const bubble = document.createElement('div');
+    bubble.className = 'buzz-bubble';
+    bubble.innerText = text;
+    const left = nearCenter ? 35 + Math.random() * 30 : 8 + Math.random() * 78;
+    const top = 24 + Math.random() * 54;
+    bubble.style.left = left + 'vw';
+    bubble.style.top = top + 'vh';
+    bubble.style.animationDuration = (2.5 + Math.random() * 1.6).toFixed(2) + 's';
+    bubble.style.transform = `rotate(${(Math.random() - 0.5) * 8}deg)`;
+    buzzLayer.appendChild(bubble);
+    setTimeout(() => bubble.remove(), 4300);
+}
 
 function getVolumeByDistance(pos, maxDist = 40) {
     const dist = camera.position.distanceTo(pos);
@@ -966,7 +1381,9 @@ setInterval(() => {
         }
         let vol = getVolumeByDistance(nearest.mesh.position, 40);
         if (vol > 0.05) {
-            const u = new SpeechSynthesisUtterance(actorPhrases[Math.floor(Math.random() * actorPhrases.length)]);
+            const phrase = actorPhrases[Math.floor(Math.random() * actorPhrases.length)];
+            spawnBuzzBubble(phrase, minDist < 18);
+            const u = new SpeechSynthesisUtterance(phrase);
             u.volume = vol; u.pitch = 0.5 + Math.random(); u.rate = 0.8 + Math.random() * 0.5;
             window.speechSynthesis.speak(u);
         }
@@ -979,7 +1396,9 @@ setInterval(() => {
         }
         let vol = getVolumeByDistance(nearest.mesh.position, 35);
         if (vol > 0.05) {
-            const u = new SpeechSynthesisUtterance(nepoPhrases[Math.floor(Math.random() * nepoPhrases.length)]);
+            const phrase = nepoPhrases[Math.floor(Math.random() * nepoPhrases.length)];
+            spawnBuzzBubble(phrase, minDist < 18);
+            const u = new SpeechSynthesisUtterance(phrase);
             u.volume = vol; u.pitch = 1.2 + Math.random() * 0.5; u.rate = 1.0 + Math.random() * 0.3;
             window.speechSynthesis.speak(u);
         }
@@ -999,11 +1418,18 @@ setInterval(() => {
     }
 }, 350);
 
+setInterval(() => {
+    if (gameState !== 'PLAYING') return;
+    const phrasePool = Math.random() > 0.78 ? nepoPhrases : actorPhrases;
+    spawnBuzzBubble(phrasePool[Math.floor(Math.random() * phrasePool.length)], Math.random() > 0.65);
+}, 900);
+
 // ─── GAME LOGIC ──────────────────────────────────────────────────────────────
 
 function initGame() {
     score = 0;
     officesCompleted = 0;
+    if (buzzLayer) buzzLayer.innerHTML = '';
     updateHUD();
     createOffices();
     createCrowds();
@@ -1027,6 +1453,7 @@ function changeScreen(screenId) {
         void s.offsetWidth;
         s.classList.add('active');
         hud.style.display = screenId === 'typing-screen' ? 'flex' : 'none';
+        crosshair.style.display = 'none';
     } else {
         hud.style.display = 'flex';
         crosshair.style.display = 'block';
@@ -1077,49 +1504,95 @@ function handleGameOver() {
 }
 
 const winPhrases = [
-    { text: "The producer has called you at his home for dinner at midnight!", sound: "sensual" },
-    { text: "Sir your vanity van is ready!", sound: "victorious" }
+    {
+        type: "producer",
+        text: "The producer called. Private meeting inside.",
+        subtitle: "The door shuts. The saxophone understands the assignment.",
+        sound: "sensual"
+    },
+    {
+        type: "vanity",
+        text: "Sir, your vanity van is ready!",
+        subtitle: "Coffee, umbrella, script, and four people saying sir at once.",
+        sound: "victorious"
+    },
+    {
+        type: "script",
+        text: "Sir, the bound script has arrived!",
+        subtitle: "Everyone circles you like the industry has found its prince.",
+        sound: "victorious"
+    }
 ];
+
+function showCelebrationScene(chosen, afterScene) {
+    gameState = 'CELEBRATING';
+    const title = document.getElementById('celebration-title');
+    const subtitle = document.getElementById('celebration-subtitle');
+    const producerScene = document.getElementById('producer-scene');
+    const entourageScene = document.getElementById('entourage-scene');
+    const sirChorus = document.getElementById('sir-chorus');
+
+    if (title) title.innerText = chosen.text;
+    if (subtitle) subtitle.innerText = chosen.subtitle;
+    [producerScene, entourageScene].forEach(sceneEl => {
+        if (sceneEl) sceneEl.classList.add('hidden');
+    });
+    if (sirChorus) sirChorus.style.display = chosen.type === 'producer' ? 'none' : 'block';
+
+    if (chosen.type === 'producer' && producerScene) producerScene.classList.remove('hidden');
+    if (chosen.type !== 'producer' && entourageScene) entourageScene.classList.remove('hidden');
+
+    sounds.bgm.pause();
+    sounds.chatter.volume = chosen.type === 'producer' ? 0.08 : 0.25;
+    if (chosen.type === 'producer') {
+        sounds.sensual.currentTime = 0;
+        sounds.sensual.play().catch(() => {});
+    } else {
+        playSound(sounds.victorious);
+        ["Sir!", "Coffee, sir!", "Script, sir!", "Umbrella, sir!"].forEach((line, i) => {
+            setTimeout(() => {
+                spawnBuzzBubble(line, true);
+                if (window.speechSynthesis) {
+                    const u = new SpeechSynthesisUtterance(line);
+                    u.volume = 0.9; u.pitch = 0.9 + Math.random() * 0.4; u.rate = 0.9 + Math.random() * 0.2;
+                    window.speechSynthesis.speak(u);
+                }
+            }, i * 650);
+        });
+    }
+
+    changeScreen('celebration-screen');
+    setTimeout(() => {
+        sounds.sensual.pause();
+        sounds.chatter.volume = 0.4;
+        sounds.bgm.play().catch(() => {});
+        afterScene();
+    }, chosen.type === 'producer' ? 9200 : 7600);
+}
 
 function winMinigame() {
     const chosen = winPhrases[Math.floor(Math.random() * winPhrases.length)];
-    playSound(sounds[chosen.sound]); // Play dynamic sound
     
     currentOffice.completed = true;
     currentOffice.isWinning = true;
-    
-    // Show win message
-    const wm = document.getElementById('win-message-overlay');
-    const wmt = document.getElementById('win-message-text');
-    if(wm && wmt) {
-        wmt.innerText = chosen.text;
-        wm.classList.remove('hidden');
-        wm.style.display = 'block';
-        
-        // Remove pop animation to restart it
-        wmt.classList.remove('letter-pop');
-        void wmt.offsetWidth;
-        wmt.classList.add('letter-pop');
-        
-        setTimeout(() => {
-            wm.style.display = 'none';
-        }, 3000);
-    }
-    
+
     spawnFireworks(currentOffice.group.position.x, currentOffice.group.position.y + 10, currentOffice.group.position.z);
     
     score += Math.floor(100 * combo);
     officesCompleted++;
     updateHUD();
-    if (officesCompleted >= totalOffices) {
-        gameState = 'VICTORY';
-        vicScore.innerText = score;
-        controls.unlock();
-        changeScreen('victory-screen');
-    } else {
-        gameState = 'PLAYING';
-        changeScreen(null);
-    }
+
+    showCelebrationScene(chosen, () => {
+        if (officesCompleted >= totalOffices) {
+            gameState = 'VICTORY';
+            vicScore.innerText = score;
+            controls.unlock();
+            changeScreen('victory-screen');
+        } else {
+            gameState = 'PLAYING';
+            changeScreen(null);
+        }
+    });
 }
 
 // ─── INPUT ───────────────────────────────────────────────────────────────────
@@ -1192,16 +1665,25 @@ document.addEventListener('keyup', (e) => {
 function animatePerson(c, dt) {
     const speed = Math.sqrt(c.vx * c.vx + c.vz * c.vz);
     const ud = c.mesh.userData;
-    ud.walkTime += dt * speed * 2;
+    ud.walkTime += dt * Math.max(speed, 0.25) * 2;
     const wt = ud.walkTime;
     
-    // Rotate instead of translate for swinging limbs
-    if (ud.legL) ud.legL.rotation.x = Math.sin(wt) * 0.8;
-    if (ud.legR) ud.legR.rotation.x = Math.sin(wt + Math.PI) * 0.8;
-    if (ud.armL) ud.armL.rotation.x = Math.sin(wt + Math.PI) * 0.8;
-    if (ud.armR) ud.armR.rotation.x = Math.sin(wt) * 0.8;
+    const stride = Math.min(0.9, 0.22 + speed * 0.08);
+    if (ud.legL) ud.legL.rotation.x = Math.sin(wt) * stride;
+    if (ud.legR) ud.legR.rotation.x = Math.sin(wt + Math.PI) * stride;
+    if (ud.armL) ud.armL.rotation.x = Math.sin(wt + Math.PI) * stride * 0.78;
+    if (ud.armR) ud.armR.rotation.x = Math.sin(wt) * stride * 0.78;
+    if (ud.head) {
+        ud.head.rotation.y = Math.sin(wt * 0.35 + ud.idleOffset) * 0.16;
+        ud.head.rotation.x = Math.sin(wt * 0.5 + ud.idleOffset) * 0.04;
+    }
+    if (ud.chest) ud.chest.position.y = 3.02 + Math.sin(wt * 2) * 0.025;
     
-    c.mesh.rotation.y = Math.atan2(c.vx, c.vz);
+    if (speed > 0.05) {
+        c.mesh.rotation.y = Math.atan2(c.vx, c.vz);
+    } else {
+        c.mesh.rotation.y += Math.sin(wt * 0.6 + ud.idleOffset) * dt * 0.3;
+    }
 }
 
 function animateDog(d, dt) {
@@ -1314,12 +1796,17 @@ function animate() {
         crowds.forEach(c => {
             c.changeTimer -= dt;
             if (c.changeTimer <= 0) {
-                c.vx = (Math.random() - 0.5) * 10;
-                c.vz = (Math.random() - 0.5) * 10;
-                c.changeTimer = 1 + Math.random() * 2;
+                const drift = c.mood === 'queue' ? 0.9 : c.mood === 'cluster' ? 2.4 : 7;
+                c.vx = (Math.random() - 0.5) * drift;
+                c.vz = (Math.random() - 0.5) * drift;
+                c.changeTimer = c.mood === 'queue' ? 1.5 + Math.random() * 2.5 : 1 + Math.random() * 2;
             }
             c.mesh.position.x += c.vx * dt;
             c.mesh.position.z += c.vz * dt;
+            if (c.mood === 'queue' || c.mood === 'cluster') {
+                c.mesh.position.x += (c.baseX - c.mesh.position.x) * dt * (c.mood === 'queue' ? 1.8 : 0.7);
+                c.mesh.position.z += (c.baseZ - c.mesh.position.z) * dt * (c.mood === 'queue' ? 1.8 : 0.7);
+            }
             if (c.mesh.position.x > 240 || c.mesh.position.x < -240) c.vx *= -1;
             if (c.mesh.position.z > 240 || c.mesh.position.z < -240) c.vz *= -1;
             animatePerson(c, dt);
@@ -1393,6 +1880,7 @@ window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 });
 
 animate();
