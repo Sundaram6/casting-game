@@ -21,6 +21,7 @@ const vicScore = document.getElementById('vic-score');
 
 // --- Game State ---
 let gameState = 'START';
+let camera, scene, renderer, composer;
 let score = 0;
 let totalOffices = 15;
 let officesCompleted = 0;
@@ -453,6 +454,17 @@ renderer.toneMappingExposure = 1.1;
 renderer.outputEncoding = THREE.sRGBEncoding;
 container.appendChild(renderer.domElement);
 
+// GTA/Saints Row style Post-processing (Bloom for neon signs and realistic glow)
+const renderScene = new THREE.RenderPass(scene, camera);
+const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+bloomPass.threshold = 0.1;
+bloomPass.strength = 1.6;
+bloomPass.radius = 0.5;
+
+composer = new THREE.EffectComposer(renderer);
+composer.addPass(renderScene);
+composer.addPass(bloomPass);
+
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
 
 const controls = new THREE.PointerLockControls(camera, document.body);
@@ -506,16 +518,18 @@ scene.add(dirLight);
 // ─── ENVIRONMENT ─────────────────────────────────────────────────────────────
 
 // Outer grass
+const grassTex = createGrassTexture();
 const groundGeo = new THREE.PlaneGeometry(600, 600);
-const groundMat = new THREE.MeshStandardMaterial({ map: createGrassTexture(), roughness: 0.9 });
+const groundMat = new THREE.MeshStandardMaterial({ map: grassTex, bumpMap: grassTex, bumpScale: 0.3, roughness: 0.9 });
 const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
 // Central pavement plaza
+const paveTex = createPavementTexture();
 const plazaGeo = new THREE.PlaneGeometry(120, 120);
-const plazaMat = new THREE.MeshStandardMaterial({ map: createPavementTexture(), roughness: 0.6, metalness: 0.05 });
+const plazaMat = new THREE.MeshStandardMaterial({ map: paveTex, bumpMap: paveTex, bumpScale: 0.1, roughness: 0.6, metalness: 0.05 });
 const plaza = new THREE.Mesh(plazaGeo, plazaMat);
 plaza.rotation.x = -Math.PI / 2;
 plaza.position.y = 0.02;
@@ -524,8 +538,9 @@ scene.add(plaza);
 
 // Roads radiating out from centre
 function addRoad(x, z, w, h) {
+    const roadTex = createRoadTexture();
     const rGeo = new THREE.PlaneGeometry(w, h);
-    const rMat = new THREE.MeshStandardMaterial({ map: createRoadTexture(), roughness: 0.7 });
+    const rMat = new THREE.MeshStandardMaterial({ map: roadTex, bumpMap: roadTex, bumpScale: 0.1, roughness: 0.7 });
     const r = new THREE.Mesh(rGeo, rMat);
     r.rotation.x = -Math.PI / 2;
     r.position.set(x, 0.01, z);
@@ -604,8 +619,11 @@ let nepoCrowds = []; // nepo kids walking into nepo houses
 // ─── OFFICE BUILDER ──────────────────────────────────────────────────────────
 
 function addWindowsToBuilding(mesh, bw, bh, bd) {
+    const glassTex = createGlassTexture();
     const winMat = new THREE.MeshStandardMaterial({
-        map: createGlassTexture(),
+        map: glassTex,
+        bumpMap: glassTex,
+        bumpScale: 0.05,
         roughness: 0.1,
         metalness: 0.5,
         emissive: new THREE.Color(0x112233),
@@ -629,8 +647,11 @@ function createOfficeBuilding(config, isNepo = false) {
 
     // Main body — brick texture
     const bodyGeo = new THREE.BoxGeometry(bw, bh, bd);
+    const brickTex = createBrickTexture(isNepo ? '#8B6914' : config.color);
     const bodyMat = new THREE.MeshStandardMaterial({
-        map: createBrickTexture(isNepo ? '#8B6914' : config.color),
+        map: brickTex,
+        bumpMap: brickTex,
+        bumpScale: 0.15,
         roughness: 0.85,
         metalness: 0.05
     });
@@ -1567,6 +1588,17 @@ function showCelebrationScene(chosen, afterScene) {
         sounds.chatter.volume = 0.4;
         sounds.bgm.play().catch(() => {});
         afterScene();
+        
+        if (chosen.type === 'producer') {
+            setTimeout(() => {
+                spawnBuzzBubble("My ass hurts.", false);
+                if (window.speechSynthesis) {
+                    const u = new SpeechSynthesisUtterance("My ass hurts.");
+                    u.pitch = 0.9;
+                    window.speechSynthesis.speak(u);
+                }
+            }, 500); // Slight delay after scene transition
+        }
     }, chosen.type === 'producer' ? 9200 : 7600);
 }
 
@@ -1874,12 +1906,15 @@ function animate() {
     });
 
     renderer.render(scene, camera);
+    // composer.render() replaces renderer.render() for post-processing
+    composer.render();
 }
 
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 });
 
