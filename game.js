@@ -1901,7 +1901,6 @@ function winMinigame() {
 
 function handleTypingCharacter(key) {
     if (gameState !== 'TYPING') return;
-    if (key === ' ') return;
     let targetChar = TARGET_WORD[typeIndex];
     if (key.toLowerCase() === targetChar.toLowerCase()) {
         typeIndex++;
