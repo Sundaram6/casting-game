@@ -61,95 +61,226 @@ function playSound(snd) {
 
 function createPavementTexture() {
     const cvs = document.createElement('canvas');
-    cvs.width = 512; cvs.height = 512;
+    cvs.width = 1024; cvs.height = 1024;
     const ctx = cvs.getContext('2d');
-    ctx.fillStyle = '#b0a898';
-    ctx.fillRect(0, 0, 512, 512);
-    ctx.strokeStyle = '#887e72';
-    ctx.lineWidth = 3;
-    const tileW = 64, tileH = 48;
-    for (let row = 0; row * tileH < 512; row++) {
-        for (let col = 0; col * tileW < 512; col++) {
+    // Base warm concrete
+    const grad = ctx.createRadialGradient(512, 512, 0, 512, 512, 720);
+    grad.addColorStop(0, '#c4b8a6');
+    grad.addColorStop(1, '#a8998a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1024, 1024);
+    // Mortar lines
+    ctx.strokeStyle = '#7a6e62';
+    ctx.lineWidth = 4;
+    const tileW = 80, tileH = 56;
+    for (let row = 0; row * tileH < 1024; row++) {
+        for (let col = 0; col * tileW < 1024; col++) {
             const ox = row % 2 === 0 ? 0 : tileW / 2;
+            // Per-brick colour variation
+            const b = 0.88 + Math.random() * 0.18;
+            ctx.fillStyle = `rgba(${Math.floor(195*b)},${Math.floor(182*b)},${Math.floor(165*b)},1)`;
+            ctx.fillRect(col * tileW + ox + 2, row * tileH + 2, tileW - 4, tileH - 4);
             ctx.strokeRect(col * tileW + ox, row * tileH, tileW, tileH);
         }
     }
-    // subtle grime dots
-    for (let i = 0; i < 2000; i++) {
-        ctx.fillStyle = `rgba(80,70,60,${Math.random() * 0.2})`;
-        ctx.fillRect(Math.random() * 512, Math.random() * 512, 3, 3);
+    // Grime and worn patches
+    for (let i = 0; i < 5000; i++) {
+        ctx.fillStyle = `rgba(60,50,40,${Math.random() * 0.15})`;
+        ctx.fillRect(Math.random() * 1024, Math.random() * 1024, Math.random() * 6 + 1, Math.random() * 6 + 1);
+    }
+    // Subtle cracks
+    for (let i = 0; i < 12; i++) {
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * 1024, Math.random() * 1024);
+        ctx.lineTo(Math.random() * 1024, Math.random() * 1024);
+        ctx.strokeStyle = `rgba(70,60,50,${Math.random() * 0.25})`;
+        ctx.lineWidth = Math.random() * 2;
+        ctx.stroke();
     }
     const tex = new THREE.CanvasTexture(cvs);
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(20, 20);
+    tex.repeat.set(15, 15);
+    tex.anisotropy = 16;
+    return tex;
+}
+
+function createPavementNormalMap() {
+    const cvs = document.createElement('canvas');
+    cvs.width = 512; cvs.height = 512;
+    const ctx = cvs.getContext('2d');
+    ctx.fillStyle = '#8080ff'; // flat normal
+    ctx.fillRect(0, 0, 512, 512);
+    const tileW = 40, tileH = 28;
+    for (let row = 0; row * tileH < 512; row++) {
+        for (let col = 0; col * tileW < 512; col++) {
+            const ox = row % 2 === 0 ? 0 : tileW / 2;
+            ctx.fillStyle = '#6060ff'; // mortar recessed
+            ctx.fillRect(col * tileW + ox, row * tileH, tileW, tileH);
+            ctx.fillStyle = '#8888ff'; // tile raised
+            ctx.fillRect(col * tileW + ox + 2, row * tileH + 2, tileW - 4, tileH - 4);
+        }
+    }
+    const tex = new THREE.CanvasTexture(cvs);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(15, 15);
     return tex;
 }
 
 function createGrassTexture() {
     const cvs = document.createElement('canvas');
-    cvs.width = 512; cvs.height = 512;
+    cvs.width = 1024; cvs.height = 1024;
     const ctx = cvs.getContext('2d');
-    ctx.fillStyle = '#2d6a30';
-    ctx.fillRect(0, 0, 512, 512);
-    for (let i = 0; i < 5000; i++) {
-        ctx.fillStyle = Math.random() > 0.5 ? '#367c39' : '#245426';
-        ctx.fillRect(Math.random() * 512, Math.random() * 512, 4, 12);
+    // Multi-tone grass base
+    const gg = ctx.createLinearGradient(0, 0, 1024, 1024);
+    gg.addColorStop(0, '#2a5e28');
+    gg.addColorStop(0.5, '#337a30');
+    gg.addColorStop(1, '#1f4d1e');
+    ctx.fillStyle = gg;
+    ctx.fillRect(0, 0, 1024, 1024);
+    // Dense grass blades
+    for (let i = 0; i < 15000; i++) {
+        const x = Math.random() * 1024;
+        const y = Math.random() * 1024;
+        const h = 6 + Math.random() * 14;
+        const tone = Math.random();
+        ctx.strokeStyle = tone > 0.6 ? '#4a9e46' : (tone > 0.3 ? '#2d7a2a' : '#1a5218');
+        ctx.lineWidth = Math.random() * 2 + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.quadraticCurveTo(x + (Math.random()-0.5)*6, y - h/2, x + (Math.random()-0.5)*4, y - h);
+        ctx.stroke();
+    }
+    // Dirt patches
+    for (let i = 0; i < 30; i++) {
+        const rx = Math.random() * 1024, ry = Math.random() * 1024;
+        const rg = ctx.createRadialGradient(rx, ry, 0, rx, ry, 20 + Math.random()*30);
+        rg.addColorStop(0, 'rgba(120,90,60,0.4)');
+        rg.addColorStop(1, 'rgba(120,90,60,0)');
+        ctx.fillStyle = rg;
+        ctx.fillRect(0, 0, 1024, 1024);
     }
     const tex = new THREE.CanvasTexture(cvs);
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(50, 50);
+    tex.repeat.set(40, 40);
+    tex.anisotropy = 16;
     return tex;
 }
 
 function createBrickTexture(baseColor = '#c0634a') {
     const cvs = document.createElement('canvas');
+    cvs.width = 1024; cvs.height = 1024;
+    const ctx = cvs.getContext('2d');
+    // Base with gradient variation
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(0, 0, 1024, 1024);
+    const bw = 90, bh = 40;
+    for (let row = 0; row * bh < 1024; row++) {
+        for (let col = 0; col * bw < 1024; col++) {
+            const ox = row % 2 === 0 ? 0 : bw / 2;
+            const shade = 0.75 + Math.random() * 0.4;
+            const hue = 10 + Math.random() * 15;
+            const sat = 45 + Math.random() * 25;
+            const lit = Math.floor(32 * shade);
+            ctx.fillStyle = `hsl(${hue}, ${sat}%, ${lit}%)`;
+            ctx.fillRect(col * bw + ox + 3, row * bh + 3, bw - 6, bh - 6);
+            // Surface detail
+            for (let s = 0; s < 4; s++) {
+                ctx.fillStyle = `rgba(0,0,0,${Math.random()*0.1})`;
+                ctx.fillRect(col * bw + ox + 3 + Math.random()*(bw-10), row * bh + 3 + Math.random()*(bh-6), Math.random()*20, Math.random()*4);
+            }
+        }
+    }
+    // Mortar lines
+    ctx.strokeStyle = '#2a1e16';
+    ctx.lineWidth = 5;
+    for (let row = 0; row * bh < 1024; row++) {
+        for (let col = 0; col * bw < 1024; col++) {
+            const ox = row % 2 === 0 ? 0 : bw / 2;
+            ctx.strokeRect(col * bw + ox, row * bh, bw, bh);
+        }
+    }
+    // Streaks and weathering
+    for (let i = 0; i < 20; i++) {
+        const sx = Math.random() * 1024;
+        ctx.beginPath();
+        ctx.moveTo(sx, 0);
+        ctx.lineTo(sx + (Math.random()-0.5)*30, 1024);
+        ctx.strokeStyle = `rgba(0,0,0,${Math.random()*0.08})`;
+        ctx.lineWidth = Math.random() * 5;
+        ctx.stroke();
+    }
+    const tex = new THREE.CanvasTexture(cvs);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(2, 3);
+    tex.anisotropy = 16;
+    return tex;
+}
+
+function createBrickNormalMap() {
+    const cvs = document.createElement('canvas');
     cvs.width = 512; cvs.height = 512;
     const ctx = cvs.getContext('2d');
-    const bc = new THREE.Color(baseColor);
-    ctx.fillStyle = baseColor;
+    ctx.fillStyle = '#8080ff';
     ctx.fillRect(0, 0, 512, 512);
-    const bw = 64, bh = 32;
-    ctx.strokeStyle = '#33211a';
-    ctx.lineWidth = 4;
+    const bw = 45, bh = 20;
     for (let row = 0; row * bh < 512; row++) {
         for (let col = 0; col * bw < 512; col++) {
             const ox = row % 2 === 0 ? 0 : bw / 2;
-            // slight shade variation
-            const shade = 0.85 + Math.random() * 0.25;
-            ctx.fillStyle = `hsl(${15 + Math.random() * 10}, ${50 + Math.random() * 20}%, ${35 * shade}%)`;
+            ctx.fillStyle = '#9898ff'; // brick face slightly raised
             ctx.fillRect(col * bw + ox + 2, row * bh + 2, bw - 4, bh - 4);
-            ctx.strokeRect(col * bw + ox, row * bh, bw, bh);
+            ctx.fillStyle = '#6060d8'; // mortar recessed
+            ctx.fillRect(col * bw + ox, row * bh, bw, 2);
+            ctx.fillRect(col * bw + ox, row * bh, 2, bh);
         }
     }
     const tex = new THREE.CanvasTexture(cvs);
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(3, 4);
+    tex.repeat.set(2, 3);
     return tex;
 }
 
 function createGlassTexture() {
     const cvs = document.createElement('canvas');
-    cvs.width = 256; cvs.height = 256;
+    cvs.width = 512; cvs.height = 512;
     const ctx = cvs.getContext('2d');
-    // deep blue-grey base
-    ctx.fillStyle = '#1a2a3a';
-    ctx.fillRect(0, 0, 256, 256);
-    // window grid
-    const cols = 4, rows = 6;
-    const pw = 256 / cols, ph = 256 / rows;
+    // Tinted glass base
+    const grad = ctx.createLinearGradient(0, 0, 512, 512);
+    grad.addColorStop(0, '#0d1a2a');
+    grad.addColorStop(1, '#1a2e45');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 512, 512);
+    const cols = 5, rows = 8;
+    const pw = 512 / cols, ph = 512 / rows;
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            const lit = Math.random() > 0.3;
-            ctx.fillStyle = lit
-                ? `rgba(255,${200 + Math.random() * 55},${80 + Math.random() * 80},0.9)`
-                : 'rgba(20,40,80,0.8)';
-            ctx.fillRect(c * pw + 6, r * ph + 6, pw - 12, ph - 12);
-            // glass sheen
-            ctx.fillStyle = 'rgba(200,230,255,0.07)';
-            ctx.fillRect(c * pw + 6, r * ph + 6, pw / 3, ph - 12);
+            const lit = Math.random() > 0.25;
+            const warmCool = Math.random() > 0.5;
+            const rx = c * pw + 8, ry = r * ph + 8, rw = pw - 16, rh = ph - 16;
+            if (lit) {
+                const wg = ctx.createLinearGradient(rx, ry, rx, ry + rh);
+                if (warmCool) {
+                    wg.addColorStop(0, `rgba(255,${210 + Math.random()*40},${100 + Math.random()*80},0.85)`);
+                    wg.addColorStop(1, `rgba(255,${180 + Math.random()*40},60,0.6)`);
+                } else {
+                    wg.addColorStop(0, `rgba(180,220,${255},0.7)`);
+                    wg.addColorStop(1, `rgba(120,180,255,0.5)`);
+                }
+                ctx.fillStyle = wg;
+            } else {
+                ctx.fillStyle = 'rgba(10,25,50,0.9)';
+            }
+            ctx.fillRect(rx, ry, rw, rh);
+            // Glass sheen highlight
+            ctx.fillStyle = 'rgba(220,240,255,0.12)';
+            ctx.fillRect(rx, ry, rw * 0.3, rh);
+            // Reflection streak
+            ctx.fillStyle = 'rgba(255,255,255,0.05)';
+            ctx.fillRect(rx + rw * 0.1, ry, 3, rh);
         }
     }
     return new THREE.CanvasTexture(cvs);
@@ -428,30 +559,49 @@ const NEPO_HOUSES = [
 const container = document.getElementById('game-container');
 scene = new THREE.Scene();
 
-// High noon sky gradient
+// Volumetric procedural sky
 const skyCanvas = document.createElement('canvas');
-skyCanvas.width = 2; skyCanvas.height = 512;
+skyCanvas.width = 4; skyCanvas.height = 1024;
 const skyCtx = skyCanvas.getContext('2d');
-const skyGrad = skyCtx.createLinearGradient(0, 0, 0, 512);
-skyGrad.addColorStop(0, '#1a5ea8'); // Deep blue top
-skyGrad.addColorStop(0.5, '#4b98db');
-skyGrad.addColorStop(1, '#a8d5e8'); // Hazy horizon
+const skyGrad = skyCtx.createLinearGradient(0, 0, 0, 1024);
+skyGrad.addColorStop(0.0, '#0a1628'); // deep midnight blue top
+skyGrad.addColorStop(0.15, '#0e2a5a');
+skyGrad.addColorStop(0.35, '#1a5ea8');
+skyGrad.addColorStop(0.6, '#4b98db');
+skyGrad.addColorStop(0.8, '#7ec8e3');
+skyGrad.addColorStop(0.92, '#f5d7a3'); // warm horizon glow
+skyGrad.addColorStop(1.0, '#e8b87a');
 skyCtx.fillStyle = skyGrad;
-skyCtx.fillRect(0, 0, 2, 512);
+skyCtx.fillRect(0, 0, 4, 1024);
 scene.background = new THREE.CanvasTexture(skyCanvas);
-scene.fog = new THREE.FogExp2(0xa8d5e8, 0.008);
+scene.fog = new THREE.FogExp2(0x8fbbd8, isMobile ? 0.007 : 0.004);
+
+// Sun sphere (decorative)
+const sunGeo = new THREE.SphereGeometry(8, 16, 16);
+const sunMat = new THREE.MeshBasicMaterial({ color: 0xfff5c0 });
+const sunMesh = new THREE.Mesh(sunGeo, sunMat);
+sunMesh.position.set(180, 350, -300);
+scene.add(sunMesh);
+
+// Sun glow halo
+const haloGeo = new THREE.SphereGeometry(22, 16, 16);
+const haloMat = new THREE.MeshBasicMaterial({ color: 0xffe080, transparent: true, opacity: 0.12 });
+const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+haloMesh.position.copy(sunMesh.position);
+scene.add(haloMesh);
 
 camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.y = 2;
 
-renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'high-performance' });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio || 1, 1.5) : Math.min(window.devicePixelRatio || 1, 2));
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = isMobile ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
+renderer.toneMappingExposure = isMobile ? 1.0 : 1.3;
 renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.physicallyCorrectLights = true;
 container.appendChild(renderer.domElement);
 
 
@@ -605,33 +755,46 @@ lookZone.addEventListener('touchend', e => {
 
 // ─── LIGHTING ────────────────────────────────────────────────────────────────
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+const ambientLight = new THREE.AmbientLight(0x4060a0, 0.25); // cool blue ambient
 scene.add(ambientLight);
 
-// Hemisphere light for realistic GI scattering
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+// Hemisphere light for sky/ground GI
+const hemiLight = new THREE.HemisphereLight(0x88bbee, 0x3d5e25, 0.7);
 hemiLight.position.set(0, 200, 0);
 scene.add(hemiLight);
 
-// Direct high-noon sun
-const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-dirLight.position.set(20, 200, 40); // Top down angle
+// Primary sun directional light
+const dirLight = new THREE.DirectionalLight(0xfff4e0, isMobile ? 1.4 : 1.8);
+dirLight.position.set(180, 350, -300);
 dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = isMobile ? 512 : 4096;
-dirLight.shadow.mapSize.height = isMobile ? 512 : 4096;
-dirLight.shadow.camera.top = 250;
-dirLight.shadow.camera.bottom = -250;
-dirLight.shadow.camera.left = -250;
-dirLight.shadow.camera.right = 250;
-dirLight.shadow.bias = -0.0005;
+dirLight.shadow.mapSize.width = isMobile ? 512 : 2048;
+dirLight.shadow.mapSize.height = isMobile ? 512 : 2048;
+dirLight.shadow.camera.top = 300;
+dirLight.shadow.camera.bottom = -300;
+dirLight.shadow.camera.left = -300;
+dirLight.shadow.camera.right = 300;
+dirLight.shadow.bias = -0.0003;
+dirLight.shadow.radius = isMobile ? 2 : 4;
 scene.add(dirLight);
+
+// Secondary fill light for colour depth
+const fillLight = new THREE.DirectionalLight(0x4488cc, 0.3);
+fillLight.position.set(-100, 50, 100);
+scene.add(fillLight);
 
 // ─── ENVIRONMENT ─────────────────────────────────────────────────────────────
 
-// Outer grass
+// Outer grass with improved PBR material
 const grassTex = createGrassTexture();
-const groundGeo = new THREE.PlaneGeometry(600, 600);
-const groundMat = new THREE.MeshStandardMaterial({ map: grassTex, bumpMap: grassTex, bumpScale: 0.3, roughness: 0.9 });
+const groundGeo = new THREE.PlaneGeometry(600, 600, 1, 1);
+const groundMat = new THREE.MeshStandardMaterial({
+    map: grassTex,
+    bumpMap: grassTex,
+    bumpScale: 0.5,
+    roughness: 0.92,
+    metalness: 0.0,
+    envMapIntensity: 0.3
+});
 const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
@@ -639,8 +802,16 @@ scene.add(ground);
 
 // Central pavement plaza
 const paveTex = createPavementTexture();
+const paveNorm = createPavementNormalMap();
 const plazaGeo = new THREE.PlaneGeometry(120, 120);
-const plazaMat = new THREE.MeshStandardMaterial({ map: paveTex, bumpMap: paveTex, bumpScale: 0.1, roughness: 0.6, metalness: 0.05 });
+const plazaMat = new THREE.MeshStandardMaterial({
+    map: paveTex,
+    normalMap: paveNorm,
+    normalScale: new THREE.Vector2(1.5, 1.5),
+    roughness: 0.55,
+    metalness: 0.05,
+    envMapIntensity: 0.6
+});
 const plaza = new THREE.Mesh(plazaGeo, plazaMat);
 plaza.rotation.x = -Math.PI / 2;
 plaza.position.y = 0.02;
@@ -651,7 +822,13 @@ scene.add(plaza);
 function addRoad(x, z, w, h) {
     const roadTex = createRoadTexture();
     const rGeo = new THREE.PlaneGeometry(w, h);
-    const rMat = new THREE.MeshStandardMaterial({ map: roadTex, bumpMap: roadTex, bumpScale: 0.1, roughness: 0.7 });
+    const rMat = new THREE.MeshStandardMaterial({
+        map: roadTex,
+        bumpMap: roadTex,
+        bumpScale: 0.12,
+        roughness: 0.75,
+        metalness: 0.02
+    });
     const r = new THREE.Mesh(rGeo, rMat);
     r.rotation.x = -Math.PI / 2;
     r.position.set(x, 0.01, z);
@@ -661,25 +838,42 @@ function addRoad(x, z, w, h) {
 addRoad(0, 0, 12, 300);   // N-S road
 addRoad(0, 0, 300, 12);   // E-W road
 
-// Street lamps
+// ─── IMPROVED STREET LAMPS ───────────────────────────────────────────────────
 function addLamp(x, z) {
-    const postGeo = new THREE.CylinderGeometry(0.15, 0.15, 8, 8);
-    const postMat = new THREE.MeshStandardMaterial({ color: 0x445566, metalness: 0.8, roughness: 0.3 });
-    const post = new THREE.Mesh(postGeo, postMat);
-    post.position.set(x, 4, z);
+    const g = new THREE.Group();
+
+    // Post
+    const postMat = new THREE.MeshStandardMaterial({ color: 0x334455, metalness: 0.85, roughness: 0.2 });
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 9, 10), postMat);
+    post.position.set(x, 4.5, z);
     post.castShadow = true;
     scene.add(post);
 
-    const headGeo = new THREE.BoxGeometry(2, 0.5, 0.8);
-    const headMat = new THREE.MeshStandardMaterial({ color: 0x334455, metalness: 0.7 });
-    const lampHead = new THREE.Mesh(headGeo, headMat);
-    lampHead.position.set(x + 1, 8.3, z);
+    // Arm
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.5, 8), postMat);
+    arm.position.set(x + 1.25, 9.0, z);
+    arm.rotation.z = Math.PI / 2;
+    scene.add(arm);
+
+    // Lamp head
+    const headMat = new THREE.MeshStandardMaterial({ color: 0x1a2530, metalness: 0.7, roughness: 0.35 });
+    const lampHead = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.7, 1.0), headMat);
+    lampHead.position.set(x + 2.1, 9.0, z);
     scene.add(lampHead);
 
-    const light = new THREE.PointLight(0xffe8a0, 1.5, 25);
-    light.position.set(x + 1, 8, z);
+    // Emissive lens
+    const lensMat = new THREE.MeshStandardMaterial({ color: 0xffe8a0, emissive: 0xffe880, emissiveIntensity: 2.0, roughness: 0.4 });
+    const lens = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.3, 0.7), lensMat);
+    lens.position.set(x + 2.1, 8.7, z);
+    scene.add(lens);
+
+    // Actual point light
+    const light = new THREE.PointLight(0xffe090, 2.0, 30, 2);
+    light.position.set(x + 2.1, 8.5, z);
+    if (!isMobile) light.castShadow = true;
     scene.add(light);
 }
+
 for (let i = -120; i <= 120; i += 30) {
     addLamp(8, i);
     addLamp(-8, i);
@@ -687,18 +881,34 @@ for (let i = -120; i <= 120; i += 30) {
     addLamp(i, -8);
 }
 
-// Clouds (simple flat planes with alpha)
+// ─── IMPROVED VOLUMETRIC CLOUDS ──────────────────────────────────────────────
 function createCloudMesh() {
     const g = new THREE.Group();
-    const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, roughness: 1 });
+    const mat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.88,
+        roughness: 1.0,
+        metalness: 0.0,
+        emissive: 0xddeeff,
+        emissiveIntensity: 0.06
+    });
+    const darkMat = new THREE.MeshStandardMaterial({
+        color: 0xc8d4e0,
+        transparent: true,
+        opacity: 0.7,
+        roughness: 1.0
+    });
     const puffs = [
-        [0, 0, 0, 12, 5, 8],
-        [8, 1, 0, 10, 4, 7],
-        [-7, 0.5, 0, 8, 4, 6],
-        [3, 2, 0, 7, 4, 5],
+        [0, 0, 0, 14, 6, 10, false],
+        [10, 1.5, 0, 12, 5, 8, false],
+        [-9, 0.5, 1, 10, 4.5, 7, false],
+        [4, 3, -1, 9, 5, 6, false],
+        [0, -2, 2, 12, 3, 9, true],  // underside shadow
+        [8, -1.5, 1, 10, 2.5, 7, true],
     ];
-    puffs.forEach(([px, py, pz, sw, sh, sd]) => {
-        const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 6), mat);
+    puffs.forEach(([px, py, pz, sw, sh, sd, isDark]) => {
+        const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 7), isDark ? darkMat : mat);
         sphere.scale.set(sw, sh, sd);
         sphere.position.set(px, py, pz);
         g.add(sphere);
@@ -706,15 +916,17 @@ function createCloudMesh() {
     return g;
 }
 const cloudObjects = [];
-for (let i = 0; i < 12; i++) {
+for (let i = 0; i < (isMobile ? 8 : 18); i++) {
     const cloud = createCloudMesh();
     cloud.position.set(
-        (Math.random() - 0.5) * 400,
-        60 + Math.random() * 40,
-        (Math.random() - 0.5) * 400
+        (Math.random() - 0.5) * 500,
+        65 + Math.random() * 50,
+        (Math.random() - 0.5) * 500
     );
     cloud.rotation.y = Math.random() * Math.PI;
-    cloud.userData.speed = 0.5 + Math.random() * 1.5;
+    const s = 0.6 + Math.random() * 0.8;
+    cloud.scale.set(s, s * 0.6, s);
+    cloud.userData.speed = 0.3 + Math.random() * 1.0;
     scene.add(cloud);
     cloudObjects.push(cloud);
 }
@@ -756,15 +968,17 @@ function createOfficeBuilding(config, isNepo = false) {
     const bh = isNepo ? 18 : 12;
     const bd = isNepo ? 14 : 10;
 
-    // Main body — brick texture
+    // Main body — high quality PBR brick
     const bodyGeo = new THREE.BoxGeometry(bw, bh, bd);
     const brickTex = createBrickTexture(isNepo ? '#8B6914' : config.color);
+    const brickNorm = createBrickNormalMap();
     const bodyMat = new THREE.MeshStandardMaterial({
         map: brickTex,
-        bumpMap: brickTex,
-        bumpScale: 0.15,
-        roughness: 0.85,
-        metalness: 0.05
+        normalMap: brickNorm,
+        normalScale: new THREE.Vector2(2.0, 2.0),
+        roughness: 0.8,
+        metalness: 0.04,
+        envMapIntensity: 0.5
     });
     const body = new THREE.Mesh(bodyGeo, bodyMat);
     body.castShadow = true;
@@ -775,10 +989,13 @@ function createOfficeBuilding(config, isNepo = false) {
     addWindowsToBuilding(body, bw - 1, bh - 1, bd);
 
     // Roof parapet
-    const parapetGeo = new THREE.BoxGeometry(bw + 1, 1, bd + 1);
-    const parapetMat = new THREE.MeshStandardMaterial({ color: isNepo ? 0x8B6914 : 0x34495e, roughness: 0.9 });
-    const parapet = new THREE.Mesh(parapetGeo, parapetMat);
-    parapet.position.y = bh / 2 + 0.5;
+    const parapetMat = new THREE.MeshStandardMaterial({
+        color: isNepo ? 0x8B6914 : 0x2c3e50,
+        roughness: 0.8,
+        metalness: 0.1
+    });
+    const parapet = new THREE.Mesh(new THREE.BoxGeometry(bw + 1, 1.2, bd + 1), parapetMat);
+    parapet.position.y = bh / 2 + 0.6;
     parapet.castShadow = true;
     group.add(parapet);
 
