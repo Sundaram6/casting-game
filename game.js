@@ -516,6 +516,7 @@ const joyBase = document.getElementById('mobile-joystick-base');
 const joyStick = document.getElementById('mobile-joystick-stick');
 
 joyZone.addEventListener('touchstart', e => {
+    e.preventDefault();
     if (touchJoystickId !== null || gameState !== 'PLAYING') return;
     const touch = e.changedTouches[0];
     touchJoystickId = touch.identifier;
@@ -533,8 +534,9 @@ joyZone.addEventListener('touchstart', e => {
     joyStick.style.transform = `translate(calc(-50% + ${Math.cos(angle)*dist}px), calc(-50% + ${Math.sin(angle)*dist}px))`;
     analogJoystick.x = (Math.cos(angle)*dist) / 50;
     analogJoystick.y = (Math.sin(angle)*dist) / 50;
-});
+}, { passive: false });
 joyZone.addEventListener('touchmove', e => {
+    e.preventDefault();
     if (gameState !== 'PLAYING') return;
     for (let i=0; i<e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
@@ -549,8 +551,9 @@ joyZone.addEventListener('touchmove', e => {
             analogJoystick.y = (Math.sin(angle)*dist) / 50;
         }
     }
-});
+}, { passive: false });
 joyZone.addEventListener('touchend', e => {
+    e.preventDefault();
     for (let i=0; i<e.changedTouches.length; i++) {
         if (e.changedTouches[i].identifier === touchJoystickId) {
             touchJoystickId = null;
@@ -559,19 +562,21 @@ joyZone.addEventListener('touchend', e => {
             analogJoystick.y = 0;
         }
     }
-});
+}, { passive: false });
 
 let touchLookId = null;
 let touchLookLast = {x: 0, y: 0};
 const lookZone = document.getElementById('mobile-look-zone');
 
 lookZone.addEventListener('touchstart', e => {
+    e.preventDefault();
     if (touchLookId !== null || gameState !== 'PLAYING') return;
     const touch = e.changedTouches[0];
     touchLookId = touch.identifier;
     touchLookLast = { x: touch.clientX, y: touch.clientY };
-});
+}, { passive: false });
 lookZone.addEventListener('touchmove', e => {
+    e.preventDefault();
     if (gameState !== 'PLAYING') return;
     for (let i=0; i<e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
@@ -588,8 +593,9 @@ lookZone.addEventListener('touchmove', e => {
             camera.quaternion.setFromEuler(euler);
         }
     }
-});
+}, { passive: false });
 lookZone.addEventListener('touchend', e => {
+    e.preventDefault();
     for (let i=0; i<e.changedTouches.length; i++) {
         if (e.changedTouches[i].identifier === touchLookId) {
             touchLookId = null;
@@ -1896,7 +1902,7 @@ function animate() {
         
         if (isMobile) {
             direction.x = analogJoystick.x;
-            direction.z = analogJoystick.y;
+            direction.z = -analogJoystick.y;
         } else {
             direction.z = Number(moveForward) - Number(moveBackward);
             direction.x = Number(moveRight) - Number(moveLeft);
