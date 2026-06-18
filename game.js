@@ -746,7 +746,7 @@ hemiLight.position.set(0, 200, 0);
 scene.add(hemiLight);
 
 // Primary sun directional light
-const dirLight = new THREE.DirectionalLight(0xfff4e0, isMobile ? 1.4 : 1.8);
+const dirLight = new THREE.DirectionalLight(0xfff4e0, 1.6);
 dirLight.position.set(180, 350, -300);
 dirLight.castShadow = true;
 dirLight.shadow.mapSize.width = isMobile ? 512 : 2048;
@@ -756,13 +756,7 @@ dirLight.shadow.camera.bottom = -300;
 dirLight.shadow.camera.left = -300;
 dirLight.shadow.camera.right = 300;
 dirLight.shadow.bias = -0.0003;
-dirLight.shadow.radius = isMobile ? 2 : 4;
 scene.add(dirLight);
-
-// Secondary fill light for colour depth
-const fillLight = new THREE.DirectionalLight(0x4488cc, 0.3);
-fillLight.position.set(-100, 50, 100);
-scene.add(fillLight);
 
 // ─── ENVIRONMENT ─────────────────────────────────────────────────────────────
 
@@ -786,13 +780,13 @@ scene.add(ground);
 const paveTex = createPavementTexture();
 const paveNorm = createPavementNormalMap();
 const plazaGeo = new THREE.PlaneGeometry(120, 120);
+// Pavement bump (cheaper than normal map)
 const plazaMat = new THREE.MeshStandardMaterial({
     map: paveTex,
-    normalMap: paveNorm,
-    normalScale: new THREE.Vector2(1.5, 1.5),
+    bumpMap: paveTex,
+    bumpScale: 0.15,
     roughness: 0.55,
-    metalness: 0.05,
-    envMapIntensity: 0.6
+    metalness: 0.05
 });
 const plaza = new THREE.Mesh(plazaGeo, plazaMat);
 plaza.rotation.x = -Math.PI / 2;
@@ -807,9 +801,8 @@ function addRoad(x, z, w, h) {
     const rMat = new THREE.MeshStandardMaterial({
         map: roadTex,
         bumpMap: roadTex,
-        bumpScale: 0.12,
-        roughness: 0.75,
-        metalness: 0.02
+        bumpScale: 0.1,
+        roughness: 0.75
     });
     const r = new THREE.Mesh(rGeo, rMat);
     r.rotation.x = -Math.PI / 2;
@@ -820,77 +813,49 @@ function addRoad(x, z, w, h) {
 addRoad(0, 0, 12, 300);   // N-S road
 addRoad(0, 0, 300, 12);   // E-W road
 
-// ─── IMPROVED STREET LAMPS ───────────────────────────────────────────────────
+// Street lamps — emissive glow only, NO point lights
 function addLamp(x, z) {
-    const g = new THREE.Group();
-
-    // Post
-    const postMat = new THREE.MeshStandardMaterial({ color: 0x334455, metalness: 0.85, roughness: 0.2 });
-    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 9, 10), postMat);
+    const postMat = new THREE.MeshStandardMaterial({ color: 0x334455, metalness: 0.8, roughness: 0.3 });
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 9, 6), postMat);
     post.position.set(x, 4.5, z);
     post.castShadow = true;
     scene.add(post);
 
-    // Arm
-    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.5, 8), postMat);
-    arm.position.set(x + 1.25, 9.0, z);
-    arm.rotation.z = Math.PI / 2;
-    scene.add(arm);
-
-    // Lamp head
-    const headMat = new THREE.MeshStandardMaterial({ color: 0x1a2530, metalness: 0.7, roughness: 0.35 });
-    const lampHead = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.7, 1.0), headMat);
-    lampHead.position.set(x + 2.1, 9.0, z);
+    const lampHead = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 0.5, 0.8),
+        new THREE.MeshStandardMaterial({ color: 0x1a2530, metalness: 0.7, roughness: 0.35 })
+    );
+    lampHead.position.set(x + 1, 9.0, z);
     scene.add(lampHead);
 
-    // Emissive lens
-    const lensMat = new THREE.MeshStandardMaterial({ color: 0xffe8a0, emissive: 0xffe880, emissiveIntensity: 2.0, roughness: 0.4 });
-    const lens = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.3, 0.7), lensMat);
-    lens.position.set(x + 2.1, 8.7, z);
+    // Emissive lens — looks like it glows, costs nothing
+    const lens = new THREE.Mesh(
+        new THREE.BoxGeometry(1.6, 0.3, 0.7),
+        new THREE.MeshStandardMaterial({ color: 0xffe8a0, emissive: 0xffe880, emissiveIntensity: 1.5 })
+    );
+    lens.position.set(x + 1, 8.7, z);
     scene.add(lens);
-
-    // Actual point light
-    const light = new THREE.PointLight(0xffe090, 2.0, 30, 2);
-    light.position.set(x + 2.1, 8.5, z);
-    if (!isMobile) light.castShadow = true;
-    scene.add(light);
 }
 
-for (let i = -120; i <= 120; i += 30) {
+for (let i = -120; i <= 120; i += 40) {
     addLamp(8, i);
     addLamp(-8, i);
     addLamp(i, 8);
     addLamp(i, -8);
 }
 
-// ─── IMPROVED VOLUMETRIC CLOUDS ──────────────────────────────────────────────
+// Clouds — simple and lightweight
 function createCloudMesh() {
     const g = new THREE.Group();
-    const mat = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.88,
-        roughness: 1.0,
-        metalness: 0.0,
-        emissive: 0xddeeff,
-        emissiveIntensity: 0.06
-    });
-    const darkMat = new THREE.MeshStandardMaterial({
-        color: 0xc8d4e0,
-        transparent: true,
-        opacity: 0.7,
-        roughness: 1.0
-    });
+    const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
     const puffs = [
-        [0, 0, 0, 14, 6, 10, false],
-        [10, 1.5, 0, 12, 5, 8, false],
-        [-9, 0.5, 1, 10, 4.5, 7, false],
-        [4, 3, -1, 9, 5, 6, false],
-        [0, -2, 2, 12, 3, 9, true],  // underside shadow
-        [8, -1.5, 1, 10, 2.5, 7, true],
+        [0, 0, 0, 12, 5, 8],
+        [8, 1, 0, 10, 4, 7],
+        [-7, 0.5, 0, 8, 4, 6],
+        [3, 2, 0, 7, 4, 5],
     ];
-    puffs.forEach(([px, py, pz, sw, sh, sd, isDark]) => {
-        const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 7), isDark ? darkMat : mat);
+    puffs.forEach(([px, py, pz, sw, sh, sd]) => {
+        const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 6, 5), mat);
         sphere.scale.set(sw, sh, sd);
         sphere.position.set(px, py, pz);
         g.add(sphere);
@@ -898,7 +863,7 @@ function createCloudMesh() {
     return g;
 }
 const cloudObjects = [];
-for (let i = 0; i < (isMobile ? 8 : 18); i++) {
+for (let i = 0; i < 10; i++) {
     const cloud = createCloudMesh();
     cloud.position.set(
         (Math.random() - 0.5) * 500,
@@ -906,8 +871,6 @@ for (let i = 0; i < (isMobile ? 8 : 18); i++) {
         (Math.random() - 0.5) * 500
     );
     cloud.rotation.y = Math.random() * Math.PI;
-    const s = 0.6 + Math.random() * 0.8;
-    cloud.scale.set(s, s * 0.6, s);
     cloud.userData.speed = 0.3 + Math.random() * 1.0;
     scene.add(cloud);
     cloudObjects.push(cloud);
@@ -1012,10 +975,7 @@ function createOfficeBuilding(config, isNepo = false) {
         gatePost.castShadow = true;
         group.add(gatePost);
 
-        // Gold light halo above
-        const haloLight = new THREE.PointLight(0xFFD700, 2.5, 40);
-        haloLight.position.y = bh / 2 + 6;
-        group.add(haloLight);
+        // (Gold halo removed for performance - dome emissive handles it)
 
         // Velvet rope posts (left & right of door)
         [-4, 4].forEach(px => {
@@ -1070,10 +1030,7 @@ function createOfficeBuilding(config, isNepo = false) {
     carpet.receiveShadow = true;
     group.add(carpet);
 
-    // Entry neon light
-    const entryLight = new THREE.PointLight(isNepo ? 0xFFD700 : 0xfffa65, isNepo ? 2 : 1, isNepo ? 45 : 30);
-    entryLight.position.set(0, -bh / 2 + 5, bd / 2 + 5);
-    group.add(entryLight);
+    // (Entry light removed for performance - door emissive handles it)
 
     const propDark = new THREE.MeshStandardMaterial({ color: 0x111820, roughness: 0.65, metalness: 0.25 });
     const propMetal = new THREE.MeshStandardMaterial({ color: 0x889099, roughness: 0.3, metalness: 0.7 });
@@ -1115,9 +1072,7 @@ function createOfficeBuilding(config, isNepo = false) {
             lens.position.set(0, 2.55, -0.42);
             lens.rotation.x = Math.PI / 2;
             tripod.add(lens);
-            const flash = new THREE.PointLight(0xffffff, 1.4, 18);
-            flash.position.set(0, 2.95, -0.8);
-            tripod.add(flash);
+            // (Flash light removed for performance)
             tripod.position.set(side * 8.2, -bh / 2 + 0.1, bd / 2 + 9.8);
             tripod.rotation.y = side * -0.7;
             group.add(tripod);
