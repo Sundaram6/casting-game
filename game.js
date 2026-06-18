@@ -64,47 +64,36 @@ function playSound(snd) {
 
 function createPavementTexture() {
     const cvs = document.createElement('canvas');
-    cvs.width = 1024; cvs.height = 1024;
+    cvs.width = 512; cvs.height = 512;
     const ctx = cvs.getContext('2d');
-    // Base warm concrete
-    const grad = ctx.createRadialGradient(512, 512, 0, 512, 512, 720);
+    // Base warm concrete gradient
+    const grad = ctx.createRadialGradient(256, 256, 0, 256, 256, 360);
     grad.addColorStop(0, '#c4b8a6');
     grad.addColorStop(1, '#a8998a');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 1024, 1024);
-    // Mortar lines
+    ctx.fillRect(0, 0, 512, 512);
+    // Tile grid
+    const tileW = 64, tileH = 44;
     ctx.strokeStyle = '#7a6e62';
-    ctx.lineWidth = 4;
-    const tileW = 80, tileH = 56;
-    for (let row = 0; row * tileH < 1024; row++) {
-        for (let col = 0; col * tileW < 1024; col++) {
+    ctx.lineWidth = 3;
+    for (let row = 0; row * tileH < 512; row++) {
+        for (let col = 0; col * tileW < 512; col++) {
             const ox = row % 2 === 0 ? 0 : tileW / 2;
-            // Per-brick colour variation
-            const b = 0.88 + Math.random() * 0.18;
+            const b = 0.9 + Math.random() * 0.15;
             ctx.fillStyle = `rgba(${Math.floor(195*b)},${Math.floor(182*b)},${Math.floor(165*b)},1)`;
             ctx.fillRect(col * tileW + ox + 2, row * tileH + 2, tileW - 4, tileH - 4);
             ctx.strokeRect(col * tileW + ox, row * tileH, tileW, tileH);
         }
     }
-    // Grime and worn patches
-    for (let i = 0; i < 5000; i++) {
-        ctx.fillStyle = `rgba(60,50,40,${Math.random() * 0.15})`;
-        ctx.fillRect(Math.random() * 1024, Math.random() * 1024, Math.random() * 6 + 1, Math.random() * 6 + 1);
-    }
-    // Subtle cracks
-    for (let i = 0; i < 12; i++) {
-        ctx.beginPath();
-        ctx.moveTo(Math.random() * 1024, Math.random() * 1024);
-        ctx.lineTo(Math.random() * 1024, Math.random() * 1024);
-        ctx.strokeStyle = `rgba(70,60,50,${Math.random() * 0.25})`;
-        ctx.lineWidth = Math.random() * 2;
-        ctx.stroke();
+    // Grime dots
+    for (let i = 0; i < 800; i++) {
+        ctx.fillStyle = `rgba(60,50,40,${Math.random() * 0.12})`;
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, Math.random() * 5 + 1, Math.random() * 5 + 1);
     }
     const tex = new THREE.CanvasTexture(cvs);
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(15, 15);
-    tex.anisotropy = 16;
+    tex.repeat.set(18, 18);
     return tex;
 }
 
@@ -133,93 +122,84 @@ function createPavementNormalMap() {
 
 function createGrassTexture() {
     const cvs = document.createElement('canvas');
-    cvs.width = 1024; cvs.height = 1024;
+    cvs.width = 512; cvs.height = 512;
     const ctx = cvs.getContext('2d');
-    // Multi-tone grass base
-    const gg = ctx.createLinearGradient(0, 0, 1024, 1024);
+    // Multi-tone base
+    const gg = ctx.createLinearGradient(0, 0, 512, 512);
     gg.addColorStop(0, '#2a5e28');
     gg.addColorStop(0.5, '#337a30');
     gg.addColorStop(1, '#1f4d1e');
     ctx.fillStyle = gg;
-    ctx.fillRect(0, 0, 1024, 1024);
-    // Dense grass blades
-    for (let i = 0; i < 15000; i++) {
-        const x = Math.random() * 1024;
-        const y = Math.random() * 1024;
-        const h = 6 + Math.random() * 14;
+    ctx.fillRect(0, 0, 512, 512);
+    // Grass blade clusters (optimised count)
+    for (let i = 0; i < 2500; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        const h = 5 + Math.random() * 10;
         const tone = Math.random();
         ctx.strokeStyle = tone > 0.6 ? '#4a9e46' : (tone > 0.3 ? '#2d7a2a' : '#1a5218');
-        ctx.lineWidth = Math.random() * 2 + 0.5;
+        ctx.lineWidth = Math.random() * 1.5 + 0.5;
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.quadraticCurveTo(x + (Math.random()-0.5)*6, y - h/2, x + (Math.random()-0.5)*4, y - h);
+        ctx.lineTo(x + (Math.random()-0.5)*5, y - h);
         ctx.stroke();
     }
-    // Dirt patches
-    for (let i = 0; i < 30; i++) {
-        const rx = Math.random() * 1024, ry = Math.random() * 1024;
-        const rg = ctx.createRadialGradient(rx, ry, 0, rx, ry, 20 + Math.random()*30);
-        rg.addColorStop(0, 'rgba(120,90,60,0.4)');
-        rg.addColorStop(1, 'rgba(120,90,60,0)');
+    // A few dirt patches
+    for (let i = 0; i < 8; i++) {
+        const rx = Math.random() * 512, ry = Math.random() * 512;
+        const rg = ctx.createRadialGradient(rx, ry, 0, rx, ry, 25);
+        rg.addColorStop(0, 'rgba(110,80,50,0.35)');
+        rg.addColorStop(1, 'rgba(110,80,50,0)');
         ctx.fillStyle = rg;
-        ctx.fillRect(0, 0, 1024, 1024);
+        ctx.fillRect(rx-30, ry-30, 60, 60);
     }
     const tex = new THREE.CanvasTexture(cvs);
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(40, 40);
-    tex.anisotropy = 16;
+    tex.repeat.set(45, 45);
     return tex;
 }
 
 function createBrickTexture(baseColor = '#c0634a') {
     const cvs = document.createElement('canvas');
-    cvs.width = 1024; cvs.height = 1024;
+    cvs.width = 512; cvs.height = 512;
     const ctx = cvs.getContext('2d');
-    // Base with gradient variation
     ctx.fillStyle = baseColor;
-    ctx.fillRect(0, 0, 1024, 1024);
-    const bw = 90, bh = 40;
-    for (let row = 0; row * bh < 1024; row++) {
-        for (let col = 0; col * bw < 1024; col++) {
+    ctx.fillRect(0, 0, 512, 512);
+    const bw = 64, bh = 30;
+    for (let row = 0; row * bh < 512; row++) {
+        for (let col = 0; col * bw < 512; col++) {
             const ox = row % 2 === 0 ? 0 : bw / 2;
-            const shade = 0.75 + Math.random() * 0.4;
+            const shade = 0.78 + Math.random() * 0.36;
             const hue = 10 + Math.random() * 15;
             const sat = 45 + Math.random() * 25;
-            const lit = Math.floor(32 * shade);
-            ctx.fillStyle = `hsl(${hue}, ${sat}%, ${lit}%)`;
+            ctx.fillStyle = `hsl(${hue}, ${sat}%, ${Math.floor(30 * shade)}%)`;
             ctx.fillRect(col * bw + ox + 3, row * bh + 3, bw - 6, bh - 6);
-            // Surface detail
-            for (let s = 0; s < 4; s++) {
-                ctx.fillStyle = `rgba(0,0,0,${Math.random()*0.1})`;
-                ctx.fillRect(col * bw + ox + 3 + Math.random()*(bw-10), row * bh + 3 + Math.random()*(bh-6), Math.random()*20, Math.random()*4);
-            }
         }
     }
-    // Mortar lines
+    // Mortar
     ctx.strokeStyle = '#2a1e16';
-    ctx.lineWidth = 5;
-    for (let row = 0; row * bh < 1024; row++) {
-        for (let col = 0; col * bw < 1024; col++) {
+    ctx.lineWidth = 4;
+    for (let row = 0; row * bh < 512; row++) {
+        for (let col = 0; col * bw < 512; col++) {
             const ox = row % 2 === 0 ? 0 : bw / 2;
             ctx.strokeRect(col * bw + ox, row * bh, bw, bh);
         }
     }
-    // Streaks and weathering
-    for (let i = 0; i < 20; i++) {
-        const sx = Math.random() * 1024;
+    // Weathering streaks
+    for (let i = 0; i < 10; i++) {
+        const sx = Math.random() * 512;
         ctx.beginPath();
         ctx.moveTo(sx, 0);
-        ctx.lineTo(sx + (Math.random()-0.5)*30, 1024);
-        ctx.strokeStyle = `rgba(0,0,0,${Math.random()*0.08})`;
-        ctx.lineWidth = Math.random() * 5;
+        ctx.lineTo(sx + (Math.random()-0.5)*20, 512);
+        ctx.strokeStyle = `rgba(0,0,0,${Math.random()*0.07})`;
+        ctx.lineWidth = Math.random() * 4;
         ctx.stroke();
     }
     const tex = new THREE.CanvasTexture(cvs);
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
     tex.repeat.set(2, 3);
-    tex.anisotropy = 16;
     return tex;
 }
 
@@ -604,7 +584,7 @@ renderer.shadowMap.type = isMobile ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = isMobile ? 1.0 : 1.3;
 renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.physicallyCorrectLights = true;
+renderer.physicallyCorrectLights = false; // too expensive for realtime
 container.appendChild(renderer.domElement);
 
 
