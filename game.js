@@ -26,6 +26,9 @@ let score = 0;
 let totalOffices = 15;
 let officesCompleted = 0;
 
+// --- Device Detection (must be at top, used throughout) ---
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
+
 const TARGET_WORD = "nepo kid";
 let typeIndex = 0;
 let currentTimer = 0;
@@ -607,7 +610,6 @@ container.appendChild(renderer.domElement);
 
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
 
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
 const controls = new THREE.PointerLockControls(camera, document.body);
 
 if (isMobile) {
