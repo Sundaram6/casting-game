@@ -560,18 +560,26 @@ scene.background = new THREE.CanvasTexture(skyCanvas);
 scene.fog = new THREE.FogExp2(0x8fbbd8, isMobile ? 0.007 : 0.004);
 
 // Sun sphere (decorative)
-const sunGeo = new THREE.SphereGeometry(8, 16, 16);
+const sunGeo = new THREE.SphereGeometry(12, 32, 32);
 const sunMat = new THREE.MeshBasicMaterial({ color: 0xfff5c0 });
 const sunMesh = new THREE.Mesh(sunGeo, sunMat);
 sunMesh.position.set(180, 350, -300);
 scene.add(sunMesh);
 
-// Sun glow halo
-const haloGeo = new THREE.SphereGeometry(22, 16, 16);
-const haloMat = new THREE.MeshBasicMaterial({ color: 0xffe080, transparent: true, opacity: 0.12 });
-const haloMesh = new THREE.Mesh(haloGeo, haloMat);
-haloMesh.position.copy(sunMesh.position);
-scene.add(haloMesh);
+// Sun glow halos (Additive blending for bloom effect)
+for(let i=1; i<=3; i++) {
+    const haloGeo = new THREE.SphereGeometry(12 + i * 15, 32, 32);
+    const haloMat = new THREE.MeshBasicMaterial({ 
+        color: 0xffaa00, 
+        transparent: true, 
+        opacity: 0.15 / i,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+    });
+    const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+    haloMesh.position.copy(sunMesh.position);
+    scene.add(haloMesh);
+}
 
 camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.y = 2;
@@ -637,7 +645,32 @@ let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
 let prevTime = performance.now();
 
+// Virtual Keyboard Logic
+document.querySelectorAll('.kb-key').forEach(btn => {
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (gameState !== 'TYPING') return;
+        let char = btn.innerText;
+        if (char === 'SPACE') char = ' ';
+        handleTypingCharacter(char);
+    });
+});
 
+// Mobile Action Buttons
+const sprintBtn = document.getElementById('mobile-sprint-btn');
+const jumpBtn = document.getElementById('mobile-jump-btn');
+if (sprintBtn) {
+    sprintBtn.addEventListener('touchstart', (e) => { e.preventDefault(); isSprinting = true; sprintBtn.classList.add('active'); });
+    sprintBtn.addEventListener('touchend', (e) => { e.preventDefault(); isSprinting = false; sprintBtn.classList.remove('active'); });
+}
+if (jumpBtn) {
+    jumpBtn.addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        jumpBtn.classList.add('active');
+        if (isGrounded) { velocityY = 15; isGrounded = false; }
+    });
+    jumpBtn.addEventListener('touchend', (e) => { e.preventDefault(); jumpBtn.classList.remove('active'); });
+}
 
 let touchJoystickId = null;
 let touchJoystickOrigin = {x: 0, y: 0};
@@ -835,6 +868,47 @@ function addLamp(x, z) {
     );
     lens.position.set(x + 1, 8.7, z);
     scene.add(lens);
+
+    // Volumetric dust cone (Particle System)
+    if (!isMobile) {
+        const dustGeo = new THREE.BufferGeometry();
+        const dustCount = 40;
+        const positions = new Float32Array(dustCount * 3);
+        for(let i = 0; i < dustCount; i++) {
+            positions[i*3] = (Math.random() - 0.5) * 4;
+            positions[i*3+1] = Math.random() * -8; // downwards
+            positions[i*3+2] = (Math.random() - 0.5) * 4;
+        }
+        dustGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const dustMat = new THREE.PointsMaterial({
+            color: 0xffe8a0,
+            size: 0.15,
+            transparent: true,
+            opacity: 0.4,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+        const dust = new THREE.Points(dustGeo, dustMat);
+        dust.position.set(x + 1, 8.7, z);
+        
+        // Custom animation function stored in userData
+        dust.userData = {
+            update: (time) => {
+                const pos = dust.geometry.attributes.position.array;
+                for(let i=0; i<dustCount; i++) {
+                    pos[i*3+1] -= 0.02; // fall
+                    pos[i*3] += Math.sin(time + i) * 0.01; // sway
+                    if (pos[i*3+1] < -8) {
+                        pos[i*3+1] = 0;
+                    }
+                }
+                dust.geometry.attributes.position.needsUpdate = true;
+            }
+        };
+        scene.add(dust);
+        if (!window.dustSystems) window.dustSystems = [];
+        window.dustSystems.push(dust);
+    }
 }
 
 for (let i = -120; i <= 120; i += 40) {
@@ -894,8 +968,9 @@ function addWindowsToBuilding(mesh, bw, bh, bd) {
         bumpScale: 0.05,
         roughness: 0.1,
         metalness: 0.5,
-        emissive: new THREE.Color(0x112233),
-        emissiveIntensity: 0.3
+        emissiveMap: glassTex,
+        emissive: new THREE.Color(0xffffff),
+        emissiveIntensity: 0.8
     });
     const winGeo = new THREE.BoxGeometry(bw * 0.85, bh * 0.85, 0.2);
     [-1, 1].forEach(side => {
@@ -943,6 +1018,19 @@ function createOfficeBuilding(config, isNepo = false) {
     parapet.position.y = bh / 2 + 0.6;
     parapet.castShadow = true;
     group.add(parapet);
+
+    // Ground floor ledge
+    const ledge = new THREE.Mesh(new THREE.BoxGeometry(bw + 0.6, 0.6, bd + 0.6), parapetMat);
+    ledge.position.y = -bh / 2 + 3;
+    ledge.castShadow = true;
+    group.add(ledge);
+
+    // Front door frame
+    const doorFrameGeo = new THREE.BoxGeometry(3.5, 4.5, bd + 0.8);
+    const doorFrameMat = new THREE.MeshStandardMaterial({ color: isNepo ? 0xFFD700 : 0x111111, metalness: 0.6, roughness: 0.4 });
+    const doorFrame = new THREE.Mesh(doorFrameGeo, doorFrameMat);
+    doorFrame.position.set(0, -bh / 2 + 2.25, 0);
+    group.add(doorFrame);
 
     if (isNepo) {
         // Gold dome on top for nepo houses
@@ -1733,11 +1821,26 @@ function changeScreen(screenId) {
         s.classList.remove('active');
         s.classList.add('hidden');
     });
+    
+    if (isMobile) {
+        const kb = document.getElementById('mobile-keyboard');
+        const controls = document.getElementById('mobile-controls');
+        if (screenId === 'typing-screen') {
+            if (kb) kb.classList.remove('hidden');
+            if (controls) controls.classList.add('hidden');
+        } else {
+            if (kb) kb.classList.add('hidden');
+            if (controls && gameState === 'PLAYING') controls.classList.remove('hidden');
+        }
+    }
+
     if (screenId) {
         const s = document.getElementById(screenId);
-        s.classList.remove('hidden');
-        void s.offsetWidth;
-        s.classList.add('active');
+        if (s) {
+            s.classList.remove('hidden');
+            void s.offsetWidth;
+            s.classList.add('active');
+        }
         hud.style.display = screenId === 'typing-screen' ? 'flex' : 'none';
         crosshair.style.display = 'none';
     } else {
@@ -1764,9 +1867,8 @@ function startTypingMinigame(office) {
     updateTypingUI();
     changeScreen('typing-screen');
     if (isMobile) {
-        const input = document.getElementById('mobile-typing-input');
-        input.value = '';
-        input.focus();
+        document.getElementById('mobile-keyboard').classList.remove('hidden');
+        document.getElementById('mobile-controls').classList.add('hidden'); // hide joystick
     }
 }
 
@@ -1956,17 +2058,6 @@ document.addEventListener('keydown', (e) => {
         handleTypingCharacter(e.key);
     }
 });
-
-const mobileInput = document.getElementById('mobile-typing-input');
-mobileInput.addEventListener('input', (e) => {
-    if (gameState !== 'TYPING') return;
-    const val = e.target.value;
-    if (val.length > 0) {
-        handleTypingCharacter(val.slice(-1));
-        e.target.value = ''; // keep clearing it
-    }
-});
-
 document.addEventListener('keyup', (e) => {
     switch (e.code) {
         case 'ArrowUp': case 'KeyW': moveForward = false; break;
@@ -2200,6 +2291,11 @@ function animate() {
             });
         }
     });
+
+    if (window.dustSystems) {
+        const t = performance.now() * 0.002;
+        window.dustSystems.forEach(sys => sys.userData.update(t));
+    }
 
     renderer.render(scene, camera);
 }
