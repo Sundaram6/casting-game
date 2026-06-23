@@ -280,6 +280,32 @@ p {
     font-size: 36px;
     font-weight: 900;
     font-variant-numeric: tabular-nums;
+    transition: color 0.2s;
+    display: inline-block;
+}
+
+@keyframes timerPulse {
+    0% { color: #fff; transform: scale(1); }
+    50% { color: #ff4757; transform: scale(1.2); text-shadow: 0 0 15px #ff4757; }
+    100% { color: #fff; transform: scale(1); }
+}
+
+.timer-warning {
+    animation: timerPulse 0.5s infinite;
+}
+
+#hud-score {
+    display: inline-block;
+}
+
+@keyframes scorePop {
+    0% { transform: scale(1); color: #ffda79; }
+    50% { transform: scale(1.5); color: #2ed573; text-shadow: 0 0 15px #2ed573; }
+    100% { transform: scale(1); color: #ffda79; }
+}
+
+.score-pop {
+    animation: scorePop 0.3s ease-out;
 }
 
 /* ─── DOPAMINE ANIMATIONS ─── */
@@ -506,8 +532,6 @@ p {
     0%, 100% { opacity: 0; transform: scale(0.5); }
     35%, 70% { opacity: 1; transform: scale(1.15); }
 }
- 
- / *   
 
 /* Mobile Controls */
 #mobile-controls { position: absolute; inset: 0; pointer-events: none; z-index: 50; }

@@ -1,15 +1,19 @@
 # Changelog
 
-## [Unreleased]
+## [1.1.0] - Visual & Architecture Overhaul
+
 ### Added
-- Custom on-screen QWERTY keyboard for mobile playability to bypass native keyboard zoom/resize issues.
-- Dedicated mobile on-screen **SPRINT** and **JUMP** buttons.
-- Volumetric dust particle cones beneath streetlamps.
-- Dynamic view-bobbing to the camera when walking and sprinting.
-- 3D architectural details to office buildings (ground ledges, door frames, inset doors).
-- Glowing additive-blended halos to simulate a brighter sun.
+- **Dynamic Day/Night Cycle**: Implemented an animated time-of-day system that dynamically transitions the sky dome colors, directional lighting position, and intensities.
+- **Physics Particles**: Added bounding physics-based particle system for the typing minigame using dynamic primitive geometries.
+- **Micro-animations**: Added reactive UI elements, including dopamine pop animations for scores, combo multipliers, and an aggressive pulsing indicator for low timers.
+- **ES Modules & Vite**: Initialized the project with modern web tooling (Vite, npm) for structured dependency management (`three.js`) and module bundling.
 
 ### Changed
-- Replaced the procedural grass system and lighting with optimized variants to ensure 60 FPS performance.
-- Upgraded the building window materials to correctly use an emissive map so they glow realistically in the dark.
-- Fixed a bug where the spacebar could not be used in the typing minigame on mobile devices.
+- **Rendering Pipeline**: Switched from procedural textures to a robust `EffectComposer` pipeline incorporating `RenderPass`, `UnrealBloomPass`, and `ShaderPass` with `FXAAShader`.
+- **Sky Implementation**: Replaced legacy skyboxes with a custom gradient ShaderMaterial for realistic atmospheric scattering.
+- **Code Architecture**: Migrated monolithic `game.js` into an ES module `src/main.js` compatible with Vite compilation.
+
+### Fixed
+- Replaced non-existent `CapsuleGeometry` with native grouping and composite geometry functions for NPC character generation.
+- Addressed rendering context artifacts and removed circular dependency structures during module porting.
+- UI scaling and touch controls verified for better cross-device responsive mapping on mobile screens.

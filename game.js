@@ -1,3 +1,28 @@
+// --- Post-Processing (loaded dynamically) ---
+let EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, FXAAShader;
+let composer;
+
+function loadPostProcessing() {
+    return new Promise((resolve) => {
+        const scripts = [
+            'https://unpkg.com/three@0.128.0/examples/js/postprocessing/EffectComposer.js',
+            'https://unpkg.com/three@0.128.0/examples/js/postprocessing/RenderPass.js',
+            'https://unpkg.com/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js',
+            'https://unpkg.com/three@0.128.0/examples/js/postprocessing/ShaderPass.js',
+            'https://unpkg.com/three@0.128.0/examples/js/shaders/FXAAShader.js',
+            'https://unpkg.com/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js',
+            'https://unpkg.com/three@0.128.0/examples/js/shaders/CopyShader.js'
+        ];
+        let loaded = 0;
+        scripts.forEach(src => {
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = () => { loaded++; if (loaded === scripts.length) resolve(); };
+            document.head.appendChild(s);
+        });
+    });
+}
+
 // --- UI Elements ---
 const screens = {
     start: document.getElementById('start-screen'),
@@ -513,6 +538,85 @@ function createRoadTexture() {
     return tex;
 }
 
+// --- MATERIALS LIBRARY ---
+const MAT = {
+    BRICK: (color) => new THREE.MeshStandardMaterial({
+        map: createBrickTexture(color || '#8B4513'),
+        normalMap: createBrickNormalMap(),
+        normalScale: new THREE.Vector2(2.0, 2.0),
+        roughness: 0.85,
+        metalness: 0.02,
+        envMapIntensity: 0.4
+    }),
+    GLASS: () => new THREE.MeshStandardMaterial({
+        map: createGlassTexture(),
+        bumpMap: createGlassTexture(),
+        bumpScale: 0.05,
+        roughness: 0.05,
+        metalness: 0.6,
+        emissiveMap: createGlassTexture(),
+        emissive: new THREE.Color(0xffffff),
+        emissiveIntensity: 0.7,
+        transparent: true,
+        opacity: 0.85
+    }),
+    ROAD: () => new THREE.MeshStandardMaterial({
+        map: createRoadTexture(),
+        bumpMap: createRoadTexture(),
+        bumpScale: 0.1,
+        roughness: 0.75,
+        metalness: 0.0
+    }),
+    PAVEMENT: () => new THREE.MeshStandardMaterial({
+        map: createPavementTexture(),
+        bumpMap: createPavementTexture(),
+        bumpScale: 0.15,
+        roughness: 0.6,
+        metalness: 0.03
+    }),
+    GRASS: () => new THREE.MeshStandardMaterial({
+        map: createGrassTexture(),
+        bumpMap: createGrassTexture(),
+        bumpScale: 0.5,
+        roughness: 0.92,
+        metalness: 0.0
+    }),
+    NEON: (color) => new THREE.MeshStandardMaterial({
+        color: color || 0xff0000,
+        emissive: color || 0xff0000,
+        emissiveIntensity: 2.0,
+        roughness: 0.2,
+        metalness: 0.8
+    }),
+    LAMP_POST: () => new THREE.MeshStandardMaterial({
+        color: 0x334455,
+        metalness: 0.85,
+        roughness: 0.25
+    }),
+    LAMP_LENS: () => new THREE.MeshStandardMaterial({
+        color: 0xffe8a0,
+        emissive: 0xffe880,
+        emissiveIntensity: 1.8,
+        roughness: 0.1,
+        metalness: 0.0
+    }),
+    CARPET: (color) => new THREE.MeshStandardMaterial({
+        color: color || 0x8B0000,
+        roughness: 0.95,
+        metalness: 0.0
+    }),
+    METAL: () => new THREE.MeshStandardMaterial({
+        color: 0x888888,
+        metalness: 0.9,
+        roughness: 0.15
+    }),
+    WOOD: () => new THREE.MeshStandardMaterial({
+        color: 0x654321,
+        roughness: 0.7,
+        metalness: 0.0
+    })
+};
+
 // ─── STUDIO CONFIGS ──────────────────────────────────────────────────────────
 
 const NORMAL_STUDIOS = [
@@ -542,22 +646,47 @@ const NEPO_HOUSES = [
 const container = document.getElementById('game-container');
 scene = new THREE.Scene();
 
-// Volumetric procedural sky
-const skyCanvas = document.createElement('canvas');
-skyCanvas.width = 4; skyCanvas.height = 1024;
-const skyCtx = skyCanvas.getContext('2d');
-const skyGrad = skyCtx.createLinearGradient(0, 0, 0, 1024);
-skyGrad.addColorStop(0.0, '#0a1628'); // deep midnight blue top
-skyGrad.addColorStop(0.15, '#0e2a5a');
-skyGrad.addColorStop(0.35, '#1a5ea8');
-skyGrad.addColorStop(0.6, '#4b98db');
-skyGrad.addColorStop(0.8, '#7ec8e3');
-skyGrad.addColorStop(0.92, '#f5d7a3'); // warm horizon glow
-skyGrad.addColorStop(1.0, '#e8b87a');
-skyCtx.fillStyle = skyGrad;
-skyCtx.fillRect(0, 0, 4, 1024);
-scene.background = new THREE.CanvasTexture(skyCanvas);
-scene.fog = new THREE.FogExp2(0x8fbbd8, isMobile ? 0.007 : 0.004);
+// Sky dome - large sphere with gradient shader
+const skyGeo = new THREE.SphereGeometry(450, 32, 32);
+const skyMat = new THREE.ShaderMaterial({
+    uniforms: {
+        topColor: { value: new THREE.Color(0x0a1628) },
+        horizonColor: { value: new THREE.Color(0x7ec8e3) },
+        bottomColor: { value: new THREE.Color(0xf5d7a3) },
+        offset: { value: 20 },
+        exponent: { value: 0.5 }
+    },
+    vertexShader: `
+        varying vec3 vWorldPosition;
+        void main() {
+            vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+            vWorldPosition = worldPosition.xyz;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform vec3 topColor;
+        uniform vec3 horizonColor;
+        uniform vec3 bottomColor;
+        uniform float offset;
+        uniform float exponent;
+        varying vec3 vWorldPosition;
+        void main() {
+            float h = normalize(vWorldPosition + offset).y;
+            float t = max(pow(max(h, 0.0), exponent), 0.0);
+            vec3 sky = mix(horizonColor, topColor, t);
+            if (h < 0.0) {
+                sky = mix(horizonColor, bottomColor, min(-h * 3.0, 1.0));
+            }
+            gl_FragColor = vec4(sky, 1.0);
+        }
+    `,
+    side: THREE.BackSide
+});
+const skyDome = new THREE.Mesh(skyGeo, skyMat);
+scene.add(skyDome);
+scene.background = null; // Remove canvas texture background
+scene.fog = new THREE.FogExp2(0x7ec8e3, isMobile ? 0.006 : 0.0035);
 
 // Sun sphere (decorative)
 const sunGeo = new THREE.SphereGeometry(12, 32, 32);
@@ -594,6 +723,32 @@ renderer.toneMappingExposure = isMobile ? 1.0 : 1.3;
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.physicallyCorrectLights = false; // too expensive for realtime
 container.appendChild(renderer.domElement);
+
+// Post-processing setup
+async function initPostProcessing() {
+    await loadPostProcessing();
+    
+    composer = new THREE.EffectComposer(renderer);
+    
+    const renderPass = new THREE.RenderPass(scene, camera);
+    composer.addPass(renderPass);
+    
+    // Bloom for emissive glow (neon signs, sun, lamps)
+    const bloomPass = new THREE.UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        isMobile ? 0.3 : 0.6,  // strength
+        0.4,  // radius
+        0.85  // threshold
+    );
+    composer.addPass(bloomPass);
+    
+    // FXAA anti-aliasing
+    const fxaaPass = new THREE.ShaderPass(THREE.FXAAShader);
+    fxaaPass.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
+    composer.addPass(fxaaPass);
+}
+
+initPostProcessing();
 
 
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
@@ -770,73 +925,154 @@ lookZone.addEventListener('touchend', e => {
 
 // ─── LIGHTING ────────────────────────────────────────────────────────────────
 
-const ambientLight = new THREE.AmbientLight(0x4060a0, 0.25); // cool blue ambient
+const ambientLight = new THREE.AmbientLight(0x4060a0, 0.35);
 scene.add(ambientLight);
 
 // Hemisphere light for sky/ground GI
-const hemiLight = new THREE.HemisphereLight(0x88bbee, 0x3d5e25, 0.7);
+const hemiLight = new THREE.HemisphereLight(0x88bbee, 0x445533, 0.8);
 hemiLight.position.set(0, 200, 0);
 scene.add(hemiLight);
 
 // Primary sun directional light
-const dirLight = new THREE.DirectionalLight(0xfff4e0, 1.6);
+const dirLight = new THREE.DirectionalLight(0xfff4e0, 1.8);
 dirLight.position.set(180, 350, -300);
 dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = isMobile ? 512 : 2048;
-dirLight.shadow.mapSize.height = isMobile ? 512 : 2048;
-dirLight.shadow.camera.top = 300;
-dirLight.shadow.camera.bottom = -300;
-dirLight.shadow.camera.left = -300;
-dirLight.shadow.camera.right = 300;
-dirLight.shadow.bias = -0.0003;
+dirLight.shadow.mapSize.width = isMobile ? 1024 : 2048;
+dirLight.shadow.mapSize.height = isMobile ? 1024 : 2048;
+dirLight.shadow.camera.top = 350;
+dirLight.shadow.camera.bottom = -350;
+dirLight.shadow.camera.left = -350;
+dirLight.shadow.camera.right = 350;
+dirLight.shadow.camera.near = 1;
+dirLight.shadow.camera.far = 800;
+dirLight.shadow.bias = -0.0002;
+dirLight.shadow.normalBias = 0.02;
 scene.add(dirLight);
+
+// Rim light from behind for edge definition
+const rimLight = new THREE.DirectionalLight(0xffeedd, 0.3);
+rimLight.position.set(-180, 200, 300);
+scene.add(rimLight);
 
 // ─── ENVIRONMENT ─────────────────────────────────────────────────────────────
 
-// Outer grass with improved PBR material
-const grassTex = createGrassTexture();
-const groundGeo = new THREE.PlaneGeometry(600, 600, 1, 1);
-const groundMat = new THREE.MeshStandardMaterial({
-    map: grassTex,
-    bumpMap: grassTex,
-    bumpScale: 0.5,
-    roughness: 0.92,
+// Grass - instanced blades for natural look
+const grassGroup = new THREE.Group();
+const bladeCount = isMobile ? 3000 : 8000;
+
+// Blade geometry - simple triangle
+const bladeGeo = new THREE.BufferGeometry();
+const bladeVertices = new Float32Array([
+    -0.1, 0, 0,
+     0.1, 0, 0,
+     0.0, 0.8, 0
+]);
+const bladeUvs = new Float32Array([0,0, 1,0, 0.5,1]);
+bladeGeo.setAttribute('position', new THREE.BufferAttribute(bladeVertices, 3));
+bladeGeo.setAttribute('uv', new THREE.BufferAttribute(bladeUvs, 2));
+
+const bladeMat = new THREE.MeshStandardMaterial({
+    color: 0x4a7c3f,
+    roughness: 0.9,
     metalness: 0.0,
-    envMapIntensity: 0.3
+    side: THREE.DoubleSide
 });
-const ground = new THREE.Mesh(groundGeo, groundMat);
-ground.rotation.x = -Math.PI / 2;
-ground.receiveShadow = true;
-scene.add(ground);
+
+const grassInstanced = new THREE.InstancedMesh(bladeGeo, bladeMat, bladeCount);
+const dummy = new THREE.Object3D();
+const grassColors = [];
+
+for (let i = 0; i < bladeCount; i++) {
+    const x = (Math.random() - 0.5) * 580;
+    const z = (Math.random() - 0.5) * 580;
+    const scale = 0.5 + Math.random() * 1.0;
+    const rotation = Math.random() * Math.PI;
+    
+    // Skip blades that would be on the plaza or roads
+    if (Math.abs(x) < 65 && Math.abs(z) < 65) continue;
+    if (Math.abs(x) < 8 && Math.abs(z) < 155) continue;
+    if (Math.abs(z) < 8 && Math.abs(x) < 155) continue;
+    
+    dummy.position.set(x, scale * 0.4, z);
+    dummy.rotation.set(0, rotation, (Math.random() - 0.5) * 0.3);
+    dummy.scale.set(1, scale, 1);
+    dummy.updateMatrix();
+    grassInstanced.setMatrixAt(i, dummy.matrix);
+    
+    // Slight color variation
+    const shade = 0.8 + Math.random() * 0.4;
+    grassInstanced.setColorAt(i, new THREE.Color(0.29 * shade, 0.49 * shade, 0.25 * shade));
+}
+
+grassInstanced.instanceMatrix.needsUpdate = true;
+if (grassInstanced.instanceColor) grassInstanced.instanceColor.needsUpdate = true;
+grassInstanced.receiveShadow = true;
+scene.add(grassInstanced);
 
 // Central pavement plaza
 const paveTex = createPavementTexture();
 const paveNorm = createPavementNormalMap();
 const plazaGeo = new THREE.PlaneGeometry(120, 120);
 // Pavement bump (cheaper than normal map)
-const plazaMat = new THREE.MeshStandardMaterial({
-    map: paveTex,
-    bumpMap: paveTex,
-    bumpScale: 0.15,
-    roughness: 0.55,
-    metalness: 0.05
-});
+const plazaMat = MAT.PAVEMENT();
 const plaza = new THREE.Mesh(plazaGeo, plazaMat);
 plaza.rotation.x = -Math.PI / 2;
 plaza.position.y = 0.02;
 plaza.receiveShadow = true;
 scene.add(plaza);
 
+// Water feature in plaza
+const waterGeo = new THREE.PlaneGeometry(30, 30, 32, 32);
+const waterMat = new THREE.ShaderMaterial({
+    uniforms: {
+        time: { value: 0 },
+        color1: { value: new THREE.Color(0x1a5ea8) },
+        color2: { value: new THREE.Color(0x7ec8e3) },
+        opacity: { value: 0.7 }
+    },
+    vertexShader: `
+        uniform float time;
+        varying vec2 vUv;
+        varying float vElevation;
+        void main() {
+            vUv = uv;
+            vec3 pos = position;
+            float wave1 = sin(pos.x * 2.0 + time * 1.5) * 0.15;
+            float wave2 = sin(pos.y * 3.0 + time * 1.2) * 0.1;
+            pos.z = wave1 + wave2;
+            vElevation = pos.z;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform vec3 color1;
+        uniform vec3 color2;
+        uniform float opacity;
+        varying vec2 vUv;
+        varying float vElevation;
+        void main() {
+            float mixFactor = (vElevation + 0.25) * 2.0;
+            vec3 color = mix(color1, color2, mixFactor);
+            // Add subtle sparkle
+            float sparkle = pow(sin(vUv.x * 50.0 + vUv.y * 50.0) * 0.5 + 0.5, 8.0);
+            color += vec3(sparkle * 0.3);
+            gl_FragColor = vec4(color, opacity);
+        }
+    `,
+    transparent: true,
+    side: THREE.DoubleSide
+});
+
+const water = new THREE.Mesh(waterGeo, waterMat);
+water.rotation.x = -Math.PI / 2;
+water.position.set(0, 0.08, 0);
+scene.add(water);
+
 // Roads radiating out from centre
 function addRoad(x, z, w, h) {
     const roadTex = createRoadTexture();
     const rGeo = new THREE.PlaneGeometry(w, h);
-    const rMat = new THREE.MeshStandardMaterial({
-        map: roadTex,
-        bumpMap: roadTex,
-        bumpScale: 0.1,
-        roughness: 0.75
-    });
+    const rMat = MAT.ROAD();
     const r = new THREE.Mesh(rGeo, rMat);
     r.rotation.x = -Math.PI / 2;
     r.position.set(x, 0.01, z);
@@ -848,7 +1084,7 @@ addRoad(0, 0, 300, 12);   // E-W road
 
 // Street lamps — emissive glow only, NO point lights
 function addLamp(x, z) {
-    const postMat = new THREE.MeshStandardMaterial({ color: 0x334455, metalness: 0.8, roughness: 0.3 });
+    const postMat = MAT.LAMP_POST();
     const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.18, 9, 6), postMat);
     post.position.set(x, 4.5, z);
     post.castShadow = true;
@@ -856,7 +1092,7 @@ function addLamp(x, z) {
 
     const lampHead = new THREE.Mesh(
         new THREE.BoxGeometry(2, 0.5, 0.8),
-        new THREE.MeshStandardMaterial({ color: 0x1a2530, metalness: 0.7, roughness: 0.35 })
+        new THREE.MeshStandardMaterial({ color: 0x1a2530, metalness: 0.75, roughness: 0.3 })
     );
     lampHead.position.set(x + 1, 9.0, z);
     scene.add(lampHead);
@@ -864,7 +1100,7 @@ function addLamp(x, z) {
     // Emissive lens — looks like it glows, costs nothing
     const lens = new THREE.Mesh(
         new THREE.BoxGeometry(1.6, 0.3, 0.7),
-        new THREE.MeshStandardMaterial({ color: 0xffe8a0, emissive: 0xffe880, emissiveIntensity: 1.5 })
+        MAT.LAMP_LENS()
     );
     lens.position.set(x + 1, 8.7, z);
     scene.add(lens);
@@ -918,34 +1154,49 @@ for (let i = -120; i <= 120; i += 40) {
     addLamp(i, -8);
 }
 
-// Clouds — simple and lightweight
+// Clouds — fluffy PBR clouds
 function createCloudMesh() {
     const g = new THREE.Group();
-    const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
+    const mat = new THREE.MeshStandardMaterial({ 
+        color: 0xffffff, 
+        roughness: 0.9,
+        metalness: 0.0,
+        flatShading: true,
+        transparent: true, 
+        opacity: 0.9 
+    });
     const puffs = [
-        [0, 0, 0, 12, 5, 8],
-        [8, 1, 0, 10, 4, 7],
-        [-7, 0.5, 0, 8, 4, 6],
-        [3, 2, 0, 7, 4, 5],
+        [0, 0, 0, 16, 8, 12],
+        [10, 2, 2, 14, 6, 10],
+        [-10, 1, -2, 12, 6, 9],
+        [4, 4, 3, 10, 6, 8],
+        [-5, -2, 5, 8, 5, 8],
     ];
     puffs.forEach(([px, py, pz, sw, sh, sd]) => {
-        const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 6, 5), mat);
+        // Icosahedron geometry gives nice low-poly look with flatShading
+        const sphere = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 1), mat);
         sphere.scale.set(sw, sh, sd);
         sphere.position.set(px, py, pz);
+        sphere.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+        sphere.castShadow = true;
+        sphere.receiveShadow = true;
         g.add(sphere);
     });
     return g;
 }
 const cloudObjects = [];
-for (let i = 0; i < 10; i++) {
+const numClouds = isMobile ? 12 : 25;
+for (let i = 0; i < numClouds; i++) {
     const cloud = createCloudMesh();
     cloud.position.set(
-        (Math.random() - 0.5) * 500,
-        65 + Math.random() * 50,
-        (Math.random() - 0.5) * 500
+        (Math.random() - 0.5) * 800,
+        120 + Math.random() * 80,
+        (Math.random() - 0.5) * 800
     );
     cloud.rotation.y = Math.random() * Math.PI;
-    cloud.userData.speed = 0.3 + Math.random() * 1.0;
+    const scale = 0.5 + Math.random() * 1.5;
+    cloud.scale.set(scale, scale, scale);
+    cloud.userData.speed = 0.2 + Math.random() * 0.8;
     scene.add(cloud);
     cloudObjects.push(cloud);
 }
@@ -962,16 +1213,7 @@ let nepoCrowds = []; // nepo kids walking into nepo houses
 
 function addWindowsToBuilding(mesh, bw, bh, bd) {
     const glassTex = createGlassTexture();
-    const winMat = new THREE.MeshStandardMaterial({
-        map: glassTex,
-        bumpMap: glassTex,
-        bumpScale: 0.05,
-        roughness: 0.1,
-        metalness: 0.5,
-        emissiveMap: glassTex,
-        emissive: new THREE.Color(0xffffff),
-        emissiveIntensity: 0.8
-    });
+    const winMat = MAT.GLASS();
     const winGeo = new THREE.BoxGeometry(bw * 0.85, bh * 0.85, 0.2);
     [-1, 1].forEach(side => {
         const win = new THREE.Mesh(winGeo, winMat);
@@ -2297,7 +2539,30 @@ function animate() {
         window.dustSystems.forEach(sys => sys.userData.update(t));
     }
 
-    renderer.render(scene, camera);
+    // Water animation
+    if (typeof water !== 'undefined' && water && waterMat.uniforms) {
+        waterMat.uniforms.time.value = performance.now() * 0.001;
+    }
+
+    // Grass wind animation (desktop only)
+    if (!isMobile && typeof grassInstanced !== 'undefined' && grassInstanced) {
+        const time = performance.now() * 0.001;
+        for (let i = 0; i < bladeCount; i++) {
+            const wave = Math.sin(time * 2 + i * 0.01) * 0.05;
+            grassInstanced.getMatrixAt(i, dummy.matrix);
+            dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale);
+            dummy.position.y += wave * 0.1;
+            dummy.updateMatrix();
+            grassInstanced.setMatrixAt(i, dummy.matrix);
+        }
+        grassInstanced.instanceMatrix.needsUpdate = true;
+    }
+
+    if (composer) {
+        composer.render();
+    } else {
+        renderer.render(scene, camera);
+    }
 }
 
 window.addEventListener('resize', () => {
@@ -2305,6 +2570,9 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    if (composer) {
+        composer.setSize(window.innerWidth, window.innerHeight);
+    }
 });
 
 animate();
