@@ -17,6 +17,7 @@ import {
     createAllowedSignTexture
 } from './materials.js';
 import { initEnvironment } from './environment.js';
+import { updateDialogueUI } from './ui/dialogue-ui.js';
 
 // --- Post-Processing (loaded dynamically) ---
 
@@ -1836,6 +1837,9 @@ function animate() {
     if (typeof water !== 'undefined' && water && waterMat.uniforms) {
         waterMat.uniforms.time.value = performance.now() * 0.001;
     }
+
+    // Update dialogue UI
+    updateDialogueUI();
 
     // Grass wind animation (desktop only)
     if (!isMobile && typeof grassInstanced !== 'undefined' && grassInstanced) {
