@@ -5,6 +5,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+import { initScene, getScene, getCamera, getRenderer } from './scene.js';
 
 // --- Post-Processing (loaded dynamically) ---
 
@@ -45,7 +46,6 @@ const nightBottom = new THREE.Color(0x0a1525);
 let dayTime = Math.PI / 2; // start at day
 
 let gameState = 'START';
-let camera, scene, renderer;
 let score = 0;
 let totalOffices = 15;
 let officesCompleted = 0;
@@ -642,8 +642,10 @@ const NEPO_HOUSES = [
 
 // ─── THREE.JS SETUP ──────────────────────────────────────────────────────────
 
-const container = document.getElementById('game-container');
-scene = new THREE.Scene();
+initScene();
+const scene = getScene();
+const camera = getCamera();
+const renderer = getRenderer();
 
 // Sky dome - large sphere with gradient shader
 const skyGeo = new THREE.SphereGeometry(450, 32, 32);
@@ -709,24 +711,8 @@ for(let i=1; i<=3; i++) {
     scene.add(haloMesh);
 }
 
-camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.y = 2;
-
-renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'high-performance' });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio || 1, 1.5) : Math.min(window.devicePixelRatio || 1, 2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = isMobile ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = isMobile ? 1.0 : 1.3;
-renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.physicallyCorrectLights = false; // too expensive for realtime
-container.appendChild(renderer.domElement);
-
 // Post-processing setup
-async function initPostProcessing() {
-    await loadPostProcessing();
-    
+function initPostProcessing() {
     composer = new EffectComposer(renderer);
     
     const renderPass = new RenderPass(scene, camera);
@@ -2415,6 +2401,10 @@ function animateDog(d, dt) {
 function animate() {
     requestAnimationFrame(animate);
 
+    const time = performance.now();
+    const dt = Math.min((time - prevTime) / 1000, 0.05);
+    prevTime = time;
+
     // Update physics particles
     for (let i = physicsParticles.length - 1; i >= 0; i--) {
         const p = physicsParticles[i];
@@ -2443,7 +2433,6 @@ function animate() {
         }
     }
 
-
     // --- DAY/NIGHT CYCLE ---
     dayTime += dt * 0.1; // speed of day/night
     const blend = (Math.sin(dayTime) + 1.0) / 2.0; // 0 to 1
@@ -2469,11 +2458,6 @@ function animate() {
     if (rimLight) {
         rimLight.intensity = Math.max(0.1, blend * 0.6);
     }
-
-
-    const time = performance.now();
-    const dt = Math.min((time - prevTime) / 1000, 0.05);
-    prevTime = time;
 
     // Drift clouds
     cloudObjects.forEach(c => {
@@ -2665,10 +2649,6 @@ function animate() {
 }
 
 window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     if (composer) {
         composer.setSize(window.innerWidth, window.innerHeight);
     }
