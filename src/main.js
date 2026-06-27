@@ -18,6 +18,8 @@ import {
 } from './materials.js';
 import { initEnvironment } from './environment.js';
 import { updateDialogueUI } from './ui/dialogue-ui.js';
+import { updateInteraction, interact } from './interaction.js';
+import { setState, STATES } from './state.js';
 
 // --- Post-Processing (loaded dynamically) ---
 
@@ -1245,6 +1247,7 @@ function initGame() {
     velocity.set(0, 0, 0);
     screens.gameOver.classList.remove('flashing');
     gameState = 'PLAYING';
+    setState(STATES.EXPLORING);
     changeScreen(null);
     sounds.bgm.play().catch(() => {});
     sounds.chatter.play().catch(() => {});
@@ -1496,8 +1499,11 @@ document.addEventListener('keydown', (e) => {
             case 'ArrowDown': case 'KeyS': moveBackward = true; break;
             case 'ArrowRight': case 'KeyD': moveRight = true; break;
             case 'ShiftLeft': case 'ShiftRight': isSprinting = true; break;
-            case 'Space': 
+            case 'Space':
                 if (isGrounded) { velocityY = 15; isGrounded = false; }
+                break;
+            case 'KeyE':
+                interact();
                 break;
         }
     } else if (gameState === 'TYPING') {
@@ -1840,6 +1846,18 @@ function animate() {
 
     // Update dialogue UI
     updateDialogueUI();
+
+    // Update interaction system
+    if (gameState === 'PLAYING') {
+        const nearby = updateInteraction(camera);
+        const prompt = document.getElementById('interaction-prompt');
+        if (nearby) {
+            prompt.classList.remove('hidden');
+            document.getElementById('interaction-text').textContent = nearby.label || 'Interact';
+        } else {
+            prompt.classList.add('hidden');
+        }
+    }
 
     // Grass wind animation (desktop only)
     if (!isMobile && typeof grassInstanced !== 'undefined' && grassInstanced) {

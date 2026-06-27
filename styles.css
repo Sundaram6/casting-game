@@ -629,6 +629,36 @@ p {
     flex: 5;
 }
 
+/* Interaction Prompt */
+#interaction-prompt {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 4px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 150;
+}
+
+#interaction-key {
+    background: rgba(255, 215, 0, 0.2);
+    border: 1px solid #FFD700;
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+#interaction-text {
+    color: #fff;
+    font-size: 0.9rem;
+}
+
 /* Dialogue UI */
 #dialogue-overlay {
     position: fixed;
