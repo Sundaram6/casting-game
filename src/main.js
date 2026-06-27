@@ -6,6 +6,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import { initScene, getScene, getCamera, getRenderer } from './scene.js';
+import { initLighting, getAmbientLight, getHemiLight, getDirLight, getRimLight } from './lighting.js';
 
 // --- Post-Processing (loaded dynamically) ---
 
@@ -643,6 +644,7 @@ const NEPO_HOUSES = [
 // ─── THREE.JS SETUP ──────────────────────────────────────────────────────────
 
 initScene();
+initLighting();
 const scene = getScene();
 const camera = getCamera();
 const renderer = getRenderer();
@@ -907,37 +909,6 @@ lookZone.addEventListener('touchend', e => {
         }
     }
 });
-
-// ─── LIGHTING ────────────────────────────────────────────────────────────────
-
-const ambientLight = new THREE.AmbientLight(0x4060a0, 0.35);
-scene.add(ambientLight);
-
-// Hemisphere light for sky/ground GI
-const hemiLight = new THREE.HemisphereLight(0x88bbee, 0x445533, 0.8);
-hemiLight.position.set(0, 200, 0);
-scene.add(hemiLight);
-
-// Primary sun directional light
-const dirLight = new THREE.DirectionalLight(0xfff4e0, 1.8);
-dirLight.position.set(180, 350, -300);
-dirLight.castShadow = true;
-dirLight.shadow.mapSize.width = isMobile ? 1024 : 2048;
-dirLight.shadow.mapSize.height = isMobile ? 1024 : 2048;
-dirLight.shadow.camera.top = 350;
-dirLight.shadow.camera.bottom = -350;
-dirLight.shadow.camera.left = -350;
-dirLight.shadow.camera.right = 350;
-dirLight.shadow.camera.near = 1;
-dirLight.shadow.camera.far = 800;
-dirLight.shadow.bias = -0.0002;
-dirLight.shadow.normalBias = 0.02;
-scene.add(dirLight);
-
-// Rim light from behind for edge definition
-const rimLight = new THREE.DirectionalLight(0xffeedd, 0.3);
-rimLight.position.set(-180, 200, 300);
-scene.add(rimLight);
 
 // ─── ENVIRONMENT ─────────────────────────────────────────────────────────────
 
@@ -2445,18 +2416,22 @@ function animate() {
     }
     
     // Update Lights
-    if (dirLight) {
-        dirLight.position.set(Math.cos(dayTime) * 300, Math.max(0, Math.sin(dayTime)) * 350 + 50, Math.sin(dayTime) * 300);
-        dirLight.intensity = Math.max(0, Math.sin(dayTime)) * 1.8;
+    const _dirLight = getDirLight();
+    const _ambientLight = getAmbientLight();
+    const _hemiLight = getHemiLight();
+    const _rimLight = getRimLight();
+    if (_dirLight) {
+        _dirLight.position.set(Math.cos(dayTime) * 300, Math.max(0, Math.sin(dayTime)) * 350 + 50, Math.sin(dayTime) * 300);
+        _dirLight.intensity = Math.max(0, Math.sin(dayTime)) * 1.8;
     }
-    if (ambientLight) {
-        ambientLight.intensity = Math.max(0.1, blend * 0.35);
+    if (_ambientLight) {
+        _ambientLight.intensity = Math.max(0.1, blend * 0.35);
     }
-    if (hemiLight) {
-        hemiLight.intensity = Math.max(0.1, blend * 0.5);
+    if (_hemiLight) {
+        _hemiLight.intensity = Math.max(0.1, blend * 0.5);
     }
-    if (rimLight) {
-        rimLight.intensity = Math.max(0.1, blend * 0.6);
+    if (_rimLight) {
+        _rimLight.intensity = Math.max(0.1, blend * 0.6);
     }
 
     // Drift clouds
