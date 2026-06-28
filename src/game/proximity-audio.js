@@ -1,6 +1,6 @@
 import { getCrowds, getNepoCrowds } from '../legacy/crowds.js';
 import { getOffices } from './buildings.js';
-import { getGameState } from './loop.js';
+import { getState, STATES } from '../state.js';
 
 const actorPhrases = [
     "I am an actor", "My height is six foot", "I can cry on cue",
@@ -20,7 +20,7 @@ function initProximityAudio(options) {
 }
 
 function spawnBuzzBubble(text, nearCenter = false) {
-    if (!buzzLayer || (getGameState() !== 'PLAYING' && getGameState() !== 'CELEBRATING')) return;
+    if (!buzzLayer || (getState() !== STATES.EXPLORING && getState() !== STATES.CELEBRATING)) return;
     const bubble = document.createElement('div');
     bubble.className = 'buzz-bubble';
     bubble.innerText = text;
@@ -42,7 +42,7 @@ function getVolumeByDistance(pos, maxDist = 40) {
 
 function initProximityAudioIntervals() {
     setInterval(() => {
-        if (getGameState() !== 'PLAYING' || !window.speechSynthesis) return;
+        if (getState() !== STATES.EXPLORING || !window.speechSynthesis) return;
         if (window.speechSynthesis.pending) return;
 
         const crowdArr = getCrowds();
@@ -95,7 +95,7 @@ function initProximityAudioIntervals() {
     }, 350);
 
     setInterval(() => {
-        if (getGameState() !== 'PLAYING') return;
+        if (getState() !== STATES.EXPLORING) return;
         const phrasePool = Math.random() > 0.78 ? nepoPhrases : actorPhrases;
         spawnBuzzBubble(phrasePool[Math.floor(Math.random() * phrasePool.length)], Math.random() > 0.65);
     }, 900);
