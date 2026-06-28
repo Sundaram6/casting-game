@@ -4,7 +4,7 @@ import { initScene, getScene, getCamera, getRenderer } from './scene.js';
 import { initLighting } from './lighting.js';
 import { initEnvironment } from './environment.js';
 import { initSundaramChapter } from './chapters/sundaram.js';
-import { setState, STATES, getCharacter, setCharacter } from './state.js';
+import { getState, setState, STATES, getCharacter, setCharacter } from './state.js';
 import { initAmbientSound, startAmbientForCharacter } from './audio/ambient.js';
 import './ui/switcher-ui.js';
 import './ui/subtitle-settings.js';
@@ -16,8 +16,8 @@ import { initJournalUI } from './ui/journal-ui.js';
 import { initSwitcherUI, resetChapterInit } from './ui/switcher-ui.js';
 import { createOffices, getOffices, NEPO_POSITIONS } from './game/buildings.js';
 import { initInput, getInputState, setInputState } from './game/input.js';
-import { initGameLoop, animate, getGameState, setGameState, getScore, addScore, getOfficesCompleted, incrementOfficesCompleted, getTotalOffices, spawnFireworks, spawnPhysicsParticle } from './game/loop.js';
-import { sounds, playSound } from './game/sounds.js';
+import { initGameLoop, animate, getScore, addScore, getOfficesCompleted, incrementOfficesCompleted, getTotalOffices, spawnFireworks, spawnPhysicsParticle } from './game/loop.js';
+import { sounds, playSound, stopAllSounds } from './game/sounds.js';
 import { initProximityAudio, spawnBuzzBubble, initProximityAudioIntervals } from './game/proximity-audio.js';
 import { initPostProcessing, resizePostProcessing } from './effects/postProcessing.js';
 
@@ -148,13 +148,13 @@ function lockOrShowMobileControls() {
 }
 
 screens.start.addEventListener('click', () => {
-    if (getGameState() === 'START' || getGameState() === 'GAME_OVER' || getGameState() === 'VICTORY') {
+    if (getState() === STATES.START || getState() === STATES.GAME_OVER || getState() === STATES.VICTORY) {
         initGame();
         lockOrShowMobileControls();
     }
 });
 controls.addEventListener('unlock', () => {
-    if (getGameState() === 'PLAYING') crosshair.style.display = 'none';
+    if (getState() === STATES.EXPLORING) crosshair.style.display = 'none';
 });
 controls.addEventListener('lock', () => {
     camera.rotation.set(0, 0, 0);
@@ -169,7 +169,8 @@ const { cloudObjects, water, waterMat, grassInstanced, bladeCount, dummy } = env
 
 // ─── GAME LOGIC ──────────────────────────────────────────────────────────────
 function initGame() {
-    setGameState('START');
+    stopAllSounds();
+    setState(STATES.START);
     if (buzzLayer) buzzLayer.innerHTML = '';
     document.body.classList.remove('shake-severe');
     updateHUD();
@@ -177,7 +178,7 @@ function initGame() {
     initJournalUI();
     initSwitcherUI();
     initTypingGame({
-        setGameState, getGameState, addScore, incrementOfficesCompleted,
+        addScore, incrementOfficesCompleted,
         getScore, getOfficesCompleted, getTotalOffices,
         camera, controls, sounds, playSound, spawnPhysicsParticle,
         spawnFireworks, spawnBuzzBubble, updateHUD, updateTypingDisplay, changeScreen, isMobile
@@ -196,7 +197,6 @@ function initGame() {
     inputState.isGrounded = true;
     setInputState(inputState);
     screens.gameOver.classList.remove('flashing');
-    setGameState('PLAYING');
     setState(STATES.EXPLORING);
     changeScreen(null);
     sounds.bgm.play().catch(() => {});
@@ -207,7 +207,7 @@ function initGame() {
         cloudObjects, water, waterMat, grassInstanced, bladeCount, dummy,
         isMobile, startTypingMinigame
     });
-    initInput({ gameStateGetter: getGameState, isMobile, camera });
+    initInput({ gameStateGetter: getState, isMobile, camera });
     initProximityAudio({ camera, buzzLayer });
     initProximityAudioIntervals();
 }
@@ -225,7 +225,7 @@ function changeScreen(screenId) {
             if (controls) controls.classList.add('hidden');
         } else {
             if (kb) kb.classList.add('hidden');
-            if (controls && getGameState() === 'PLAYING') controls.classList.remove('hidden');
+            if (controls && getState() === STATES.EXPLORING) controls.classList.remove('hidden');
         }
     }
     if (screenId) {
