@@ -846,3 +846,128 @@ p {
     transition: opacity 0.8s;
     z-index: 9999;
 }
+
+/* Journal Overlay */
+#journal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 250;
+    backdrop-filter: blur(4px);
+}
+
+.journal-container {
+    width: min(700px, 90vw);
+    max-height: 80vh;
+    background: rgba(20, 20, 30, 0.95);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.journal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.journal-title {
+    color: #FFD700;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.journal-close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.journal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.journal-entries {
+    padding: 16px 24px;
+    overflow-y: auto;
+    max-height: calc(80vh - 60px);
+}
+
+.journal-entry {
+    padding: 16px;
+    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: border-color 0.2s;
+}
+
+.journal-entry:hover {
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.journal-entry:last-child {
+    margin-bottom: 0;
+}
+
+.journal-entry-character {
+    color: #888;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.journal-entry-title {
+    color: #FFD700;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.journal-entry-content {
+    line-height: 1.6;
+}
+
+.journal-entry-content .text-hi {
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+.journal-entry-content .text-en {
+    color: #aaa;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.journal-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+}
+
+.journal-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.journal-empty-text {
+    font-size: 1rem;
+    color: #666;
+}
