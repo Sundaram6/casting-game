@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.1.0] - Bug Fixes, State Unification, and Victory Redesign
+
+### Fixed
+- **Dual state systems unified** — Merged `gameState` from loop.js into `state.js` STATES enum. Single source of truth eliminates Tab handler bug and state sync issues.
+- **Sound cleanup on all transitions** — Added `stopAllSounds()` function called before every state transition (game start, character switch, typing win/loss). Victory/careless whisper sounds now properly stopped.
+- **Tab handler fixed** — Character switcher now correctly blocks switching during typing minigames (fixed by state unification).
+
+### Added
+- **Satirical victory awards** — Each character receives 3 ironic awards after completing all offices. Arjun gets nepotism awards, Sundaram gets "nobody noticed" awards, Rekha gets "looking the other way" awards.
+- **Sigma Rule victory music** — Replaces FF7 Victory Fanfare with meme-appropriate sound for satirical ending.
+- **`stopAllSounds()` utility** — Exports from sounds.js for use across codebase.
+
+### Removed
+- **`sounds.success`** — Unused Yippee sound (dead code).
+- **`src/audio/music.js`** — Complete stub with no actual functionality.
+
 ## [2.0.0] - Narrative Satire Redesign
 
 ### Added
