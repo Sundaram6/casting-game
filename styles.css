@@ -788,3 +788,20 @@ p {
     color: #ccc;
     margin-top: 8px;
 }
+
+/* Hindi / Bhojpuri font support */
+.text-hi, .text-bhojpuri, .transition-hi {
+    font-family: 'Noto Sans Devanagari', sans-serif;
+}
+
+.text-en {
+    font-family: 'Outfit', sans-serif;
+    color: #aaa;
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+.text-bhojpuri {
+    color: #D4A574;
+    font-style: italic;
+}
