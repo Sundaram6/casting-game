@@ -20,6 +20,7 @@ import { initEnvironment } from './environment.js';
 import { updateDialogueUI } from './ui/dialogue-ui.js';
 import { updateInteraction, interact } from './interaction.js';
 import { setState, STATES } from './state.js';
+import './ui/switcher-ui.js';
 
 // --- Post-Processing (loaded dynamically) ---
 

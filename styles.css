@@ -724,3 +724,31 @@ p {
     color: #888;
     margin-left: 8px;
 }
+
+/* Character Switch Transition */
+#transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+}
+
+#transition-name {
+    text-align: center;
+    color: #FFD700;
+    font-size: 2.5rem;
+    font-weight: 300;
+    letter-spacing: 4px;
+}
+
+.transition-hi {
+    font-size: 1.5rem;
+    color: #ccc;
+    margin-top: 8px;
+}
