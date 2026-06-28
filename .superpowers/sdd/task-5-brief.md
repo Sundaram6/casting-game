@@ -1,66 +1,64 @@
-### Task 5: Create Environment Module
+# Task 5: Create Relationship Tracker
 
-**Files:**
-- Create: `src/environment.js`
-- Modify: `src/main.js` (extract environment code)
+## Files:
+- Create: `src/relationship.js`
+- Modify: `src/dialogue/engine.js`
+- Modify: `src/dialogue/arjun.js`
 
-**Interfaces:**
-- Consumes: `getScene()`, `MAT`, texture generators
-- Produces: `initEnvironment(scene)` — creates ground, plaza, roads, lamps, clouds, water
+## Interfaces:
+- Consumes: dialogue choices from engine.js
+- Produces: `updateRelationship(character, delta)`, `getRelationship(character)`, `getRelationshipSummary()`
 
-- [ ] **Step 1: Create environment.js**
+## Steps:
 
-Move all environment construction code from main.js into this file. The environment code spans approximately lines 986-1683 and includes:
-- Ground plane
-- Pavement sidewalks
-- Road meshes
-- Casting office building shell
-- Dhamaka Productions building shell
-- Glass windows
-- Interior carpet
-- Entrance steps
-- Lamp posts with glow spheres
-- Neon sign (nepo sign + allowed sign)
-- Interior casting office room
-- Waiting area chairs and table
-- Director's desk and chair
-- Office entrance door frame
-- Back room door
-- Casting office roof railings
-- Dhamaka Productions building details
-- Dhamaka glass windows
-- Water tower
-- AC units
-- Street lamp posts
-- Background buildings
-- Billboard
-- Clouds
-- Ambient dust particles
-- Office ceiling detail
+### Step 1: Create relationship tracker
 
-The function should accept scene as a parameter (not import getScene) since it's called from main.js which already has the scene.
-
+Create `src/relationship.js`:
 ```javascript
-import * as THREE from 'three';
-import { MAT, createPavementTexture, createRoadTexture, createGrassTexture } from './materials.js';
+const relationships = {
+  sundaram: { trust: 50, respect: 50, empathy: 50 },
+  arjun: { trust: 50, respect: 50, guilt: 50 },
+  rekha: { trust: 50, respect: 50, complicity: 50 }
+};
 
-export function initEnvironment(scene) {
-    // Ground, plaza, roads, lamps, clouds, water
-    // ... all environment construction code from main.js lines 986-1683
+export function updateRelationship(character, key, delta) {
+  if (relationships[character] && relationships[character][key] !== undefined) {
+    relationships[character][key] = Math.max(0, Math.min(100, relationships[character][key] + delta));
+  }
+}
+
+export function getRelationship(character) {
+  return relationships[character] ? { ...relationships[character] } : null;
+}
+
+export function getRelationshipSummary() {
+  return JSON.parse(JSON.stringify(relationships));
 }
 ```
 
-- [ ] **Step 2: Update main.js**
+### Step 2: Integrate with dialogue engine
 
-Remove environment code. Import and call `initEnvironment(scene)`.
+Modify `src/dialogue/engine.js` to accept optional `onChoice` callback that can call `updateRelationship()`:
+```javascript
+export function startDialogue(node, onChoice) {
+  // When a choice is made, call onChoice(choiceData) if provided
+  // Dialogue nodes can include relationship effects:
+  // choices: [
+  //   { text: {...}, next: '...', effects: { arjun: { guilt: +10 } } }
+  // ]
+}
+```
 
-- [ ] **Step 3: Test**
+### Step 3: Add relationship effects to Arjun's dialogue
 
-Verify environment renders correctly.
+In `src/dialogue/arjun.js`, add `effects` to key choices:
+- Choosing honesty with Sundaram → +empathy, +trust
+- Choosing to use connections → +guilt, -respect
+- Confronting father → varies based on dialogue path
 
-- [ ] **Step 4: Commit**
+### Step 4: Commit
 
 ```bash
-git add src/environment.js src/main.js
-git commit -m "feat: extract environment into environment.js"
+git add src/relationship.js src/dialogue/engine.js src/dialogue/arjun.js
+git commit -m "feat: add relationship tracker with dialogue integration"
 ```

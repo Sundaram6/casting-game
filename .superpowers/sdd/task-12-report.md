@@ -1,33 +1,27 @@
-# Task 12: Add Basic Ambient Sound — Report
+# Task 12: Build Convergence/Audition System
 
-## What I Implemented
+## Status
+DONE
 
-Created the ambient sound system with oscillator-based placeholder sounds for three environments (office, street, pg). The system:
-- Creates Web Audio API oscillators for each ambient type
-- Handles proper audio context initialization on first user interaction (click/tap) per browser policy
-- Maps characters to their ambient environments (Sundaram → street, Arjun/Rekha → office)
-- Supports location-based ambient switching with crossfade via linearRampToValueAtTime
-- Cleans up oscillators when switching between locations
+## Commits
+- `61a25f9` feat: add convergence/audition system with three perspectives
 
-## Files Changed
+## Test Summary
+Syntax validation with `node -c` passed for both `src/convergence/system.js` and `src/convergence/audition.js`.
 
-1. **Created:** `src/audio/ambient.js` — ambient sound system with oscillator-based sounds
-2. **Modified:** `src/main.js` — added imports, audio context initialization on first click/tap, and `startAmbientForCharacter()` call in `initGame()`
+## Concerns
+None.
 
-## Testing
+## Implementation Details
+- Created `src/convergence/system.js` with convergence state machine (`inactive → sundaram_audition → arjun_audition → rekha_decision → ending → complete`), `initConvergence()`, `advanceConvergence()`, `getConvergenceState()`, `isComplete()`, and `playAuditionPerspective(character)`.
+- Created `src/convergence/audition.js` with `AUDITION_DIALOGUE` containing nodes for each character's audition perspective, including:
+  - Sundaram's trilingual monologue (Hindi + English + Bhojpuri)
+  - Arjun's nervous audition relying on father's name
+  - Rekha's decision (Arjun confirmed, Sundaram rejected)
+  - Quiet devastating ending (Rekha stares at Sundaram's tape, closes laptop)
+- Dialogue nodes use the existing dialogue engine format (speaker, text, options) with `effects: ['advance']` on final options to trigger state advancement.
+- The convergence system is a narrative sequence; player watches with no decisions required (only "Continue" options).
 
-- Build succeeded (`vite build` completed with no errors)
-- All 28 modules transformed successfully including the new `src/audio/ambient.js`
-
-## Self-Review
-
-- ✅ Follows the exact structure from the task brief (oscillator configs, exported functions)
-- ✅ Imports `getCharacter()` from state.js as specified
-- ✅ Audio context created only on first user interaction (browser autoplay policy)
-- ✅ Character-based ambient mapping matches spec (sundaram=street, arjun=office, rekha=office)
-- ✅ No unnecessary comments or over-engineering
-- ✅ Consistent with existing code style
-
-## Commit
-
-- `dd4d310` — feat: add basic ambient sound system
+## Files Created
+1. `src/convergence/system.js`
+2. `src/convergence/audition.js`

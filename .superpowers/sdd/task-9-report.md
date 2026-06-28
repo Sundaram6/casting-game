@@ -1,37 +1,37 @@
-# Task 9: Create Interaction System - Report
+# Task 9: Create Flashback System - Report
 
-## Status: DONE
+## Completed Implementation
 
-## What Was Implemented
+### Files Created
+1. `src/flashback/system.js` - Core flashback system with state management, overlay control, and environment/dialogue integration
+2. `src/flashback/scenes.js` - Three character flashback scenes with dialogue nodes and environment presets
 
-### 1. Created `src/interaction.js`
-- Raycaster for detecting interactable objects at screen center
-- `registerInteractable(mesh, data)` - registry for interactable meshes
-- `updateInteraction(camera)` - checks for nearby interactables (within 5 units)
-- `interact()` - triggers interaction based on type (dialogue, examine, flashback)
-- Fixed the `require()` issue from the brief by using ES module import for `startDialogue`
+### Files Modified
+1. `src/environment.js` - Added three new environment presets: `sundaram_patna`, `arjun_childhood`, `rekha_1998`
+2. `src/dialogue/engine.js` - Modified `startDialogue` to allow dialogue during FLASHBACK state
+3. `src/game/loop.js` - Added import of `updateFlashback` and called it in the animate loop
+4. `index.html` - Added `#flashback-overlay` div before closing body tag
+5. `styles.css` - Added CSS for flashback overlay with fixed positioning and transition
 
-### 2. Added interaction prompt HTML to `index.html`
-- Added `#interaction-prompt` div with "E" key indicator and interaction text label
+### Features Implemented
+- **Flashback triggering**: `triggerFlashback(sceneKey, duration)` starts a flashback sequence
+- **State management**: Uses existing `STATES.FLASHBACK` state for proper game state transitions
+- **Visual overlay**: Black overlay fades in/out with 0.8s transition
+- **Environment switching**: Changes lighting presets during flashbacks
+- **Dialogue integration**: Shows character-specific dialogue during flashbacks
+- **Three character flashbacks**:
+  - `sundaram_patna`: Sundaram's mother encouraging him to go to Mumbai
+  - `arjun_childhood`: Arjun's father getting him a role on a film set
+  - `rekha_1998`: Rekha fighting for an unknown Adivasi actress
 
-### 3. Added interaction CSS to `styles.css`
-- Styled `#interaction-prompt` with fixed positioning at bottom center
-- Gold-themed styling matching the game's aesthetic
+### Technical Details
+- Flashback phases: `idle`, `fading_in`, `playing`, `fading_out`
+- Duration control via scene definitions or override parameter
+- Saves/restores previous environment preset
+- Proper state transitions: EXPLORING → FLASHBACK → EXPLORING
+- Dialogue engine modified to work in FLASHBACK state
 
-### 4. Updated `src/main.js`
-- Added imports for `updateInteraction`, `interact`, `setState`, and `STATES`
-- Added `setState(STATES.EXPLORING)` in `initGame()` to sync state.js with main.js
-- Added `updateInteraction(camera)` call in animation loop to update prompt UI
-- Added `KeyE` handler to trigger interactions
-
-## Files Changed
-- `src/interaction.js` (created)
-- `src/main.js` (modified)
-- `index.html` (modified)
-- `styles.css` (modified)
-
-## Self-Review
-- The `require()` issue from the brief was fixed by using ES module imports
-- State synchronization between main.js and state.js is handled correctly
-- The interaction system only activates when in PLAYING/EXPLORING state
-- Prompt UI updates every frame based on raycaster results
+### Verification
+- All JavaScript files pass `node -c` syntax check
+- Commit created with all required files
+- System integrates with existing game loop and state management

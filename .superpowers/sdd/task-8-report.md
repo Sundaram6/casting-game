@@ -1,43 +1,40 @@
-# Task 8: Create Dialogue UI
+# Task 8 Report: Create Rekha's Chapter Module
 
-## Status: DONE
-
-## What I implemented
-- Added dialogue overlay HTML elements to `index.html` (dialogue-overlay, dialogue-box, speaker, text, options)
-- Added CSS styles to `styles.css` for dialogue display (fixed bottom panel, gold accent, option buttons)
-- Created `src/ui/dialogue-ui.js` that connects the dialogue engine to the DOM:
-  - Imports `getCurrentNode`, `selectOption`, `isDialogueActive` from dialogue engine
-  - `updateDialogueUI()` function that shows/hides overlay based on dialogue state
-  - Displays speaker name with mapped display names (Sundaram Sharma, Rekha Iyer, etc.)
-  - Renders trilingual text (Hindi, English, Bhojpuri) in separate divs
-  - Creates clickable option buttons that call `selectOption` and refresh UI
-  - Keyboard shortcuts (1-3) for quick option selection
-- Integrated the UI into the main game loop (`src/main.js`) by importing `updateDialogueUI` and calling it each animation frame
-
-## What I tested
-- Build passes (`vite build` succeeds with no errors)
-- No import resolution issues
-- HTML structure matches the plan exactly
-- CSS includes all required selectors and styles
-- Dialogue UI module exports the required function
-
-## Files changed
-- `index.html` (added dialogue overlay HTML)
-- `styles.css` (added dialogue CSS)
-- `src/ui/dialogue-ui.js` (new file)
-- `src/main.js` (imported and called updateDialogueUI)
-
-## Self-review findings
-- All requirements from the task brief are satisfied
-- Speaker name mapping uses correct capitalized keys as clarified
-- Text display handles missing language variants gracefully
-- Option buttons are properly styled and interactive
-- The overlay integrates with existing z-index hierarchy (z-index 200, above UI layer)
-- No overbuilding beyond what was requested
-- Code follows existing project patterns (module imports, class-based styling)
+**Status:** DONE
 
 ## Commit
-- 9b8aa4b: "feat: add dialogue UI with trilingual text display"
+- `2da91ab` — feat: add Rekha's chapter module with tape reviewer UI
+
+## Files Created
+1. `src/chapters/rekha.js` (183 lines)
+2. `src/ui/tape-reviewer.js` (188 lines)
+
+## Summary
+
+### src/chapters/rekha.js
+Followed the arjun.js chapter module pattern exactly:
+- `initRekhaChapter(scene, cameraRef)` — creates office scene objects (desk, monitor, photo frame, wine glass, scripts, phone), registers interactables, sets environment preset
+- `updateRekhaChapter(delta)` — handles state-based camera transitions and scene effects
+- `triggerRekhaDialogue(nodeId)` — returns dialogue node from `REKHA_DIALOGUE`
+- `setRekhaState()` / `getRekhaState()` — state management with environment preset changes
+- States: morning → reviewing → phone_call → flashback → meeting → ending
+- All interactables wired to `REKHA_DIALOGUE` nodes
+- Monitor interactable triggers tape reviewer UI
+
+### src/ui/tape-reviewer.js
+Split-screen overlay for comparing audition tapes:
+- `showTapeReview()` / `hideTapeReview()` / `getCurrentTape()` exports
+- Left panel: Sundaram's tape (origin, description, dialogue snippet, verdict)
+- Right panel: Arjun's tape (same structure)
+- Toggle focus with Tab key (both → left → right → both)
+- Escape to close
+- `TAPES` data object contains full tape content for both characters
+- Uses `.hidden` class convention matching existing UI modules
+
+## Syntax Verification
+- `node -c src/chapters/rekha.js` — OK
+- `node -c src/ui/tape-reviewer.js` — OK
 
 ## Concerns
-None. The dialogue UI is fully functional and ready for integration with the game's dialogue system.
+- The HTML overlay (`#tape-review-overlay`, `#tape-left`, `#tape-right`, `#tape-toggle`) must be added to `index.html` for the UI to render — not in scope for this task but needed for integration.
+- Environment preset `rekha_office` referenced in `setEnvironmentPreset` — must exist in `environment.js` or will be a no-op.

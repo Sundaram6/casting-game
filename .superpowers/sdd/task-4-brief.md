@@ -1,129 +1,90 @@
-### Task 4: Create Materials Library Module
+# Task 4: Create Arjun's Chapter Module
 
-**Files:**
-- Create: `src/materials.js`
-- Modify: `src/main.js` (extract material/texture code)
+## Files:
+- Create: `src/chapters/arjun.js`
+- Modify: `src/state.js`
+- Modify: `src/environment.js`
 
-**Interfaces:**
-- Consumes: Three.js library
-- Produces: `MAT` object with all material factory functions
+## Interfaces:
+- Consumes: `ARJUN_DIALOGUE` from `src/dialogue/arjun.js`, scene, camera
+- Produces: `initArjunChapter(scene)`, `updateArjunChapter(dt)`
 
-- [ ] **Step 1: Create materials.js**
+## Steps:
 
-Move all texture generator functions and the `MAT` object from main.js into this file. Export `MAT` and all `create*Texture()` functions.
+### Step 1: Add Arjun states to state.js
 
-The texture generators in main.js are:
-- createPavementTexture()
-- createPavementNormalMap()
-- createGrassTexture()
-- createBrickTexture(baseColor)
-- createBrickNormalMap()
-- createGlassTexture()
-- createNeonSignTexture(text, neonColor, bgColor)
-- createNepoSignTexture()
-- createAllowedSignTexture()
-- createRoadTexture()
-
-The MAT object is around line 540-617.
-
+Add to `src/state.js`:
 ```javascript
-import * as THREE from 'three';
-
-// ... all texture generator functions
-
-export const MAT = {
-    BRICK: (color) => new THREE.MeshStandardMaterial({
-        map: createBrickTexture(color || '#8B4513'),
-        normalMap: createBrickNormalMap(),
-        normalScale: new THREE.Vector2(2.0, 2.0),
-        roughness: 0.85,
-        metalness: 0.02,
-        envMapIntensity: 0.4
-    }),
-    GLASS: () => new THREE.MeshStandardMaterial({
-        map: createGlassTexture(),
-        bumpMap: createGlassTexture(),
-        bumpScale: 0.05,
-        roughness: 0.05,
-        metalness: 0.6,
-        emissiveMap: createGlassTexture(),
-        emissive: new THREE.Color(0xffffff),
-        emissiveIntensity: 0.7,
-        transparent: true,
-        opacity: 0.85
-    }),
-    ROAD: () => new THREE.MeshStandardMaterial({
-        map: createRoadTexture(),
-        bumpMap: createRoadTexture(),
-        bumpScale: 0.1,
-        roughness: 0.75,
-        metalness: 0.0
-    }),
-    PAVEMENT: () => new THREE.MeshStandardMaterial({
-        map: createPavementTexture(),
-        bumpMap: createPavementTexture(),
-        bumpScale: 0.15,
-        roughness: 0.6,
-        metalness: 0.03
-    }),
-    GRASS: () => new THREE.MeshStandardMaterial({
-        map: createGrassTexture(),
-        bumpMap: createGrassTexture(),
-        bumpScale: 0.5,
-        roughness: 0.92,
-        metalness: 0.0
-    }),
-    NEON: (color) => new THREE.MeshStandardMaterial({
-        color: color || 0xff0000,
-        emissive: color || 0xff0000,
-        emissiveIntensity: 2.0,
-        roughness: 0.2,
-        metalness: 0.8
-    }),
-    LAMP_POST: () => new THREE.MeshStandardMaterial({
-        color: 0x334455,
-        metalness: 0.85,
-        roughness: 0.25
-    }),
-    LAMP_LENS: () => new THREE.MeshStandardMaterial({
-        color: 0xffe8a0,
-        emissive: 0xffe880,
-        emissiveIntensity: 1.8,
-        roughness: 0.1,
-        metalness: 0.0
-    }),
-    CARPET: (color) => new THREE.MeshStandardMaterial({
-        color: color || 0x8B0000,
-        roughness: 0.95,
-        metalness: 0.0
-    }),
-    METAL: () => new THREE.MeshStandardMaterial({
-        color: 0x888888,
-        metalness: 0.9,
-        roughness: 0.15
-    }),
-    WOOD: () => new THREE.MeshStandardMaterial({
-        color: 0x654321,
-        roughness: 0.7,
-        metalness: 0.0
-    })
+export const STATES = {
+  // Existing
+  EXPLORING: 'exploring',
+  DIALOGUE: 'dialogue',
+  // New
+  ARJUN_MORNING: 'arjun_morning',
+  ARJUN_ARRIVAL: 'arjun_arrival',
+  ARJUN_WAITING: 'arjun_waiting',
+  ARJUN_AUDITION: 'arjun_audition',
+  ARJUN_DINNER: 'arjun_dinner',
+  REKHA_OFFICE: 'rekha_office',
+  REKHA_FLASHBACK: 'rekha_flashback',
+  CONVERGENCE: 'convergence'
 };
 ```
 
-- [ ] **Step 2: Update main.js**
+### Step 2: Create arjun.js chapter module
 
-Remove texture generators and MAT object. Import from materials.js:
+Create `src/chapters/arjun.js`:
 ```javascript
-import { MAT, createPavementTexture, createBrickTexture, ... } from './materials.js';
+import { ARJUN_DIALOGUE } from '../dialogue/arjun.js';
+import { startDialogue } from '../dialogue/engine.js';
+
+let arjunScene = null;
+let arjunState = 'morning'; // morning → arrival → waiting → audition → dinner
+
+export function initArjunChapter(scene) {
+  arjunScene = scene;
+  arjunState = 'morning';
+  // Position camera at Arjun's apartment (high-rise view)
+  // Set up environmental triggers for this chapter
+}
+
+export function updateArjunChapter(dt) {
+  // Check environmental triggers
+  // Advance state based on player progress
+  // Handle transitions between scenes
+}
+
+export function triggerArjunDialogue(nodeId) {
+  if (ARJUN_DIALOGUE[nodeId]) {
+    startDialogue(ARJUN_DIALOGUE[nodeId]);
+  }
+}
+
+export function getArjunState() { return arjunState; }
 ```
 
-- [ ] **Step 3: Test**
+### Step 3: Create Arjun's environment variations
 
-Verify all materials render correctly.
+Arjun's chapter needs different environment states:
+- **Morning:** Camera at high-rise position (y=50), looking down at Mumbai skyline
+- **Arrival:** Camera at casting office entrance, luxury car visible
+- **Waiting room:** Same as Sundaram but from Arjun's perspective — he's comfortable, not anxious
+- **Audition:** Inside audition room, professional lighting
+- **Dinner:** Bandra restaurant setting (new environment or retextured office)
 
-- [ ] **Step 4: Commit**
+Add environment preset functions to `src/environment.js`:
+```javascript
+export function setEnvironmentPreset(preset) {
+  // 'sundaram_normal' - default warm lighting
+  // 'arjun_luxury' - cool whites, steel blues
+  // 'rekha_office' - muted greys, fluorescent
+  // 'arjun_dinner' - warm restaurant lighting
+}
+```
+
+### Step 4: Commit
 
 ```bash
-git add src/materials.js src/main.js
-git commit -m "feat: extract materials library into materials.js"
+git add src/chapters/arjun.js src/state.js src/environment.js
+git commit -m "feat: add Arjun's chapter module with environment presets"
 ```

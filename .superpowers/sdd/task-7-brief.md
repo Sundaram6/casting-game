@@ -1,92 +1,42 @@
-### Task 7: Create Dialogue Engine
+# Task 7: Create Rekha's Dialogue Trees
 
-**Files:**
-- Create: `src/dialogue/engine.js`
-- Create: `src/dialogue/sundaram.js`
+## Files:
+- Create: `src/dialogue/rekha.js`
 
-**Interfaces:**
-- Consumes: `getState()`, `setState()` from state.js
-- Produces: `startDialogue(id)`, `selectOption(index)`, `getCurrentNode()`, `isDialogueActive()`
+## Interfaces:
+- Consumes: dialogue engine API
+- Produces: `REKHA_DIALOGUE` object
 
-- [ ] **Step 1: Create dialogue engine**
+## Steps:
+
+### Step 1: Write Rekha's dialogue content
+
+Rekha's chapter dialogue for these scenes:
+1. **Morning routine** (3-4 nodes): Filter coffee, scripts, phone buzzing
+2. **Reviewing tapes** (4-5 nodes): Watching Sundaram's and Arjun's audition tapes side by side
+3. **Phone call with Vikram** (5-6 nodes): The compromising conversation — she pushes back, then relents
+4. **Flashback trigger** (2-3 nodes): The Adivasi actress from 1998
+5. **Meeting Sundaram** (4-5 nodes): After his audition, she sees his potential and his disappointment
+6. **Ending** (3-4 nodes): Glass of wine, the photo, the weight of 30 years
+
+Language: Hindi + English + occasional Tamil words (she's half-Tamil, half-Marathi)
+
+### Step 2: Create REKHA_DIALOGUE export
 
 ```javascript
-import { getState, setState, STATES } from '../state.js';
-
-let currentDialogue = null;
-let currentNodeId = null;
-
-export function startDialogue(dialogueData, startNodeId) {
-    if (getState() !== STATES.EXPLORING) return false;
-    currentDialogue = dialogueData;
-    currentNodeId = startNodeId;
-    setState(STATES.DIALOGUE);
-    return true;
-}
-
-export function getCurrentNode() {
-    if (!currentDialogue || !currentNodeId) return null;
-    return currentDialogue.nodes[currentNodeId];
-}
-
-export function selectOption(optionIndex) {
-    const node = getCurrentNode();
-    if (!node || !node.options || !node.options[optionIndex]) return false;
-    
-    const option = node.options[optionIndex];
-    
-    // Execute side effects
-    if (option.effect) option.effect();
-    
-    // Move to next node
-    if (option.next) {
-        currentNodeId = option.next;
-        return true;
-    }
-    
-    // End dialogue
-    endDialogue();
-    return false;
-}
-
-export function endDialogue() {
-    currentDialogue = null;
-    currentNodeId = null;
-    setState(STATES.EXPLORING);
-}
-
-export function isDialogueActive() {
-    return getState() === STATES.DIALOGUE && currentDialogue !== null;
-}
+export const REKHA_DIALOGUE = {
+  morning_routine: {
+    speaker: 'rekha',
+    text: { en: ' filter coffee. Scripts. The same morning for 30 years.', hi: 'फ़िल्टर कॉफ़ी। स्क्रिप्ट्स। 30 साल से वही सुबह।' },
+    next: 'morning_scripts'
+  },
+  // ... (full dialogue tree with 30+ nodes)
+};
 ```
 
-- [ ] **Step 2: Create Sundaram's dialogue data**
-
-Full dialogue tree for Sundaram's chapter with trilingual text (Hindi, English, Bhojpuri). Nodes:
-- start: First impression of the office
-- enter_office: Going inside
-- look_around: Exploring outside first
-- chai: Getting tea from chai wallah
-- waiting_room: Sitting in the waiting room
-- talk_actor: Talking to another actor
-- actor_response: Actor's response about Raksh Chhabra
-- sit_and_wait: Waiting
-- audition_call: Being called for audition
-- to_audition: Walking to audition room
-- audition_scene: The audition itself
-- audition_end: Rekha's response
-
-- [ ] **Step 3: Test dialogue flow**
-
-Import and test the dialogue engine in main.js. Verify:
-- `startDialogue(sundaramDialogue, 'start')` works
-- `getCurrentNode()` returns correct nodes
-- `selectOption(0)` advances dialogue
-- State transitions work correctly
-
-- [ ] **Step 4: Commit**
+### Step 3: Commit
 
 ```bash
-git add src/dialogue/
-git commit -m "feat: add dialogue engine with Sundaram's dialogue trees"
+git add src/dialogue/rekha.js
+git commit -m "feat: add Rekha's dialogue trees"
 ```

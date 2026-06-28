@@ -1,56 +1,97 @@
-### Task 15: Add Subtitle Toggle
+# Task 15: Re-enable Post-Processing with Fixed Clear Color
 
-**Files:**
-- Create: `src/ui/subtitle-settings.js`
-- Modify: `index.html` (add settings button)
-- Modify: `styles.css` (add subtitles-off style)
+## Files:
+- Modify: `src/main.js`
+- Create: `src/effects/postProcessing.js`
 
-**Interfaces:**
-- Consumes: dialogue UI, examine UI
-- Produces: toggle for showing/hiding subtitles
+## Interfaces:
+- Consumes: renderer, scene, camera
+- Produces: `initPostProcessing()`, `renderWithPostProcessing()`
 
-- [ ] **Step 1: Add settings button to HUD**
+## Steps:
 
-```html
-<button id="settings-btn" class="hud-btn">⚙</button>
-```
+### Step 1: Create post-processing module
 
-- [ ] **Step 2: Create subtitle settings**
-
+Create `src/effects/postProcessing.js`:
 ```javascript
-// src/ui/subtitle-settings.js
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+import * as THREE from 'three';
 
-let subtitlesEnabled = true;
+let composer = null;
 
-export function toggleSubtitles() {
-    subtitlesEnabled = !subtitlesEnabled;
-    document.body.classList.toggle('subtitles-off', !subtitlesEnabled);
+export function initPostProcessing(renderer, scene, camera, isMobile) {
+  composer = new EffectComposer(renderer);
+
+  // FIX: Set the render target clear color to match scene background
+  composer.renderTarget1.clearColor = new THREE.Color(0x87ceeb);
+  composer.renderTarget2.clearColor = new THREE.Color(0x87ceeb);
+
+  const renderPass = new RenderPass(scene, camera);
+  composer.addPass(renderPass);
+
+  const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    isMobile ? 0.2 : 0.4,  // Reduced strength
+    0.4,
+    0.9  // Higher threshold — only very bright things bloom
+  );
+  composer.addPass(bloomPass);
+
+  const fxaaPass = new ShaderPass(FXAAShader);
+  fxaaPass.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
+  composer.addPass(fxaaPass);
+
+  return composer;
 }
 
-export function areSubtitlesEnabled() {
-    return subtitlesEnabled;
+export function renderWithPostProcessing() {
+  if (composer) {
+    composer.render();
+    return true;
+  }
+  return false;
 }
 
-document.getElementById('settings-btn')?.addEventListener('click', toggleSubtitles);
+export function resizePostProcessing(width, height) {
+  if (composer) {
+    composer.setSize(width, height);
+  }
+}
 ```
 
-- [ ] **Step 3: Add CSS for subtitles off**
+### Step 2: Re-enable in main.js
 
-```css
-.subtitles-off #dialogue-overlay,
-.subtitles-off #examine-overlay {
-    opacity: 0;
-    pointer-events: none;
+In `src/main.js`, replace `composer = null` with:
+```javascript
+import { initPostProcessing, renderWithPostProcessing, resizePostProcessing } from './effects/postProcessing.js';
+
+// In initGame():
+composer = initPostProcessing(renderer, scene, camera, isMobile);
+
+// In animate():
+if (!renderWithPostProcessing()) {
+  renderer.render(scene, camera);
 }
+
+// In resize handler:
+resizePostProcessing(window.innerWidth, window.innerHeight);
 ```
 
-- [ ] **Step 4: Test**
+### Step 3: Test that bloom works without black background
 
-Verify settings button toggles subtitle visibility.
+Verify:
+- Scene renders correctly (no black areas)
+- Bloom adds subtle glow to neon signs, lamp lenses, sun
+- FXAA smooths edges
+- Performance is acceptable (30+ FPS desktop)
 
-- [ ] **Step 5: Commit**
+### Step 4: Commit
 
 ```bash
-git add src/ui/subtitle-settings.js index.html styles.css
-git commit -m "feat: add subtitle toggle in settings"
+git add src/effects/postProcessing.js src/main.js
+git commit -m "feat: re-enable post-processing with fixed clear color"
 ```

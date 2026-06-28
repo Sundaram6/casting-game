@@ -1,40 +1,109 @@
-# Task 6: Create State Machine
+# Task 6 Report: Implement Arjun's Key Scenes
 
-## What I Implemented
+## Status: DONE
 
-Created `src/state.js` with a simple finite state machine for the game, exactly as specified in the task brief.
+## Summary
 
-### Components:
-- **STATES object**: 7 game states (START, EXPLORING, DIALOGUE, INTERACTING, FLASHBACK, TRANSITIONING, CHAPTER_END)
-- **transitions object**: Defines valid state transitions
-- **getState()**: Returns current state
-- **setState(newState)**: Transitions to new state if valid, returns boolean
-- **canTransition(to)**: Checks if transition is valid
-- **getCharacter()**: Returns current character (default: 'sundaram')
-- **setCharacter(char)**: Sets current character
+Successfully implemented Arjun's key scenes with environmental triggers and narrative sequences:
+
+1. **Waiting Room Encounter** - Arjun meets Sundaram with Bhojpuri dialogue attempt
+2. **Audition Scene** - Narrative sequence with camera movement
+3. **Dinner Confrontation** - Climax with key line and relationship effects
+
+## Changes Made
+
+### 1. `src/dialogue/arjun.js`
+
+**Enhanced waiting room encounter:**
+- Added headshot detail to initial observation
+- Added Bhojpuri dialogue attempt node (`sundaram_bhojpuri_attempt`)
+- Added Bhojpuri response node (`sundaram_bhojpuri_response`)
+- Enhanced dialogue beats with relationship effects
+
+**Enhanced dinner confrontation:**
+- Added restaurant environment description
+- Added Vikram's arrival scene
+- Added Arjun's realization node referencing Sundaram's words
+- Maintained key line: "तेरे बाप ने मेहनत की है ताकि तेरे को मेहनत ना करनी पड़े।"
+
+### 2. `src/chapters/arjun.js`
+
+**Added environmental triggers:**
+- Created Sundaram NPC with creased headshot visual
+- Implemented proximity-based trigger (within 5 units)
+- Added scene state management system
+- Added environment preset transitions:
+  - `arjun_luxury` for morning scenes
+  - `arjun_dinner` for dinner confrontation
+
+**Added scene transition logic:**
+- Camera movement for audition scene
+- Camera movement for dinner scene
+- State-based environment preset changes
+
+**Added new exports:**
+- `setArjunSceneState(newState)` - Manages scene transitions
+- `getArjunSceneState()` - Returns current scene state
+
+### 3. `src/main.js`
+
+**Added Arjun chapter initialization:**
+- Imported `initArjunChapter` function
+- Added chapter initialization with camera reference
+- Added `setCharacter` import for character switching
 
 ## Testing
 
-Created and ran a test script verifying:
-- Initial state is START
-- Initial character is 'sundaram'
-- Valid transitions work (START -> EXPLORING -> DIALOGUE -> EXPLORING, etc.)
-- Invalid transitions are rejected and state remains unchanged
-- Full cycle: EXPLORING -> TRANSITIONING -> CHAPTER_END -> START
+✅ **Build successful** - Vite build completed without errors
+✅ **No syntax errors** - All JavaScript files parse correctly
+✅ **Import chain verified** - All module imports resolve properly
 
-All tests passed successfully.
+## Key Features Implemented
 
-## Files Changed
+### Waiting Room Encounter (Emotional Core)
+- Proximity trigger when camera is within 5 units of Sundaram NPC
+- Arjun notices Sundaram's creased headshot
+- Awkward Bhojpuri connection attempt
+- Sundaram's monologue about his journey from Bihar
+- Relationship effects: empathy, trust, respect adjustments
 
-- Created: `src/state.js` (42 lines)
+### Audition Scene (Narrative Sequence)
+- Camera movement to audition room
+- Dialogue with Raksh Chhabra
+- Arjun's performance monologue
+- Outcome revelation (father's influence)
 
-## Self-Review
+### Dinner Confrontation (Climax)
+- Restaurant environment preset
+- Vikram Malhotra's character appearance
+- Key line delivery: "Your father worked hard so you wouldn't have to"
+- Player choices determine emotional arc
+- Arjun's realization referencing Sundaram's words
 
-- **Completeness**: All required functions and states implemented ✅
-- **Quality**: Code is clean, follows specification exactly ✅
-- **Discipline**: No overbuilding, only what was requested ✅
-- **Testing**: Verified all transitions work correctly ✅
+## Relationship Effects
+
+All dialogue choices apply relationship effects:
+- **Sundaram**: trust, empathy, respect adjustments
+- **Arjun**: guilt, respect adjustments
+
+## Environment Presets
+
+Scene transitions trigger appropriate lighting:
+- `arjun_luxury` - Bright, clean lighting for apartment/morning
+- `arjun_dinner` - Warm, intimate lighting for restaurant
 
 ## Commit
 
-`fdf5682` - "feat: add game state machine"
+```
+feat: implement Arjun's complete chapter (morning to dinner)
+
+- Add waiting room encounter with Sundaram (Bhojpuri dialogue)
+- Add audition narrative sequence with camera movement
+- Add dinner confrontation with key line and relationship effects
+- Add environmental triggers and scene state management
+- Add Sundaram NPC with creased headshot visual
+```
+
+## Concerns
+
+None - all task requirements met successfully.

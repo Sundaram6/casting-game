@@ -1,25 +1,47 @@
-### Task 5 Report: Create Environment Module
+# Task 5 Report: Create Relationship Tracker
 
-**Status:** DONE
+## Status: DONE
 
-**What I implemented:**
-- Created `src/environment.js` with `initEnvironment(scene, isMobile)` function
-- Extracted all environment construction code from `src/main.js` (the `// ─── ENVIRONMENT ───` section, ~245 lines)
-- The extracted code includes: grass (instanced blades), central pavement plaza, animated water feature, road meshes, street lamps with volumetric dust particles, and cloud meshes
-- `initEnvironment` returns animation state (`cloudObjects`, `water`, `waterMat`, `grassInstanced`, `bladeCount`, `dummy`) needed by the animation loop in main.js
-- Updated `src/main.js` to import `initEnvironment` from `environment.js` and call it with the scene and isMobile flag
+## Files Created/Modified:
+- **Created:** `src/relationship.js` - Relationship tracking system
+- **Modified:** `src/dialogue/engine.js` - Added onChoice callback support
+- **Modified:** `src/dialogue/arjun.js` - Added effects to 10 key choices
 
-**Files changed:**
-- Created: `src/environment.js` (241 lines)
-- Modified: `src/main.js` (1867 lines, down from 2113)
+## Implementation Details:
 
-**Build verification:**
-- `vite build` succeeds with no errors (19 modules transformed)
-- Node syntax check passes for both files
+### 1. Relationship Tracker (`src/relationship.js`)
+- Tracks trust, respect, empathy, guilt, and complicity for sundaram, arjun, and rekha
+- Initial values set to 50 for all attributes
+- `updateRelationship(character, key, delta)` - Updates relationship values
+- `getRelationship(character)` - Returns a copy of character's relationship
+- `getRelationshipSummary()` - Returns all relationships
+- Values clamped between 0-100
 
-**Self-review findings:**
-- Clean 1:1 extraction with no logic changes
-- The brief listed many items (interior rooms, water tower, AC units, billboard, etc.) that don't exist in the current code. The actual environment section contains only grass, plaza, water, roads, lamps, and clouds. The other items appear to be planned features not yet implemented.
-- `isMobile` was passed as a second parameter to `initEnvironment` since it's needed for grass blade count, cloud count, and lamp dust particles. The brief only mentioned `scene` as a parameter, but `isMobile` is a required dependency.
+### 2. Dialogue Engine Integration (`src/dialogue/engine.js`)
+- Added optional `onChoice` callback parameter to `startDialogue()`
+- Modified `selectOption()` to handle `effects` property on choices
+- Calls `onChoice(effects)` when a choice with effects is selected
+- Clears callback on dialogue end
 
-**Commit:** `497fafc` feat: extract environment into environment.js
+### 3. Arjun's Dialogue Effects (`src/dialogue/arjun.js`)
+Added effects to 10 key choices:
+1. `waiting_enter` - Talking to Sundaram (+empathy, +trust) vs sitting quietly (-empathy)
+2. `auto_driver_knows_father` - Admitting identity (+guilt, -respect) vs downplaying (-guilt, +respect)
+3. `sundaram_reaction` - Responding to Sundaram (+trust, +empathy)
+4. `sundaram_hope` - Acknowledging Sundaram's hope (+empathy, +guilt)
+5. `sundaram_advice` - Taking Sundaram's advice (+trust, +respect)
+6. `morning_compliant` - Being compliant (+guilt, -respect)
+7. `morning_resigned` - Being resigned (+guilt)
+8. `dinner_father_anger` - Standing up to father (-guilt, +respect)
+9. `dinner_father_final` - Conceding to father (+guilt, -respect)
+10. `audition_perform` - Performing audition (+respect)
+11. `dinner_end` - Reflecting on dinner (+guilt)
+
+## Verification:
+- All files pass `node -c` syntax check
+- Existing dialogue functionality preserved
+- Effects are optional (existing choices without effects still work)
+
+## Commit:
+- SHA: 6bac3df
+- Message: feat: add relationship tracker with dialogue integration

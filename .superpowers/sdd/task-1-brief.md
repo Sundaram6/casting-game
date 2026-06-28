@@ -1,74 +1,80 @@
-### Task 1: Scaffold Vite Project
+# Task 1: Extract Old Typing Game into Standalone Module
 
-**Files:**
-- Create: `package.json`
-- Create: `vite.config.js`
-- Modify: `index.html`
+## Files:
+- Create: `src/legacy/typing-game.js`
+- Create: `src/legacy/typing-ui.js`
+- Create: `src/legacy/crowds.js`
+- Modify: `src/main.js` (remove extracted code, import from legacy/)
 
-**Interfaces:**
-- Consumes: existing `game.js`, `styles.css`
-- Produces: working Vite dev server with hot reload
+## Interfaces:
+- Consumes: `scene`, `camera`, `controls`, `offices` from main.js
+- Produces: `initTypingGame()`, `startTypingMinigame()`, `updateTyping()`, `handleGameOver()`, `createCrowds()`, `updateCrowds()`
 
-- [ ] **Step 1: Create package.json**
+## Steps:
 
-```json
-{
-  "name": "casting-office-3d",
-  "version": "2.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "three": "^0.160.0"
-  },
-  "devDependencies": {
-    "vite": "^5.0.0"
-  }
-}
+### Step 1: Create `src/legacy/` directory
+
+```bash
+mkdir -p src/legacy
 ```
 
-- [ ] **Step 2: Create vite.config.js**
+### Step 2: Extract typing minigame logic
 
+Move the following from `src/main.js` into `src/legacy/typing-game.js`:
+- `TARGET_WORD`, `typeIndex`, `currentTimer`, `maxTimer`, `currentOffice`, `combo`, `lastTypeTime`
+- `startTypingMinigame()` function
+- `updateTypingUI()` function
+- `handleTypingCharacter()` function (search for it in main.js)
+- `handleGameOver()` function
+- `showCelebrationScene()` function
+- `handleVictory()` function (search for it)
+- All typing-related keyboard event listeners
+
+Export: `initTypingGame(config)`, `startTypingMinigame(office, camera)`, `updateTyping(dt)`, `handleGameOver()`
+
+### Step 3: Extract crowd/NPC system
+
+Move from `src/main.js` into `src/legacy/crowds.js`:
+- `createPersonMesh()` function
+- `animatePerson()` function
+- `createDogMesh()` function
+- `animateDog()` function
+- `createCrowds()` function
+- Crowd update logic from the animate loop
+- `nepoCrowds`, `nepoDogs`, `crowds` arrays and their update logic
+
+Export: `initCrowds(scene, offices)`, `updateCrowds(dt)`, `getCrowds()`, `getNepoCrowds()`, `getNepoDogs()`
+
+### Step 4: Extract typing UI
+
+Move from `src/main.js` into `src/legacy/typing-ui.js`:
+- `updateTypingUI()` function
+- `screens.typing` references
+- `typedTextEl`, `untypedTextEl`, `timerBar`, `timerText` references
+- `startTypingMinigame()` screen change logic
+
+Export: `initTypingUI()`, `showTypingScreen(office)`, `hideTypingScreen()`, `updateTypingDisplay(typed, untyped, pct, time)`
+
+### Step 5: Refactor main.js to use legacy modules
+
+In `src/main.js`, replace extracted code with imports:
 ```javascript
-import { defineConfig } from 'vite';
-
-export default defineConfig({
-  root: '.',
-  publicDir: 'public',
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets'
-  }
-});
+import { initTypingGame, startTypingMinigame as legacyStartTyping, updateTyping } from './legacy/typing-game.js';
+import { initCrowds, updateCrowds } from './legacy/crowds.js';
+import { initTypingUI, showTypingScreen, hideTypingScreen } from './legacy/typing-ui.js';
 ```
 
-- [ ] **Step 3: Update index.html script tag**
+Remove all extracted functions and variables from main.js. Keep the import references. Verify the game still works.
 
-Replace the old script tag with:
-```html
-<script type="module" src="/src/main.js"></script>
-```
+### Step 6: Test and commit
 
-- [ ] **Step 4: Install dependencies**
+Run the dev server. Verify:
+- Old typing minigame still works (walk up to office, type "nepo kid")
+- Crowds still animate
+- Score/combos still function
+- No console errors
 
 ```bash
-npm install
-```
-
-- [ ] **Step 5: Test dev server**
-
-```bash
-npm run dev
-```
-
-Verify game loads in browser at `http://localhost:5173`.
-
-- [ ] **Step 6: Commit**
-
-```bash
-git add package.json package-lock.json vite.config.js index.html
-git commit -m "feat: scaffold Vite project with Three.js dependency"
+git add src/legacy/ src/main.js
+git commit -m "refactor: extract old typing game and crowds into legacy/ modules"
 ```

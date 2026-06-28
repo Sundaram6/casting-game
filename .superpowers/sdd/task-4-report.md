@@ -1,71 +1,36 @@
-# Task 4: Create Materials Library Module - Report
+# Task 4: Create Arjun's Chapter Module — Report
 
-## What I Implemented
+## Status: DONE
 
-Created `src/materials.js` containing all texture generator functions and the MAT object extracted from `src/main.js`. Updated `src/main.js` to import from the new module.
+## Commit
+- `d6d80eb` — feat: add Arjun's chapter module with environment presets
 
-### Changes Made
+## What was done
 
-1. **Created `src/materials.js`** with:
-   - All 10 texture generator functions:
-     - `createPavementTexture()`
-     - `createPavementNormalMap()`
-     - `createGrassTexture()`
-     - `createBrickTexture(baseColor)`
-     - `createBrickNormalMap()`
-     - `createGlassTexture()`
-     - `createNeonSignTexture(text, neonColor, bgColor)`
-     - `createNepoSignTexture()`
-     - `createAllowedSignTexture()`
-     - `createRoadTexture()`
-   - The MAT object with all material factory functions
-   - Named exports for MAT and all texture generators
+### 1. New states added to `src/state.js`
+Added 8 new state constants: `ARJUN_MORNING`, `ARJUN_ARRIVAL`, `ARJUN_WAITING`, `ARJUN_AUDITION`, `ARJUN_DINNER`, `REKHA_OFFICE`, `REKHA_FLASHBACK`, `CONVERGENCE`.
 
-2. **Updated `src/main.js`**:
-   - Added import for MAT and all texture generators from `./materials.js`
-   - Removed all texture generator functions (lines 88-538)
-   - Removed MAT object definition (lines 540-617)
+### 2. Created `src/chapters/arjun.js`
+- Follows same pattern as `src/chapters/sundaram.js`
+- Exports: `initArjunChapter(scene)`, `updateArjunChapter(delta)`, `triggerArjunDialogue(nodeId)`, `getArjunState()`, `setArjunState(state)`
+- Creates 3 interactables: luxury apartment door (dialogue), luxury car (dialogue), newspaper clipping (examine)
+- Includes NPC creation helper function
+- Imports `arjunDialogue` from `src/dialogue/arjun.js`
 
-## What I Tested
+### 3. Added environment preset system to `src/environment.js`
+- New `setEnvironmentPreset(presetName)` function with 4 presets:
+  - `sundaram_normal` — warm default lighting
+  - `arjun_luxury` — cool whites, steel blues, brighter
+  - `rekha_office` — muted greys, fluorescent
+  - `arjun_dinner` — warm restaurant tones
+- Uses dynamic import to access lighting getters (avoids circular dependency)
+- Exported `getEnvironmentPresets()` for discoverability
 
-- **Build verification**: Ran `npm run build` - succeeded without errors
-- **Import verification**: Confirmed `const MAT` no longer exists in main.js (only in materials.js)
-- **Usage verification**: Confirmed MAT is properly imported and used throughout main.js (7 usage locations)
-- **File structure verification**: Confirmed materials.js exports all required functions
-
-## Files Changed
-
-- `src/materials.js` (new) - 546 lines
-- `src/main.js` (modified) - reduced from 2632 to 2113 lines (519 lines removed)
-
-## Self-Review Findings
-
-**Completeness**: ✅ All requirements met
-- All 10 texture generator functions moved to materials.js
-- MAT object moved to materials.js
-- All functions properly exported
-- main.js updated with correct imports
-
-**Quality**: ✅ Clean implementation
-- Exact code preservation - no functional changes
-- Proper ES module syntax
-- Consistent code style maintained
-
-**Discipline**: ✅ Followed spec exactly
-- No over-engineering
-- No unnecessary modifications
-- Minimal changes to existing functionality
-
-**Testing**: ✅ Verified
-- Build succeeds
-- No syntax errors
-- Imports work correctly
-- MAT object properly exported and imported
+## Test summary
+- `node -c` syntax check: all 3 files pass
+- `node -e "import('./src/state.js')"` confirms all 15 states exported correctly
+- Game loads without errors (dynamic import of lighting.js deferred to runtime)
 
 ## Concerns
-
-None. The extraction was straightforward and successful.
-
-## Commits
-
-- `5d59ca3` - feat: extract materials library into materials.js
+- The `setEnvironmentPreset` function uses dynamic `import()` inside lighting.js. This works in browser ES modules but adds a micro-tick delay. If the preset must be applied synchronously, lighting getters could be imported at module top-level instead.
+- The `arjun.js` chapter currently duplicates some interactable setup patterns from `sundaram.js` — a shared helper could reduce repetition in future refactoring.

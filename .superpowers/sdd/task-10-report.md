@@ -1,53 +1,49 @@
-# Task 10: Create Character Switcher
+# Task 10 Report: Color Grading System
 
 ## Status: DONE
 
-## What I Implemented
+## Files Created/Modified
+- **Created:** `src/effects/colorGrading.js` — Color grading module with presets and CSS fallback
+- **Modified:** `src/game/loop.js` — Added import and `updateColorGrading(dt)` call in animate loop
 
-Created the character switcher infrastructure with transition overlay:
+## Commit
+- `01b8a3d` — feat: add color grading system with character presets
 
-1. **`src/characters.js`** - Character configs for Sundaram, Arjun, and Rekha with:
-   - English and Hindi names, roles, colors, positions
-   - `getCharacterConfig()` - get config by character ID
-   - `switchCharacter()` - updates state and dispatches transition event
-   - `getAllCharacters()` - returns all character configs
-   - Custom event system (`characterSwitch`) for notifications
+## Implementation Summary
 
-2. **`src/ui/switcher-ui.js`** - Transition UI handler:
-   - Listens for `characterSwitch` events
-   - Shows fade-to-black overlay with character name display
-   - Auto-hides after 2 seconds
+Created a color grading system with four character presets:
 
-3. **`index.html`** - Added transition overlay HTML structure
+| Preset | Brightness | Contrast | Saturation | Tint |
+|--------|-----------|----------|------------|------|
+| neutral | 1.0 | 1.0 | 1.0 | — |
+| sundaram | 1.1 | 1.05 | 1.3 | warm gold (sepia + hue-rotate 15°) |
+| arjun | 0.95 | 1.05 | 0.85 | cool blue (hue-rotate 200°) |
+| rekha | 0.85 | 0.95 | 0.5 | muted grey |
 
-4. **`styles.css`** - Added transition overlay styles:
-   - Fixed position, black background, z-index 300
-   - 0.5s opacity transition
-   - Gold character name, Hindi subtitle in gray
+### Key Features
+- **CSS filter fallback** — Since EffectComposer is null, applies `brightness()`, `contrast()`, `saturate()`, `sepia()`, and `hue-rotate()` directly to the canvas element
+- **Smooth transitions** — Eased interpolation (ease-in-out quad) over ~1 second between presets
+- **Shader ready** — Full GLSL shader with vertex/fragment code exported for Task 15 when EffectComposer is re-enabled
+- **Public API**: `initColorGrading()`, `setColorGrading(preset)`, `getColorGrading()`, `updateColorGrading(dt)`, `createColorGradingShader()`, `getShaderUniforms(preset)`
 
-5. **`src/main.js`** - Added import for switcher-ui.js
+### Integration
+- `updateColorGrading(dt)` is called every frame in `src/game/loop.js:297`
+- No changes to `main.js` needed — module is imported directly by loop.js
 
-## Files Changed
-
-- Created: `src/characters.js`
-- Created: `src/ui/switcher-ui.js`
-- Modified: `index.html` (added transition overlay div)
-- Modified: `styles.css` (added transition styles)
-- Modified: `src/main.js` (added import)
-
-## Build Verification
-
-Build succeeded with `vite build` - all modules transformed correctly.
+## Test Summary
+- `npm run build` passes (vite build, 35 modules transformed, no errors)
 
 ## Self-Review
 
-- **Completeness**: All 4 files from spec created/modified
-- **Quality**: Follows existing codebase patterns, clean implementation
-- **Discipline**: Only built what was requested - no overengineering
-- **Testing**: N/A - infrastructure only, Phase 1 only has Sundaram playable
+### Strengths
+- Clean separation: shader code exported for future use, CSS fallback handles current state
+- Transitions are smooth with easing to avoid jarring visual jumps
+- Fallback handles missing canvas element gracefully
+- All four presets match the narrative intent (warm golds for Sundaram, cool blues for Arjun, muted greys for Rekha)
 
-## Notes
+### Considerations for Task 15
+- When EffectComposer is re-enabled, replace CSS filter application with ShaderPass using `createColorGradingShader()`
+- The shader uniforms are already structured to receive per-frame updates via `getShaderUniforms()`
 
-- The switcher is infrastructure for later phases - currently only Sundaram is playable
-- `switchCharacter()` can be called to test the transition overlay
-- Custom event system allows other parts of codebase to react to character changes
+## Concerns
+None.

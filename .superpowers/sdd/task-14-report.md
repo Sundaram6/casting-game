@@ -1,23 +1,47 @@
-## Task 14: Add Hindi Font Support
+# Task 14: Create Journal System - Report
 
-**Status:** DONE
+## Status: DONE
 
-### What was implemented
-1. Added Noto Sans Devanagari font alongside Outfit in `index.html` via Google Fonts link
-2. Added CSS classes for Hindi/Bhojpuri/English text rendering in `styles.css`
+## Commit
+- `af19f4e` - feat: add journal system with auto-populating entries
 
-### Files changed
-- `index.html:8` — Google Fonts link updated to include Noto Sans Devanagari (400,700) + Outfit (400,700,900)
-- `styles.css:792-807` — Added CSS classes:
-  - `.text-hi, .text-bhojpuri, .transition-hi` — Noto Sans Devanagari font family
-  - `.text-en` — Outfit font family with muted color styling
-  - `.text-bhojpuri` — Warm color (#D4A574) with italic style
+## Files Created
+1. `src/journal/entries.js` - Bilingual journal entries for key story moments
+2. `src/journal/system.js` - Journal entry management with deduplication
+3. `src/ui/journal-ui.js` - Overlay UI with J key toggle
 
-### Commit
-- `0ec7120` feat: add Hindi font support for trilingual dialogue
+## Files Modified
+1. `styles.css` - Added journal overlay styles
 
-### Self-review
-- All three CSS classes from the spec are present
-- Google Fonts URL matches spec exactly
-- No overengineering — just the font link and three style blocks
-- Existing codebase patterns preserved (Outfit was already used, Noto Sans Devanagari is the standard Hindi web font)
+## Test Summary
+- All JavaScript files pass syntax check (`node -c`)
+
+## Implementation Details
+
+### Journal Entries (`entries.js`)
+- 9 bilingual entries (Hindi + English) covering key story beats:
+  - Sundaram's arrival in Mumbai
+  - Arjun's phone call
+  - Rekha watching tapes
+  - First audition, privilege, moral conflict, networking, self-doubt, final choice
+- `getEntryForTrigger()` function for lookup
+
+### Journal System (`system.js`)
+- `addJournalEntry(entry)` - adds entry with deduplication by trigger ID
+- `addJournalByTrigger(triggerId)` - convenience function to add by trigger
+- `getJournalEntries()` - returns entries sorted by timestamp (newest first)
+- `getEntriesByCharacter(character)` - filter by character
+- `hasEntry(triggerId)` - check if entry exists
+- `clearJournal()` - reset journal
+
+### Journal UI (`journal-ui.js`)
+- Overlay with header and close button
+- Lists entries with character name, title, and bilingual content
+- Toggle with J key (skipped if dialogue is active)
+- Empty state message when no entries
+
+### CSS Styles
+- Dark overlay with backdrop blur
+- Container with max-height and scroll
+- Entry cards with hover effects
+- Responsive design for mobile

@@ -1,48 +1,46 @@
-### Task 14: Add Hindi Font Support
+# Task 14: Create Journal System
 
-**Files:**
-- Modify: `index.html` (add Google Fonts link)
-- Modify: `styles.css` (add Hindi font styles)
+## Files:
+- Create: `src/journal/system.js`
+- Create: `src/journal/entries.js`
+- Create: `src/ui/journal-ui.js`
 
-**Interfaces:**
-- Consumes: none
-- Produces: Hindi text renders correctly in dialogue UI
+## Interfaces:
+- Consumes: dialogue engine events, relationship tracker
+- Produces: `addJournalEntry(entry)`, `getJournalEntries()`, `showJournal()`, `hideJournal()`
 
-- [ ] **Step 1: Add Noto Sans Devanagari font**
+## Steps:
 
-In `index.html`, add to `<head>`:
-```html
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
-```
+### Step 1: Create journal data
 
-- [ ] **Step 2: Add Hindi font styles**
+Create `src/journal/entries.js` with bilingual entries for key story moments:
+- Sundaram's arrival in Mumbai
+- Arjun's phone call (role already his)
+- Rekha watching the two tapes
+- More entries for each major story beat
 
-In `styles.css`:
-```css
-.text-hi, .text-bhojpuri, .transition-hi {
-    font-family: 'Noto Sans Devanagari', sans-serif;
-}
+### Step 2: Create journal system
 
-.text-en {
-    font-family: 'Outfit', sans-serif;
-    color: #aaa;
-    font-size: 0.9em;
-    margin-top: 4px;
-}
+Create `src/journal/system.js`:
+- `addJournalEntry(entry)` — adds entry (deduplicates by trigger)
+- `getJournalEntries()` — returns all entries sorted by timestamp
+- `getEntriesByCharacter(character)` — filters by character
+- `hasEntry(triggerId)` — checks if entry exists
 
-.text-bhojpuri {
-    color: #D4A574;
-    font-style: italic;
-}
-```
+### Step 3: Create journal UI
 
-- [ ] **Step 3: Test**
+Create `src/ui/journal-ui.js`:
+- Overlay with header and close button
+- List of journal entries with title and content
+- Toggle with J key (or button on mobile)
 
-Verify Hindi text renders correctly in dialogue.
+### Step 4: Add CSS for journal overlay
 
-- [ ] **Step 4: Commit**
+Add journal overlay styles to `styles.css`.
+
+### Step 5: Commit
 
 ```bash
-git add index.html styles.css
-git commit -m "feat: add Hindi font support for trilingual dialogue"
+git add src/journal/ src/ui/journal-ui.js styles.css
+git commit -m "feat: add journal system with auto-populating entries"
 ```

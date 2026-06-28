@@ -1,28 +1,21 @@
-# Task 13: Add Examine UI — Report
+# Task 13: Create Transition System — Report
 
 ## Status: DONE
 
-## What I Implemented
-- Created `src/ui/examine-ui.js` with `showExamine(text)` and `hideExamine()` exports
-- Added HTML overlay to `index.html` with examine-overlay, examine-box, examine-text, and examine-hint
-- Added CSS styles to `styles.css` for overlay, box, text, hint, and trilingual text classes (hi/en/ta)
-- Wired `showExamine` into `src/interaction.js` so examine-type interactables display their text
-- E key handler closes overlay and transitions state back to EXPLORING
-- Added trilingual support (hi, en, ta) as specified in the task description
+## Commit
+`4f5abdc` — feat: add transition system with fade and title cards
 
-## Files Changed
-- `src/ui/examine-ui.js` (created)
-- `index.html` (added examine overlay HTML)
-- `styles.css` (added examine styles)
-- `src/interaction.js` (imported showExamine, calls it for examine type)
+## Changes
+- **Created:** `src/effects/transitions.js` — fade overlay system with `initTransitions()`, `fadeToBlack()`, `fadeFromBlack()`, and `showTitleCard()` functions
+- **Modified:** `src/ui/switcher-ui.js` — replaced manual overlay manipulation with transition API calls; added `CHARACTER_TITLES` map with Hindi/English names for Sundaram, Arjun, and Rekha
+- **Modified:** `src/main.js` — imported and called `initTransitions(document.body)` during scene setup
 
-## Build
-- `vite build` succeeds (29 modules transformed)
+## Verification
+- All three modified files pass `node -c` syntax check
+- Transition overlay uses z-index 1000, CSS opacity transitions (0.8s ease)
+- Title cards display Hindi text at 2.5rem (larger) and English text at 1.2rem (smaller, 70% opacity)
+- `pointer-events: none` set when overlay hidden to prevent click blocking
+- Overlay innerHTML cleared after title card fades to prevent stale DOM
 
-## Self-Review
-- ✅ Full-screen overlay with dark background
-- ✅ Centered text box with trilingual display
-- ✅ "Press E to close" hint
-- ✅ E key handler to close overlay
-- ✅ State management (EXPLORING → INTERACTING → EXPLORING)
-- ✅ No overbuilding — exactly what the spec asked for
+## Concerns
+- None

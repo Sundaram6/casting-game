@@ -1,43 +1,30 @@
-# Task 7 Report: Create Dialogue Engine
+# Task 7 Report: Create Rekha's Dialogue Trees
 
 ## Status: DONE
 
-## What I Implemented
+## Files Created
+- `src/dialogue/rekha.js` (674 lines, 37 nodes)
 
-Created two new files as specified:
+## Scene Breakdown
+| Scene | Nodes | Notes |
+|-------|-------|-------|
+| Morning routine | 7 | Filter coffee, scripts, phone with Vikram |
+| Reviewing tapes | 5 | Sundaram vs Arjun comparison |
+| Phone call with Vikram | 6 | Moral climax — pushback then relents |
+| Flashback trigger | 4 | 1998 Adivasi actress Geeta |
+| Meeting Sundaram | 8 | Post-audition truth and silence |
+| Ending | 4 | Wine, photo, 30-year reflection |
 
-1. **`src/dialogue/engine.js`** - The dialogue engine with:
-   - `startDialogue(dialogueData, startNodeId)` - Starts dialogue from EXPLORING state
-   - `getCurrentNode()` - Returns current dialogue node
-   - `selectOption(optionIndex)` - Selects option and advances dialogue
-   - `endDialogue()` - Ends dialogue, returns to EXPLORING state
-   - `isDialogueActive()` - Checks if dialogue is active
+## Key Details
+- **Tamil words:** "ஃபில்டர் காபி" (filter coffee), "அம்மா" (mother) — woven naturally
+- **Mumbai Hindi:** Educated, professional, occasional English
+- **Relationship effects:** 6 nodes with `effects: { rekha: { complicity, trust } }` on key choices
+- **Flashback (1998):** Adivasi actress Geeta from Jharkhand — distinct time/place feel
+- **Phone call climax:** 3-node escalation (Vikram pushes → threatens → Rekha relents)
+- **Syntax check:** `node -c` passed with no errors
 
-2. **`src/dialogue/sundaram.js`** - Sundaram's dialogue data with:
-   - 12 dialogue nodes as specified in task brief
-   - Trilingual text (Hindi, English, Bhojpuri) for all nodes
-   - Dialogue flow covering first impression, office entry, waiting, audition
+## Commits
+- `5ef1fe5` — feat: add Rekha's dialogue trees (37 nodes, 6 scenes)
 
-## Testing
-
-- Verified engine exports: `startDialogue`, `getCurrentNode`, `selectOption`, `endDialogue`, `isDialogueActive`
-- Verified sundaram.js exports: `sundaramDialogue` with all 12 nodes
-- State transitions verified against state.js: EXPLORING ↔ DIALOGUE
-
-## Files Changed
-
-- Created: `src/dialogue/engine.js` (30 lines)
-- Created: `src/dialogue/sundaram.js` (276 lines)
-
-## Self-Review
-
-- ✅ All 12 dialogue nodes implemented
-- ✅ Trilingual text provided for all nodes
-- ✅ Engine follows state.js transitions correctly
-- ✅ No over-engineering - kept exactly to spec
-- ✅ Code follows existing patterns in codebase
-
-## Commit
-
-- SHA: 98b9f38
-- Message: "feat: add dialogue engine with Sundaram's dialogue trees"
+## Concerns
+None. Dialogue covers all required scenes with consistent formatting matching sundaram.js and arjun.js patterns.

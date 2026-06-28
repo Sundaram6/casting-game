@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.0.0] - Narrative Satire Redesign
+
+### Added
+- **Three playable characters** — Sundaram Sharma (outsider from Bihar), Arjun Malhotra (nepo kid), Rekha Iyer (gatekeeper casting director). Each with full dialogue trees and distinct visual identity.
+- **Trilingual dialogue system** — Hindi, English, and Bhojpuri dialogue with bilingual subtitles. Rekha's dialogue includes Tamil loanwords.
+- **Relationship tracker** — Dialogue choices affect trust, respect, empathy, guilt, and complicity between characters.
+- **Character-specific color grading** — Warm golds (Sundaram), cool blues (Arjun), muted greys (Rekha). CSS filter fallback with smooth transitions.
+- **Character-specific lighting presets** — Distinct ambient, hemisphere, directional, and rim lighting per character.
+- **Flashback system** — Three flashback scenes: Sundaram's father's shop in Patna, Arjun's childhood on a film set, Rekha's 1998 fight for an Adivasi actress. Fade transitions with environment changes.
+- **Convergence/audition system** — Climax sequence showing all three perspectives: Sundaram's trilingual monologue, Arjun's nervous audition, Rekha's compromising decision.
+- **Transition system** — Fade-to-black transitions with bilingual title cards when switching characters.
+- **Journal system** — Auto-populating journal with bilingual entries tracking story progress. Toggle with J key.
+- **Tape reviewer UI** — Split-screen overlay for comparing Sundaram's and Arjun's audition tapes during Rekha's chapter.
+- **Character switcher** — Tab key cycling between unlocked characters with locked/unlocked UI states. Progression: Sundaram → Arjun → Rekha → Convergence.
+- **Sound design framework** — Location-based ambient soundscapes, character-specific music tracks, and Web Speech API voice playback (stub implementations).
+- **Module extraction** — Refactored monolithic main.js (1896→254 lines) into src/game/ (loop, buildings, input), src/legacy/ (typing game, crowds), src/dialogue/, src/chapters/, src/effects/, src/flashback/, src/convergence/, src/audio/, src/journal/, src/ui/.
+
+### Fixed
+- **animate() called before initGame()** — Added `initialized` guard flag in loop.js to prevent runtime errors when animate() runs at module load time before scene/camera/renderer are set up.
+- **EffectComposer black viewport** — Disabled EffectComposer entirely. HalfFloat render targets don't propagate scene.background, causing a black rectangle over the viewport. Game now uses direct renderer.render() with clearColor fallback.
+- **Flashback state transitions** — Removed redundant setState(EXPLORING)→setState(FLASHBACK) calls that caused invalid state transition warnings.
+- **Lazy chapter initialization** — Chapters now initialize on first character switch instead of all at once, preventing overlapping interactables and wasted resources.
+
+### Changed
+- **Setting moved to Mumbai** — From generic LA to Andheri West, Mumbai. Parody names: Raksh Chhabra (Mukesh Chhabra), Dhamaka Productions (Dharma Productions).
+- **Main character defined** — Sundaram Sharma: theater artist from Patna, Bihar, fluent in Hindi/English/Bhojpuri.
+- **Narrative tone** — From meme/typing game to serious narrative satire about nepotism in the Indian entertainment industry.
+
 ## [1.2.0] - Rendering Fixes & Visual Realism
 
 ### Fixed

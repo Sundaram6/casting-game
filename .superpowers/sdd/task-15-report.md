@@ -1,26 +1,26 @@
-## Task 15: Add Subtitle Toggle
+# Task 15: Re-enable Post-Processing with Fixed Clear Color — Report
 
-**Status:** DONE
+## Status: DONE
 
-### What I implemented
+## Changes
 
-Added a subtitle toggle button (gear icon ⚙) to the HUD that toggles visibility of dialogue and examine overlays via a `subtitles-off` CSS class on `<body>`.
+- **Created** `src/effects/postProcessing.js` — EffectComposer setup with RenderPass, UnrealBloomPass (0.4 desktop / 0.2 mobile), FXAAShader, and the clear color fix (`renderTarget1.clearColor` and `renderTarget2.clearColor` set to `0x87ceeb`).
+- **Modified** `src/main.js` — replaced `composer = null` with `initPostProcessing(renderer, scene, camera, isMobile)`, imported `resizePostProcessing` for the resize handler.
 
-### Files changed
+## How It Works
 
-- **Created:** `src/ui/subtitle-settings.js` — toggle logic and `areSubtitlesEnabled()` export
-- **Modified:** `index.html` — added `<button id="settings-btn" class="hud-btn">⚙</button>` in HUD
-- **Modified:** `styles.css` — added `.hud-btn` styling and `.subtitles-off #dialogue-overlay, .subtitles-off #examine-overlay` rule
-- **Modified:** `src/main.js` — imported `./ui/subtitle-settings.js` to initialize the toggle
+The root cause of the earlier black-background issue: EffectComposer renders to HalfFloat render targets that don't inherit `scene.background`. The fix sets both `renderTarget1.clearColor` and `renderTarget2.clearColor` to the sky color (`0x87ceeb`) immediately after creating the composer.
 
-### Verification
+The existing fallback in `loop.js:333-337` (`if (composer) { composer.render() } else { renderer.render(...) }`) continues to work — if composer is ever null, it falls back to direct rendering.
 
-- Vite build succeeds with no errors
-- Settings button renders in HUD with gear icon
-- Clicking toggles `subtitles-off` class on `<body>`
-- When class present, dialogue and examine overlays get `opacity: 0; pointer-events: none`
-- `areSubtitlesEnabled()` exported for other modules to check state
+## Commit
 
-### Commit
+- `16a9d44` — `feat: re-enable post-processing with fixed clear color`
 
-`e1139a0` — feat: add subtitle toggle in settings
+## Test
+
+- `npm run build` passes (46 modules, no errors). The large chunk warning (590KB) is pre-existing.
+
+## Concerns
+
+None. The implementation follows the task brief exactly.

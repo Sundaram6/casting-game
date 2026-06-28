@@ -1,99 +1,88 @@
-### Task 13: Add Examine UI
+# Task 13: Create Transition System
 
-**Files:**
-- Create: `src/ui/examine-ui.js`
-- Modify: `index.html` (add examine UI elements)
-- Modify: `styles.css` (add examine styles)
+## Files:
+- Create: `src/effects/transitions.js`
+- Modify: `src/ui/switcher-ui.js`
 
-**Interfaces:**
-- Consumes: interaction system
-- Produces: visual display for examined objects
+## Interfaces:
+- Consumes: renderer, scene
+- Produces: `fadeToBlack(callback)`, `fadeFromBlack()`, `showTitleCard(text, callback)`
 
-- [ ] **Step 1: Add examine UI to index.html**
+## Steps:
 
-```html
-<div id="examine-overlay" class="hidden">
-    <div id="examine-box">
-        <div id="examine-text"></div>
-        <div id="examine-hint">Press E to close</div>
-    </div>
-</div>
-```
+### Step 1: Create transition effects
 
-- [ ] **Step 2: Add examine CSS**
-
-```css
-#examine-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 250;
-}
-
-#examine-box {
-    max-width: 600px;
-    background: rgba(0, 0, 0, 0.9);
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    border-radius: 8px;
-    padding: 30px;
-}
-
-#examine-text {
-    color: #fff;
-    font-size: 1.1rem;
-    line-height: 1.6;
-    margin-bottom: 16px;
-}
-
-#examine-hint {
-    color: #888;
-    font-size: 0.8rem;
-    text-align: right;
-}
-```
-
-- [ ] **Step 3: Create examine-ui.js**
-
+Create `src/effects/transitions.js`:
 ```javascript
-import { getState, setState, STATES } from '../state.js';
+let overlay = null;
 
-const overlay = document.getElementById('examine-overlay');
-const textEl = document.getElementById('examine-text');
-
-export function showExamine(text) {
-    if (getState() !== STATES.EXPLORING) return;
-    
-    setState(STATES.INTERACTING);
-    overlay.classList.remove('hidden');
-    
-    let html = '';
-    if (text.hi) html += `<div class="examine-hi">${text.hi}</div>`;
-    if (text.en) html += `<div class="examine-en">${text.en}</div>`;
-    textEl.innerHTML = html;
+export function initTransitions(container) {
+  overlay = document.createElement('div');
+  overlay.id = 'transition-overlay';
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: black; opacity: 0; pointer-events: none; z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.8s ease;
+  `;
+  container.appendChild(overlay);
 }
 
-export function hideExamine() {
-    overlay.classList.add('hidden');
-    setState(STATES.EXPLORING);
+export function fadeToBlack(callback) {
+  overlay.style.opacity = '1';
+  setTimeout(() => {
+    if (callback) callback();
+  }, 800);
 }
 
-document.addEventListener('keydown', (e) => {
-    if ((e.key === 'e' || e.key === 'E') && getState() === STATES.INTERACTING) {
-        hideExamine();
-    }
-});
+export function fadeFromBlack(callback) {
+  overlay.style.opacity = '0';
+  setTimeout(() => {
+    if (callback) callback();
+  }, 800);
+}
+
+export function showTitleCard(hindi, english, callback) {
+  overlay.innerHTML = `
+    <div style="text-align: center; color: white; font-family: 'Outfit', sans-serif;">
+      <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">${hindi}</div>
+      <div style="font-size: 1.2rem; opacity: 0.7;">${english}</div>
+    </div>
+  `;
+  overlay.style.opacity = '1';
+  setTimeout(() => {
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      if (callback) callback();
+    }, 800);
+  }, 3000);
+}
 ```
 
-- [ ] **Step 4: Test**
+### Step 2: Integrate with character switching
 
-Verify examining objects shows text overlay, and pressing E closes it.
+When switching characters, use transitions:
+```javascript
+// In switcher-ui.js
+import { fadeToBlack, fadeFromBlack, showTitleCard } from '../effects/transitions.js';
 
-- [ ] **Step 5: Commit**
+export function switchCharacter(newCharacter) {
+  fadeToBlack(() => {
+    // Switch chapter, environment, lighting, color grading
+    showTitleCard(
+      getCharacterTitle(newCharacter).hindi,
+      getCharacterTitle(newCharacter).english,
+      () => {
+        fadeFromBlack();
+      }
+    );
+  });
+}
+```
+
+### Step 3: Commit
 
 ```bash
-git add src/ui/examine-ui.js index.html styles.css
-git commit -m "feat: add examine UI for object inspection"
+git add src/effects/transitions.js src/ui/switcher-ui.js
+git commit -m "feat: add transition system with fade and title cards"
 ```
