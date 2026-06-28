@@ -23,6 +23,7 @@ import { updateInteraction, interact } from './interaction.js';
 import { setState, STATES, getCharacter } from './state.js';
 import { initAmbientSound, startAmbientForCharacter } from './audio/ambient.js';
 import './ui/switcher-ui.js';
+import './ui/subtitle-settings.js';
 
 // --- Post-Processing (loaded dynamically) ---
 
