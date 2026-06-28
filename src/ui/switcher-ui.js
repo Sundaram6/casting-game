@@ -2,26 +2,31 @@
 
 import { switchCharacter, getCharacterConfig, getAllCharacters } from '../characters.js';
 import { getCharacter } from '../state.js';
+import { fadeToBlack, fadeFromBlack, showTitleCard } from '../effects/transitions.js';
 
 const switcherEl = document.getElementById('character-switcher');
 
+const CHARACTER_TITLES = {
+  sundaram: { hindi: 'सुंदरम शर्मा', english: 'Sundaram Sharma' },
+  arjun: { hindi: 'अर्जुन मल्होत्रा', english: 'Arjun Malhotra' },
+  rekha: { hindi: 'रेखा अय्यर', english: 'Rekha Iyer' },
+};
+
+function getCharacterTitle(characterId) {
+  return CHARACTER_TITLES[characterId] || { hindi: characterId, english: characterId };
+}
+
 export function initSwitcherUI() {
-    // Currently only Sundaram is playable in Phase 1
-    // Show placeholder for other characters
+  // Currently only Sundaram is playable in Phase 1
 }
 
 window.addEventListener('characterSwitch', (e) => {
-    const char = e.detail;
-    
-    const overlay = document.getElementById('transition-overlay');
-    overlay.style.opacity = '1';
-    overlay.style.pointerEvents = 'all';
-    
-    const nameEl = document.getElementById('transition-name');
-    nameEl.innerHTML = `${char.name}<br><span class="transition-hi">${char.nameHi}</span>`;
-    
-    setTimeout(() => {
-        overlay.style.opacity = '0';
-        overlay.style.pointerEvents = 'none';
-    }, 2000);
+  const char = e.detail;
+  const titles = getCharacterTitle(char.id);
+
+  fadeToBlack(() => {
+    showTitleCard(titles.hindi, titles.english, () => {
+      fadeFromBlack();
+    });
+  });
 });

@@ -9,6 +9,7 @@ import { setState, STATES, getCharacter, setCharacter } from './state.js';
 import { initAmbientSound, startAmbientForCharacter } from './audio/ambient.js';
 import './ui/switcher-ui.js';
 import './ui/subtitle-settings.js';
+import { initTransitions } from './effects/transitions.js';
 import { initTypingGame } from './legacy/typing-game.js';
 import { initCrowds } from './legacy/crowds.js';
 import { initTypingUI, updateTypingDisplay } from './legacy/typing-ui.js';
@@ -49,6 +50,7 @@ initLighting();
 const scene = getScene();
 const camera = getCamera();
 const renderer = getRenderer();
+initTransitions(document.body);
 
 // Sky dome
 const skyGeo = new THREE.SphereGeometry(450, 32, 32);
