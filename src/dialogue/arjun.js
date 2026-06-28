@@ -75,7 +75,8 @@ export const arjunDialogue = {
                         hi: 'ऑटो बुलाओ',
                         en: 'Call an auto'
                     },
-                    next: 'morning_to_auto'
+                    next: 'morning_to_auto',
+                    effects: { arjun: { guilt: +5, respect: -5 } }
                 }
             ]
         },
@@ -91,7 +92,8 @@ export const arjunDialogue = {
                         hi: 'चलो चलते हैं',
                         en: 'Let\'s go'
                     },
-                    next: 'morning_to_auto'
+                    next: 'morning_to_auto',
+                    effects: { arjun: { guilt: +10 } }
                 }
             ]
         },
@@ -157,14 +159,16 @@ export const arjunDialogue = {
                         hi: 'हाँ... वही हूँ।',
                         en: 'Yes... that\'s me.'
                     },
-                    next: 'auto_driver_fame'
+                    next: 'auto_driver_fame',
+                    effects: { arjun: { guilt: +5, respect: -5 } }
                 },
                 {
                     text: {
                         hi: 'बस... पापा का नाम है, मेरा नहीं।',
                         en: 'Just... Dad\'s name, not mine.'
                     },
-                    next: 'auto_driver_fame'
+                    next: 'auto_driver_fame',
+                    effects: { arjun: { guilt: -5, respect: +5 } }
                 }
             ]
         },
@@ -264,14 +268,16 @@ export const arjunDialogue = {
                         hi: 'उससे बात करो',
                         en: 'Talk to him'
                     },
-                    next: 'sundaram_meet'
+                    next: 'sundaram_meet',
+                    effects: { sundaram: { empathy: +5, trust: +5 } }
                 },
                 {
                     text: {
                         hi: 'चुपचाप बैठो',
                         en: 'Sit quietly'
                     },
-                    next: 'sundaram_silence'
+                    next: 'sundaram_silence',
+                    effects: { sundaram: { empathy: -5 } }
                 }
             ]
         },
@@ -351,7 +357,8 @@ export const arjunDialogue = {
                         hi: 'नहीं यार... मैं भी वैसे ही हूँ जैसे तुम।',
                         en: 'No man... I\'m just like you.'
                     },
-                    next: 'sundaram_bhojpuri'
+                    next: 'sundaram_bhojpuri',
+                    effects: { sundaram: { trust: +10, empathy: +5 } }
                 }
             ]
         },
@@ -399,7 +406,8 @@ export const arjunDialogue = {
                         hi: 'शायद तुम सही कह रहे हो...',
                         en: 'Maybe you\'re right...'
                     },
-                    next: 'sundaram_advice'
+                    next: 'sundaram_advice',
+                    effects: { sundaram: { empathy: +10 }, arjun: { guilt: +5 } }
                 }
             ]
         },
@@ -415,7 +423,8 @@ export const arjunDialogue = {
                         hi: '...तुम सही कह रहे हो।',
                         en: '...You\'re right.'
                     },
-                    next: 'audition_call'
+                    next: 'audition_call',
+                    effects: { sundaram: { trust: +15, respect: +10 } }
                 }
             ]
         },
@@ -481,7 +490,8 @@ export const arjunDialogue = {
                         hi: 'सीन खत्म करो',
                         en: 'Finish the scene'
                     },
-                    next: 'audition_response'
+                    next: 'audition_response',
+                    effects: { arjun: { respect: +5 } }
                 }
             ]
         },
@@ -629,7 +639,8 @@ export const arjunDialogue = {
                         hi: 'पर मुझे वो सब नहीं चाहिए... मुझे अपने लिए कुछ करना है।',
                         en: 'But I don\'t want all that... I want to do something for myself.'
                     },
-                    next: 'dinner_father_final'
+                    next: 'dinner_father_final',
+                    effects: { arjun: { guilt: -10, respect: +10 } }
                 }
             ]
         },
@@ -645,7 +656,8 @@ export const arjunDialogue = {
                         hi: '...कुछ नहीं पापा।',
                         en: '...Nothing Dad.'
                     },
-                    next: 'dinner_end'
+                    next: 'dinner_end',
+                    effects: { arjun: { guilt: +10, respect: -10 } }
                 }
             ]
         },
@@ -661,7 +673,8 @@ export const arjunDialogue = {
                         hi: 'अंत',
                         en: 'End'
                     },
-                    effect: () => { console.log('Arjun chapter ended'); }
+                    effect: () => { console.log('Arjun chapter ended'); },
+                    effects: { arjun: { guilt: +5 } }
                 }
             ]
         }
