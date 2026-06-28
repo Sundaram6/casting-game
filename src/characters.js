@@ -1,4 +1,5 @@
 import { getCharacter, setCharacter } from './state.js';
+import { setLightingPreset } from './lighting.js';
 
 const characters = {
     sundaram: {
@@ -41,6 +42,7 @@ export function switchCharacter(charId) {
     setCharacter(charId);
     const newChar = characters[charId];
     
+    setLightingPreset(charId);
     showTransition(newChar);
     return true;
 }

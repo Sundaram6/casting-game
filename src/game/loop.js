@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { initLighting, getAmbientLight, getHemiLight, getDirLight, getRimLight } from '../lighting.js';
+import { initLighting, getAmbientLight, getHemiLight, getDirLight, getRimLight, updateLighting, isLightingPresetActive } from '../lighting.js';
 import { updateDialogueUI } from '../ui/dialogue-ui.js';
 import { updateInteraction } from '../interaction.js';
 import { initSundaramChapter, updateSundaramChapter } from '../chapters/sundaram.js';
@@ -145,23 +145,28 @@ function animate() {
         skyMat.uniforms.bottomColor.value.copy(nightBottom).lerp(dayBottom, blend);
     }
     
-    // Update Lights
-    const _dirLight = getDirLight();
-    const _ambientLight = getAmbientLight();
-    const _hemiLight = getHemiLight();
-    const _rimLight = getRimLight();
-    if (_dirLight) {
-        _dirLight.position.set(Math.cos(dayTime) * 300, Math.max(0, Math.sin(dayTime)) * 350 + 50, Math.sin(dayTime) * 300);
-        _dirLight.intensity = Math.max(0.3, Math.sin(dayTime)) * 2.0;
-    }
-    if (_ambientLight) {
-        _ambientLight.intensity = Math.max(0.3, blend * 0.5);
-    }
-    if (_hemiLight) {
-        _hemiLight.intensity = Math.max(0.3, blend * 0.8);
-    }
-    if (_rimLight) {
-        _rimLight.intensity = Math.max(0.2, blend * 0.7);
+    // Update character-specific lighting presets
+    updateLighting(time);
+
+    // Update Lights (only if no lighting preset is active)
+    if (!isLightingPresetActive()) {
+        const _dirLight = getDirLight();
+        const _ambientLight = getAmbientLight();
+        const _hemiLight = getHemiLight();
+        const _rimLight = getRimLight();
+        if (_dirLight) {
+            _dirLight.position.set(Math.cos(dayTime) * 300, Math.max(0, Math.sin(dayTime)) * 350 + 50, Math.sin(dayTime) * 300);
+            _dirLight.intensity = Math.max(0.3, Math.sin(dayTime)) * 2.0;
+        }
+        if (_ambientLight) {
+            _ambientLight.intensity = Math.max(0.3, blend * 0.5);
+        }
+        if (_hemiLight) {
+            _hemiLight.intensity = Math.max(0.3, blend * 0.8);
+        }
+        if (_rimLight) {
+            _rimLight.intensity = Math.max(0.2, blend * 0.7);
+        }
     }
 
     // Drift clouds
