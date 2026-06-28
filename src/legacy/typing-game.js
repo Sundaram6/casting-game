@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { getState, setState, STATES, getCharacter } from '../state.js';
+import { stopAllSounds } from '../game/sounds.js';
 
 const TARGET_WORD = "nepo kid";
 let typeIndex = 0;
@@ -31,6 +33,69 @@ const winPhrases = [
     }
 ];
 
+const VICTORY_AWARDS = {
+    sundaram: [
+        "Best Background Actor — Nobody Noticed",
+        "Most Authentic Audition — Not That It Mattered",
+        "Longest Train Ride Home — Bihar to Mumbai and Back"
+    ],
+    arjun: [
+        "Best Actor — Filmfare Awards",
+        "Rising Star — Stardust Awards",
+        "Instagram Influencer of the Year"
+    ],
+    rekha: [
+        "Lifetime Achievement in Looking the Other Way",
+        "Best Supporting Character in a Broken System",
+        "30 Years of Silence — Award Pending"
+    ]
+};
+
+function showVictoryAwards(character) {
+    const awards = VICTORY_AWARDS[character] || VICTORY_AWARDS.sundaram;
+    let delay = 0;
+
+    cfg.sounds.bgm.pause();
+    cfg.sounds.sigma.currentTime = 0;
+    cfg.sounds.sigma.play().catch(() => {});
+
+    awards.forEach((award, i) => {
+        setTimeout(() => {
+            const overlay = document.getElementById('transition-overlay');
+            if (overlay) {
+                overlay.innerHTML = `
+                    <div style="text-align: center; color: #FFD700; font-family: 'Outfit', sans-serif; text-shadow: 0 0 20px rgba(255,215,0,0.5);">
+                        <div style="font-size: 1rem; opacity: 0.7; margin-bottom: 0.5rem;">${i + 1} of ${awards.length}</div>
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">${award}</div>
+                        <div style="font-size: 0.9rem; opacity: 0.5; margin-top: 1rem;">🏆</div>
+                    </div>
+                `;
+                overlay.style.opacity = '1';
+                overlay.style.pointerEvents = 'auto';
+            }
+        }, delay);
+
+        delay += 3000;
+
+        setTimeout(() => {
+            const overlay = document.getElementById('transition-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+            }
+        }, delay);
+
+        delay += 800;
+    });
+
+    setTimeout(() => {
+        cfg.sounds.sigma.pause();
+        cfg.sounds.bgm.play().catch(() => {});
+        document.getElementById('vic-score').innerText = cfg.getScore();
+        cfg.controls.unlock();
+        cfg.changeScreen('victory-screen');
+    }, delay);
+}
+
 export function initTypingGame(config) {
     cfg = config;
     typeIndex = 0;
@@ -60,7 +125,7 @@ function updateDisplay() {
 }
 
 export function startTypingMinigame(office) {
-    cfg.setGameState('TYPING');
+    setState(STATES.TYPING);
     currentOffice = office;
     typeIndex = 0;
     maxTimer = office.timeLimit;
@@ -94,7 +159,7 @@ export function updateTyping(dt) {
 }
 
 export function handleTypingCharacter(key) {
-    if (cfg.getGameState() !== 'TYPING') return;
+    if (getState() !== STATES.TYPING) return;
     let targetChar = TARGET_WORD[typeIndex];
     if (key.toLowerCase() === targetChar.toLowerCase()) {
         typeIndex++;
@@ -132,7 +197,7 @@ export function handleTypingCharacter(key) {
 }
 
 function showCelebrationScene(chosen, afterScene) {
-    cfg.setGameState('CELEBRATING');
+    setState(STATES.CELEBRATING);
     const title = document.getElementById('celebration-title');
     const subtitle = document.getElementById('celebration-subtitle');
     const producerScene = document.getElementById('producer-scene');
@@ -189,38 +254,38 @@ function showCelebrationScene(chosen, afterScene) {
 }
 
 function winMinigame() {
+    stopAllSounds();
     const chosen = winPhrases[Math.floor(Math.random() * winPhrases.length)];
-    
+
     currentOffice.completed = true;
     currentOffice.isWinning = true;
 
     cfg.spawnFireworks(currentOffice.group.position.x, currentOffice.group.position.y + 10, currentOffice.group.position.z);
-    
+
     cfg.addScore(Math.floor(100 * combo));
     cfg.incrementOfficesCompleted();
     cfg.updateHUD();
 
     showCelebrationScene(chosen, () => {
         if (cfg.getOfficesCompleted() >= cfg.getTotalOffices()) {
-            cfg.setGameState('VICTORY');
-            document.getElementById('vic-score').innerText = cfg.getScore();
-            cfg.controls.unlock();
-            cfg.changeScreen('victory-screen');
+            setState(STATES.VICTORY);
+            showVictoryAwards(getCharacter());
         } else {
-            cfg.setGameState('PLAYING');
+            setState(STATES.EXPLORING);
             cfg.changeScreen(null);
         }
     });
 }
 
 export function handleGameOver() {
-    cfg.setGameState('GAME_OVER');
+    stopAllSounds();
+    setState(STATES.GAME_OVER);
     cfg.playSound(cfg.sounds.fail);
     document.getElementById('go-score').innerText = cfg.getScore();
     cfg.controls.unlock();
     cfg.changeScreen('game-over-screen');
     document.getElementById('game-over-screen').classList.add('flashing');
-    
+
     const body = document.body;
     body.classList.remove('shake-severe');
     void body.offsetWidth;
