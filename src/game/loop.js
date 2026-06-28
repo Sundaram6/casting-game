@@ -9,6 +9,7 @@ import { getInputState, setInputState } from './input.js';
 import { getOffices } from './buildings.js';
 import { updateFlashback } from '../flashback/system.js';
 import { updateColorGrading } from '../effects/colorGrading.js';
+import { getState, setState, STATES } from '../state.js';
 
 // --- DAY/NIGHT CONSTANTS ---
 const dayTop = new THREE.Color(0x3a66a8);
@@ -20,7 +21,6 @@ const nightHorizon = new THREE.Color(0x051020);
 const nightBottom = new THREE.Color(0x0a1525);
 let dayTime = Math.PI / 2; // start at day
 
-let gameState = 'START';
 let score = 0;
 let totalOffices = 15;
 let officesCompleted = 0;
@@ -178,7 +178,7 @@ function animate() {
         if (c.position.x > 300) c.position.x = -300;
     });
 
-    if (gameState === 'PLAYING' && controls.isLocked) {
+    if (getState() === STATES.EXPLORING && controls.isLocked) {
         inputState.velocity.x -= inputState.velocity.x * 10.0 * dt;
         inputState.velocity.z -= inputState.velocity.z * 10.0 * dt;
         
@@ -238,12 +238,12 @@ function animate() {
                 }
             }
         }
-    } else if (gameState === 'TYPING') {
+    } else if (getState() === STATES.TYPING) {
         updateTyping(dt);
     }
 
     // Crowds
-    if (gameState === 'PLAYING' || gameState === 'TYPING') {
+    if (getState() === STATES.EXPLORING || getState() === STATES.TYPING) {
         updateCrowds(dt);
     }
     
@@ -308,7 +308,7 @@ function animate() {
     updateSundaramChapter(dt);
 
     // Update interaction system
-    if (gameState === 'PLAYING') {
+    if (getState() === STATES.EXPLORING) {
         const nearby = updateInteraction(camera);
         const prompt = document.getElementById('interaction-prompt');
         if (nearby) {
@@ -342,14 +342,6 @@ function animate() {
     setInputState(inputState);
 }
 
-function getGameState() {
-    return gameState;
-}
-
-function setGameState(state) {
-    gameState = state;
-}
-
 function getScore() {
     return score;
 }
@@ -370,11 +362,9 @@ function getTotalOffices() {
     return totalOffices;
 }
 
-export { 
-    initGameLoop, 
-    animate, 
-    getGameState, 
-    setGameState,
+export {
+    initGameLoop,
+    animate,
     getScore,
     addScore,
     getOfficesCompleted,
