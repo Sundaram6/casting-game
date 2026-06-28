@@ -5,6 +5,7 @@ import { initLighting } from './lighting.js';
 import { initEnvironment } from './environment.js';
 import { initSundaramChapter } from './chapters/sundaram.js';
 import { initArjunChapter } from './chapters/arjun.js';
+import { initRekhaChapter } from './chapters/rekha.js';
 import { setState, STATES, getCharacter, setCharacter } from './state.js';
 import { initAmbientSound, startAmbientForCharacter } from './audio/ambient.js';
 import './ui/switcher-ui.js';
@@ -13,6 +14,8 @@ import { initTransitions } from './effects/transitions.js';
 import { initTypingGame } from './legacy/typing-game.js';
 import { initCrowds } from './legacy/crowds.js';
 import { initTypingUI, updateTypingDisplay } from './legacy/typing-ui.js';
+import { initJournalUI } from './ui/journal-ui.js';
+import { initSwitcherUI } from './ui/switcher-ui.js';
 import { createOffices, getOffices, NEPO_POSITIONS } from './game/buildings.js';
 import { initInput, getInputState, setInputState } from './game/input.js';
 import { initGameLoop, animate, getGameState, setGameState, getScore, addScore, getOfficesCompleted, incrementOfficesCompleted, getTotalOffices, spawnFireworks, spawnPhysicsParticle } from './game/loop.js';
@@ -173,6 +176,8 @@ function initGame() {
     document.body.classList.remove('shake-severe');
     updateHUD();
     initTypingUI();
+    initJournalUI();
+    initSwitcherUI();
     initTypingGame({
         setGameState, getGameState, addScore, incrementOfficesCompleted,
         getScore, getOfficesCompleted, getTotalOffices,
@@ -183,6 +188,7 @@ function initGame() {
     initCrowds(scene, getOffices(), NEPO_POSITIONS);
     initSundaramChapter(scene);
     initArjunChapter(scene, camera);
+    initRekhaChapter(scene, camera);
     camera.position.set(0, 2, 0);
     camera.rotation.set(0, 0, 0);
     camera.quaternion.set(0, 0, 0, 1);

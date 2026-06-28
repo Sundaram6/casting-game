@@ -665,7 +665,10 @@ export const REKHA_DIALOGUE = {
                         hi: 'खत्म',
                         en: 'Finish'
                     },
-                    effect: () => { console.log('Rekha chapter ended'); },
+                    effect: () => {
+                        console.log('Rekha chapter ended');
+                        window.dispatchEvent(new CustomEvent('chapterComplete', { detail: { chapter: 'rekha' } }));
+                    },
                     effects: { rekha: { complicity: +5 } }
                 }
             ]

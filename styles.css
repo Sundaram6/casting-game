@@ -971,3 +971,217 @@ p {
     font-size: 1rem;
     color: #666;
 }
+
+/* ─── CHARACTER SWITCHER ─── */
+#character-switcher {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 180;
+    pointer-events: none;
+}
+
+.switcher-container {
+    display: flex;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 12px;
+    padding: 8px 16px;
+    pointer-events: auto;
+}
+
+.switcher-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 80px;
+    position: relative;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+}
+
+.switcher-btn:hover {
+    background: rgba(255, 215, 0, 0.1);
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.switcher-btn.active {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: #FFD700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+}
+
+.switcher-btn.locked {
+    opacity: 0.35;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.switcher-btn.locked:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: none;
+}
+
+.switcher-lock {
+    font-size: 1.2rem;
+    height: 1.2rem;
+    line-height: 1.2rem;
+}
+
+.switcher-name {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #FFD700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.switcher-name-hi {
+    font-size: 0.65rem;
+    color: #ccc;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+}
+
+.switcher-btn.locked .switcher-name {
+    color: #888;
+}
+
+.switcher-btn.locked .switcher-name-hi {
+    color: #666;
+}
+
+/* ─── TAPE REVIEWER ─── */
+#tape-review-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    z-index: 250;
+    backdrop-filter: blur(4px);
+    pointer-events: auto;
+}
+
+.tape-panel {
+    width: min(420px, 42vw);
+    max-height: 75vh;
+    background: rgba(20, 20, 30, 0.95);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+.tape-panel.tape-focused {
+    transform: scale(1.03);
+    border-color: #FFD700;
+    box-shadow: 0 0 24px rgba(255, 215, 0, 0.25);
+}
+
+.tape-panel.tape-dimmed {
+    opacity: 0.4;
+    transform: scale(0.97);
+}
+
+.tape-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.tape-header h3 {
+    color: #FFD700;
+    font-size: 1.3rem;
+    margin: 0 0 4px 0;
+}
+
+.tape-name-hi {
+    color: #ccc;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+    font-size: 0.9rem;
+}
+
+.tape-origin {
+    display: inline-block;
+    color: #888;
+    font-size: 0.8rem;
+    margin-left: 8px;
+}
+
+.tape-description,
+.tape-dialogue,
+.tape-verdict {
+    margin-bottom: 16px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.tape-desc-hi,
+.tape-dialogue-hi,
+.tape-verdict-hi {
+    color: #fff;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+
+.tape-desc-en,
+.tape-dialogue-en,
+.tape-verdict-en {
+    color: #aaa;
+    font-size: 0.85rem;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.tape-toggle-btn {
+    position: fixed;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    color: #FFD700;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 251;
+}
+
+.tape-toggle-btn:hover {
+    background: rgba(255, 215, 0, 0.15);
+    border-color: #FFD700;
+}
+
+/* ─── TITLE CARD (for transitions) ─── */
+#transition-overlay .title-card-hindi {
+    font-family: 'Noto Sans Devanagari', sans-serif;
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 8px;
+}
+
+#transition-overlay .title-card-english {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 300;
+    letter-spacing: 2px;
+}

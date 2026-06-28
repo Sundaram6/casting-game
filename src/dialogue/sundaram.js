@@ -254,7 +254,10 @@ export const sundaramDialogue = {
                         en: 'Thank you',
                         bhojpuri: 'धन्यवाद'
                     },
-                    effect: () => { console.log('Dialogue ended'); }
+                    effect: () => {
+                        console.log('Sundaram chapter ended');
+                        window.dispatchEvent(new CustomEvent('chapterComplete', { detail: { chapter: 'sundaram' } }));
+                    }
                 }
             ]
         }

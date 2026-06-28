@@ -731,7 +731,10 @@ export const arjunDialogue = {
                         hi: 'अंत',
                         en: 'End'
                     },
-                    effect: () => { console.log('Arjun chapter ended'); },
+                    effect: () => {
+                        console.log('Arjun chapter ended');
+                        window.dispatchEvent(new CustomEvent('chapterComplete', { detail: { chapter: 'arjun' } }));
+                    },
                     effects: { arjun: { guilt: +5 } }
                 }
             ]
