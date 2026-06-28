@@ -18,8 +18,9 @@ import { initInput, getInputState, setInputState } from './game/input.js';
 import { initGameLoop, animate, getGameState, setGameState, getScore, addScore, getOfficesCompleted, incrementOfficesCompleted, getTotalOffices, spawnFireworks, spawnPhysicsParticle } from './game/loop.js';
 import { sounds, playSound } from './game/sounds.js';
 import { initProximityAudio, spawnBuzzBubble, initProximityAudioIntervals } from './game/proximity-audio.js';
+import { initPostProcessing, resizePostProcessing } from './effects/postProcessing.js';
 
-// --- Post-Processing (loaded dynamically) ---
+// --- Post-Processing ---
 let composer;
 
 // --- UI Elements ---
@@ -116,7 +117,7 @@ for(let i=1; i<=3; i++) {
     scene.add(haloMesh);
 }
 
-composer = null;
+composer = initPostProcessing(renderer, scene, camera, isMobile);
 
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
 const controls = new PointerLockControls(camera, document.body);
@@ -244,7 +245,7 @@ function updateHUD() {
 }
 
 window.addEventListener('resize', () => {
-    if (composer) composer.setSize(window.innerWidth, window.innerHeight);
+    if (composer) resizePostProcessing(window.innerWidth, window.innerHeight);
 });
 
 animate();
