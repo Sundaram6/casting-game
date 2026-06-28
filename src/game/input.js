@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { handleTypingCharacter } from '../legacy/typing-game.js';
 import { interact } from '../interaction.js';
+import { STATES } from '../state.js';
 
 let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
 let isSprinting = false;
@@ -59,7 +60,7 @@ function initInput(options) {
 
     joyZone.addEventListener('touchstart', e => {
         e.preventDefault();
-        if (touchJoystickId !== null || gameStateGetter() !== 'PLAYING') return;
+        if (touchJoystickId !== null || gameStateGetter() !== STATES.EXPLORING) return;
         const touch = e.changedTouches[0];
         touchJoystickId = touch.identifier;
         
@@ -79,7 +80,7 @@ function initInput(options) {
     }, { passive: false });
     joyZone.addEventListener('touchmove', e => {
         e.preventDefault();
-        if (gameStateGetter() !== 'PLAYING') return;
+        if (gameStateGetter() !== STATES.EXPLORING) return;
         for (let i=0; i<e.changedTouches.length; i++) {
             const touch = e.changedTouches[i];
             if (touch.identifier === touchJoystickId) {
@@ -112,14 +113,14 @@ function initInput(options) {
 
     lookZone.addEventListener('touchstart', e => {
         e.preventDefault();
-        if (touchLookId !== null || gameStateGetter() !== 'PLAYING') return;
+        if (touchLookId !== null || gameStateGetter() !== STATES.EXPLORING) return;
         const touch = e.changedTouches[0];
         touchLookId = touch.identifier;
         touchLookLast = { x: touch.clientX, y: touch.clientY };
     }, { passive: false });
     lookZone.addEventListener('touchmove', e => {
         e.preventDefault();
-        if (gameStateGetter() !== 'PLAYING') return;
+        if (gameStateGetter() !== STATES.EXPLORING) return;
         for (let i=0; i<e.changedTouches.length; i++) {
             const touch = e.changedTouches[i];
             if (touch.identifier === touchLookId) {
@@ -146,7 +147,7 @@ function initInput(options) {
     });
 
     document.addEventListener('keydown', (e) => {
-        if (gameStateGetter() === 'PLAYING') {
+        if (gameStateGetter() === STATES.EXPLORING) {
             switch (e.code) {
                 case 'ArrowUp': case 'KeyW': moveForward = true; break;
                 case 'ArrowLeft': case 'KeyA': moveLeft = true; break;
