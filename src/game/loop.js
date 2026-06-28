@@ -44,6 +44,7 @@ let skyMat;
 let cloudObjects, water, waterMat, grassInstanced, bladeCount, dummy;
 let isMobile = false;
 let startTypingMinigame = null;
+let initialized = false;
 
 function initGameLoop(options) {
     scene = options.scene;
@@ -60,6 +61,7 @@ function initGameLoop(options) {
     dummy = options.dummy;
     isMobile = options.isMobile;
     startTypingMinigame = options.startTypingMinigame;
+    initialized = true;
 }
 
 function spawnFireworks(x, y, z) {
@@ -100,6 +102,7 @@ function spawnPhysicsParticle(x, y, z) {
 
 function animate() {
     requestAnimationFrame(animate);
+    if (!initialized) return;
 
     const time = performance.now();
     const inputState = getInputState();

@@ -37,14 +37,9 @@ export function updateFlashback(dt) {
     if (scene) {
       setEnvironmentPreset(scene.environment);
       if (scene.dialogue) {
-        // Temporarily set state to EXPLORING to allow dialogue
-        const prevState = getState();
-        setState(STATES.EXPLORING);
         startDialogue(scene.dialogue, 'start', () => {
           // Dialogue ended, but flashback may still be playing
         });
-        // Restore FLASHBACK state
-        setState(STATES.FLASHBACK);
       }
     }
   }
