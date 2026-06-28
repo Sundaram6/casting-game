@@ -285,6 +285,39 @@ const environmentPresets = {
         dirIntensity: 1.6,
         rimColor: 0xccaa88,
         rimIntensity: 0.35
+    },
+    sundaram_patna: {
+        ambientColor: 0xd4a574,
+        ambientIntensity: 0.8,
+        hemiSkyColor: 0xffd699,
+        hemiGroundColor: 0x8b6914,
+        hemiIntensity: 1.3,
+        dirColor: 0xffe0b2,
+        dirIntensity: 1.9,
+        rimColor: 0xffcc80,
+        rimIntensity: 0.35
+    },
+    arjun_childhood: {
+        ambientColor: 0xffe0b2,
+        ambientIntensity: 0.7,
+        hemiSkyColor: 0xffcc80,
+        hemiGroundColor: 0x795548,
+        hemiIntensity: 1.2,
+        dirColor: 0xffab40,
+        dirIntensity: 1.7,
+        rimColor: 0xff8a65,
+        rimIntensity: 0.3
+    },
+    rekha_1998: {
+        ambientColor: 0xe0e0e0,
+        ambientIntensity: 0.6,
+        hemiSkyColor: 0xf5f5f5,
+        hemiGroundColor: 0x9e9e9e,
+        hemiIntensity: 1.1,
+        dirColor: 0xffffff,
+        dirIntensity: 1.6,
+        rimColor: 0xbdbdbd,
+        rimIntensity: 0.25
     }
 };
 

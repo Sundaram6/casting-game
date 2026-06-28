@@ -7,6 +7,7 @@ import { initCrowds, updateCrowds, getCrowds, getNepoCrowds } from '../legacy/cr
 import { updateTyping } from '../legacy/typing-game.js';
 import { getInputState, setInputState } from './input.js';
 import { getOffices } from './buildings.js';
+import { updateFlashback } from '../flashback/system.js';
 
 // --- DAY/NIGHT CONSTANTS ---
 const dayTop = new THREE.Color(0x3a66a8);
@@ -287,6 +288,9 @@ function animate() {
 
     // Update dialogue UI
     updateDialogueUI();
+
+    // Update flashback system
+    updateFlashback(dt);
 
     // Update Sundaram chapter
     updateSundaramChapter(dt);

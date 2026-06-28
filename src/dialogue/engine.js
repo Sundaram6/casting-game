@@ -5,7 +5,8 @@ let currentNodeId = null;
 let onChoiceCallback = null;
 
 export function startDialogue(dialogueData, startNodeId, onChoice) {
-    if (getState() !== STATES.EXPLORING) return false;
+    const state = getState();
+    if (state !== STATES.EXPLORING && state !== STATES.FLASHBACK) return false;
     currentDialogue = dialogueData;
     currentNodeId = startNodeId;
     onChoiceCallback = onChoice || null;
