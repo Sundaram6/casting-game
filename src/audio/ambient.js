@@ -18,6 +18,38 @@ const ambientConfigs = {
     pg: [
         { type: 'sine', freq: 60, vol: 0.03 },        // ceiling fan
         { type: 'square', freq: 1000, vol: 0.005 }    // cricket on TV
+    ],
+    casting_office: [
+        { type: 'sine', freq: 120, vol: 0.02 },       // AC hum
+        { type: 'square', freq: 440, vol: 0.01 },     // distant phone
+        { type: 'sawtooth', freq: 200, vol: 0.005 }   // chai pour
+    ],
+    waiting_room: [
+        { type: 'sine', freq: 80, vol: 0.01 },        // fan whir
+        { type: 'square', freq: 300, vol: 0.005 },    // muffled talk
+        { type: 'triangle', freq: 150, vol: 0.003 }   // footsteps
+    ],
+    audition_room: [
+        { type: 'square', freq: 1000, vol: 0.001 }    // ticking clock
+    ],
+    mumbai_street: [
+        { type: 'sawtooth', freq: 80, vol: 0.03 },    // traffic hum
+        { type: 'square', freq: 150, vol: 0.02 },     // auto horn
+        { type: 'sine', freq: 2000, vol: 0.01 },      // bollywood music distant
+        { type: 'triangle', freq: 60, vol: 0.02 }     // construction low rumble
+    ],
+    pg_room: [
+        { type: 'sine', freq: 60, vol: 0.03 },        // ceiling fan
+        { type: 'square', freq: 1000, vol: 0.005 },   // neighbor TV
+        { type: 'sawtooth', freq: 100, vol: 0.01 }    // traffic outside
+    ],
+    bandra_apartment: [
+        { type: 'sine', freq: 150, vol: 0.005 },      // city hum glass
+        { type: 'triangle', freq: 300, vol: 0.002 }   // sleek door
+    ],
+    restaurant: [
+        { type: 'square', freq: 400, vol: 0.01 },     // ambient chatter
+        { type: 'sine', freq: 800, vol: 0.005 }       // clinking glasses
     ]
 };
 
@@ -65,6 +97,10 @@ export function updateAmbientSound(location) {
     if (currentLocation === location) return;
     currentLocation = location;
     startAmbient(location);
+}
+
+export function playAmbient(location) {
+    updateAmbientSound(location);
 }
 
 export function startAmbientForCharacter(charId) {

@@ -1,4 +1,19 @@
 import { getState, setState, STATES } from '../state.js';
+import { speakLine, stopSpeaking } from '../audio/voice.js';
+
+function speakNode(node) {
+    if (!node || !node.text) return;
+    // Choose language: en > hi > bhojpuri > tamil
+    const langOrder = ['en', 'hi', 'bhojpuri', 'tamil'];
+    let selectedLang = 'en';
+    for (const lang of langOrder) {
+        if (node.text[lang]) {
+            selectedLang = lang;
+            break;
+        }
+    }
+    speakLine(node.text[selectedLang], selectedLang);
+}
 
 let currentDialogue = null;
 let currentNodeId = null;
@@ -11,6 +26,7 @@ export function startDialogue(dialogueData, startNodeId, onChoice) {
     currentNodeId = startNodeId;
     onChoiceCallback = onChoice || null;
     setState(STATES.DIALOGUE);
+    speakNode(currentDialogue.nodes[currentNodeId]);
     return true;
 }
 
@@ -33,6 +49,7 @@ export function selectOption(optionIndex) {
 
     if (option.next) {
         currentNodeId = option.next;
+        speakNode(getCurrentNode());
         return true;
     }
 
@@ -41,6 +58,7 @@ export function selectOption(optionIndex) {
 }
 
 export function endDialogue() {
+    stopSpeaking();
     currentDialogue = null;
     currentNodeId = null;
     onChoiceCallback = null;
