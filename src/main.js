@@ -20,7 +20,8 @@ import { initEnvironment } from './environment.js';
 import { initSundaramChapter, updateSundaramChapter } from './chapters/sundaram.js';
 import { updateDialogueUI } from './ui/dialogue-ui.js';
 import { updateInteraction, interact } from './interaction.js';
-import { setState, STATES } from './state.js';
+import { setState, STATES, getCharacter } from './state.js';
+import { initAmbientSound, startAmbientForCharacter } from './audio/ambient.js';
 import './ui/switcher-ui.js';
 
 // --- Post-Processing (loaded dynamically) ---
@@ -94,6 +95,13 @@ sounds.chatter.loop = true;
 sounds.chatter.volume = 0.4;
 sounds.sensual.volume = 0.85;
 sounds.victorious.volume = 0.75;
+
+function initAudio() {
+    initAmbientSound();
+}
+
+document.addEventListener('click', () => initAudio(), { once: true });
+document.addEventListener('touchstart', () => initAudio(), { once: true });
 
 function playSound(snd) {
     snd.currentTime = 0;
@@ -1254,6 +1262,7 @@ function initGame() {
     changeScreen(null);
     sounds.bgm.play().catch(() => {});
     sounds.chatter.play().catch(() => {});
+    startAmbientForCharacter(getCharacter());
 }
 
 function changeScreen(screenId) {
