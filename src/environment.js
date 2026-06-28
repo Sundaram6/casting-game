@@ -239,3 +239,91 @@ export function initEnvironment(scene, isMobile) {
 
     return { cloudObjects, water, waterMat, grassInstanced, bladeCount, dummy };
 }
+
+// Environment presets for different chapters/scenes
+const environmentPresets = {
+    sundaram_normal: {
+        ambientColor: 0x6080c0,
+        ambientIntensity: 0.6,
+        hemiSkyColor: 0x88bbee,
+        hemiGroundColor: 0x445533,
+        hemiIntensity: 1.2,
+        dirColor: 0xfff4e0,
+        dirIntensity: 1.8,
+        rimColor: 0xffeedd,
+        rimIntensity: 0.3
+    },
+    arjun_luxury: {
+        ambientColor: 0xc0d0e0,
+        ambientIntensity: 0.8,
+        hemiSkyColor: 0xddeeff,
+        hemiGroundColor: 0x667788,
+        hemiIntensity: 1.4,
+        dirColor: 0xe0f0ff,
+        dirIntensity: 2.0,
+        rimColor: 0xb0c0d0,
+        rimIntensity: 0.4
+    },
+    rekha_office: {
+        ambientColor: 0x808080,
+        ambientIntensity: 0.5,
+        hemiSkyColor: 0x999999,
+        hemiGroundColor: 0x555555,
+        hemiIntensity: 1.0,
+        dirColor: 0xffffee,
+        dirIntensity: 1.5,
+        rimColor: 0xcccccc,
+        rimIntensity: 0.2
+    },
+    arjun_dinner: {
+        ambientColor: 0x806040,
+        ambientIntensity: 0.7,
+        hemiSkyColor: 0xaa8866,
+        hemiGroundColor: 0x554433,
+        hemiIntensity: 1.1,
+        dirColor: 0xffddaa,
+        dirIntensity: 1.6,
+        rimColor: 0xccaa88,
+        rimIntensity: 0.35
+    }
+};
+
+export function setEnvironmentPreset(presetName) {
+    const preset = environmentPresets[presetName];
+    if (!preset) {
+        console.warn(`Unknown environment preset: ${presetName}`);
+        return false;
+    }
+
+    // Import lighting getters dynamically to avoid circular dependencies
+    import('./lighting.js').then(({ getAmbientLight, getHemiLight, getDirLight, getRimLight }) => {
+        const ambient = getAmbientLight();
+        const hemi = getHemiLight();
+        const dir = getDirLight();
+        const rim = getRimLight();
+
+        if (ambient) {
+            ambient.color.setHex(preset.ambientColor);
+            ambient.intensity = preset.ambientIntensity;
+        }
+        if (hemi) {
+            hemi.color.setHex(preset.hemiSkyColor);
+            hemi.groundColor.setHex(preset.hemiGroundColor);
+            hemi.intensity = preset.hemiIntensity;
+        }
+        if (dir) {
+            dir.color.setHex(preset.dirColor);
+            dir.intensity = preset.dirIntensity;
+        }
+        if (rim) {
+            rim.color.setHex(preset.rimColor);
+            rim.intensity = preset.rimIntensity;
+        }
+    });
+
+    return true;
+}
+
+export function getEnvironmentPresets() {
+    return Object.keys(environmentPresets);
+}
