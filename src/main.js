@@ -17,6 +17,7 @@ import {
     createAllowedSignTexture
 } from './materials.js';
 import { initEnvironment } from './environment.js';
+import { initSundaramChapter, updateSundaramChapter } from './chapters/sundaram.js';
 import { updateDialogueUI } from './ui/dialogue-ui.js';
 import { updateInteraction, interact } from './interaction.js';
 import { setState, STATES } from './state.js';
@@ -1244,6 +1245,7 @@ function initGame() {
     updateHUD();
     createOffices();
     createCrowds();
+    initSundaramChapter(scene);
     camera.position.set(0, 2, 0);
     velocity.set(0, 0, 0);
     screens.gameOver.classList.remove('flashing');
@@ -1847,6 +1849,9 @@ function animate() {
 
     // Update dialogue UI
     updateDialogueUI();
+
+    // Update Sundaram chapter
+    updateSundaramChapter(dt);
 
     // Update interaction system
     if (gameState === 'PLAYING') {
