@@ -4,7 +4,8 @@ import { initScene, getScene, getCamera, getRenderer } from './scene.js';
 import { initLighting } from './lighting.js';
 import { initEnvironment } from './environment.js';
 import { initSundaramChapter } from './chapters/sundaram.js';
-import { setState, STATES, getCharacter } from './state.js';
+import { initArjunChapter } from './chapters/arjun.js';
+import { setState, STATES, getCharacter, setCharacter } from './state.js';
 import { initAmbientSound, startAmbientForCharacter } from './audio/ambient.js';
 import './ui/switcher-ui.js';
 import './ui/subtitle-settings.js';
@@ -178,6 +179,7 @@ function initGame() {
     createOffices(15);
     initCrowds(scene, getOffices(), NEPO_POSITIONS);
     initSundaramChapter(scene);
+    initArjunChapter(scene, camera);
     camera.position.set(0, 2, 0);
     camera.rotation.set(0, 0, 0);
     camera.quaternion.set(0, 0, 0, 1);

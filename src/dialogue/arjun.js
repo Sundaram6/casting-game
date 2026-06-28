@@ -259,8 +259,8 @@ export const arjunDialogue = {
         waiting_enter: {
             speaker: 'Arjun',
             text: {
-                hi: 'वेटिंग रूम में एक आदमी बैठा है... लगता है वो भी ऑडिशन के लिए आया है।',
-                en: 'There\'s a man sitting in the waiting room... looks like he\'s here for an audition too.'
+                hi: 'वेटिंग रूम में एक आदमी बैठा है... लगता है वो भी ऑडिशन के लिए आया है। उसका हेडशॉट कुछ मुड़ा हुआ है।',
+                en: 'There\'s a man sitting in the waiting room... looks like he\'s here for an audition too. His headshot is a bit creased.'
             },
             options: [
                 {
@@ -284,8 +284,8 @@ export const arjunDialogue = {
         sundaram_meet: {
             speaker: 'Arjun',
             text: {
-                hi: 'हैलो भैया... आप भी ऑडिशन दे रहे हो?',
-                en: 'Hello brother... are you also giving an audition?'
+                hi: 'हैलो भैया... आप भी ऑडिशन दे रहे हो? आपका हेडशॉट देख रहा था... थोड़ा मुड़ गया है।',
+                en: 'Hello brother... are you also giving an audition? I was looking at your headshot... it\'s a bit creased.'
             },
             options: [
                 {
@@ -316,8 +316,8 @@ export const arjunDialogue = {
         sundaram_intro: {
             speaker: 'Sundaram',
             text: {
-                hi: 'हाँ भैया, रक्ष छाबड़ा की फिल्म है। तुम भी आए हो?',
-                en: 'Yes brother, Raksh Chhabra\'s film. You\'ve come too?'
+                hi: 'हाँ भैया, रक्ष छाबड़ा की फिल्म है। तुम भी आए हो? ये हेडशॉट... बहुत मुश्किल से बनवाया है।',
+                en: 'Yes brother, Raksh Chhabra\'s film. You\'ve come too? This headshot... made it with great difficulty.'
             },
             options: [
                 {
@@ -406,8 +406,50 @@ export const arjunDialogue = {
                         hi: 'शायद तुम सही कह रहे हो...',
                         en: 'Maybe you\'re right...'
                     },
-                    next: 'sundaram_advice',
+                    next: 'sundaram_bhojpuri_attempt',
                     effects: { sundaram: { empathy: +10 }, arjun: { guilt: +5 } }
+                }
+            ]
+        },
+        sundaram_bhojpuri_attempt: {
+            speaker: 'Arjun',
+            text: {
+                hi: 'भैया... एक बात बोलूँ? मुझे भोजपुरी थोड़ी बहुत आती है... मेरी माँ बिहार से हैं।',
+                en: 'Brother... can I say something? I know a little Bhojpuri... my mother is from Bihar.'
+            },
+            options: [
+                {
+                    text: {
+                        hi: 'आधी-अधूरी भोजपुरी बोलो',
+                        en: 'Speak half-remembered Bhojpuri'
+                    },
+                    next: 'sundaram_bhojpuri_response',
+                    effects: { sundaram: { trust: +15, empathy: +10 } }
+                },
+                {
+                    text: {
+                        hi: 'नहीं, कुछ नहीं',
+                        en: 'No, nothing'
+                    },
+                    next: 'sundaram_advice',
+                    effects: { sundaram: { trust: -5 } }
+                }
+            ]
+        },
+        sundaram_bhojpuri_response: {
+            speaker: 'Sundaram',
+            text: {
+                hi: 'अरे भैया! तुम भोजपुरी जानते हो? क्या बात है! तुम तो अपने ही लगे!',
+                en: 'Oh brother! You know Bhojpuri? Wow! You seem like one of us!'
+            },
+            options: [
+                {
+                    text: {
+                        hi: 'बस थोड़ा बहुत... माँ से सीखा है।',
+                        en: 'Just a little... learned from mother.'
+                    },
+                    next: 'sundaram_advice',
+                    effects: { sundaram: { trust: +10, respect: +5 } }
                 }
             ]
         },
@@ -429,7 +471,7 @@ export const arjunDialogue = {
             ]
         },
 
-        // === AUDITION ===
+        // === AUDITION — Narrative Sequence ===
         audition_call: {
             speaker: 'Assistant',
             text: {
@@ -564,6 +606,22 @@ export const arjunDialogue = {
 
         // === DINNER CONFRONTATION — Climax ===
         dinner_start: {
+            speaker: 'Arjun',
+            text: {
+                hi: 'रेस्तरां में बैठे हैं... पापा ने महंगी जगह चुनी है। जैसे हर चीज़ में पैसा झलकता है।',
+                en: 'Sitting in the restaurant... Dad chose an expensive place. Like money shows in everything.'
+            },
+            options: [
+                {
+                    text: {
+                        hi: 'पापा का इंतज़ार करो',
+                        en: 'Wait for Dad'
+                    },
+                    next: 'dinner_vikram_arrives'
+                }
+            ]
+        },
+        dinner_vikram_arrives: {
             speaker: 'Vikram',
             text: {
                 hi: 'बैठो अर्जुन। आज का दिन कैसा रहा?',
@@ -656,16 +714,16 @@ export const arjunDialogue = {
                         hi: '...कुछ नहीं पापा।',
                         en: '...Nothing Dad.'
                     },
-                    next: 'dinner_end',
+                    next: 'dinner_realization',
                     effects: { arjun: { guilt: +10, respect: -10 } }
                 }
             ]
         },
-        dinner_end: {
+        dinner_realization: {
             speaker: 'Arjun',
             text: {
-                hi: 'पापा की बातें सुनकर लगता है... शायद वो सही कह रहे हैं। या शायद नहीं।',
-                en: 'Listening to Dad... maybe he\'s right. Or maybe not.'
+                hi: 'पापा की बातें सुनकर लगता है... शायद वो सही कह रहे हैं। या शायद नहीं। सुंदरम की बातें याद आ रही हैं।',
+                en: 'Listening to Dad... maybe he\'s right. Or maybe not. Sundaram\'s words are coming back to me.'
             },
             options: [
                 {
