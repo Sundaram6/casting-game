@@ -110,15 +110,15 @@ function createBrickTexture(baseColor = '#c0634a') {
     for (let row = 0; row * bh < 512; row++) {
         for (let col = 0; col * bw < 512; col++) {
             const ox = row % 2 === 0 ? 0 : bw / 2;
-            const shade = 0.78 + Math.random() * 0.36;
+            const shade = 0.85 + Math.random() * 0.30;
             const hue = 10 + Math.random() * 15;
-            const sat = 45 + Math.random() * 25;
-            ctx.fillStyle = `hsl(${hue}, ${sat}%, ${Math.floor(30 * shade)}%)`;
+            const sat = 40 + Math.random() * 20;
+            ctx.fillStyle = `hsl(${hue}, ${sat}%, ${Math.floor(55 * shade)}%)`;
             ctx.fillRect(col * bw + ox + 3, row * bh + 3, bw - 6, bh - 6);
         }
     }
     // Mortar
-    ctx.strokeStyle = '#2a1e16';
+    ctx.strokeStyle = '#6a5a4a';
     ctx.lineWidth = 4;
     for (let row = 0; row * bh < 512; row++) {
         for (let col = 0; col * bw < 512; col++) {
@@ -173,8 +173,8 @@ function createGlassTexture() {
     const ctx = cvs.getContext('2d');
     // Tinted glass base
     const grad = ctx.createLinearGradient(0, 0, 512, 512);
-    grad.addColorStop(0, '#0d1a2a');
-    grad.addColorStop(1, '#1a2e45');
+    grad.addColorStop(0, '#2a4a6a');
+    grad.addColorStop(1, '#3a5e75');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 512, 512);
     const cols = 5, rows = 8;
@@ -195,7 +195,7 @@ function createGlassTexture() {
                 }
                 ctx.fillStyle = wg;
             } else {
-                ctx.fillStyle = 'rgba(10,25,50,0.9)';
+                ctx.fillStyle = 'rgba(30,50,80,0.8)';
             }
             ctx.fillRect(rx, ry, rw, rh);
             // Glass sheen highlight
@@ -458,7 +458,7 @@ export const MAT = {
     BRICK: (color) => new THREE.MeshStandardMaterial({
         map: createBrickTexture(color || '#8B4513'),
         normalMap: createBrickNormalMap(),
-        normalScale: new THREE.Vector2(2.0, 2.0),
+        normalScale: new THREE.Vector2(0.6, 0.6),
         roughness: 0.85,
         metalness: 0.02,
         envMapIntensity: 0.4

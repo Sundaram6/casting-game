@@ -12,10 +12,11 @@ export function initScene() {
     renderer = new THREE.WebGLRenderer({ antialias: !isMobile, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio || 1, 1.5) : Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x87ceeb);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = isMobile ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = isMobile ? 1.0 : 1.3;
+    renderer.toneMappingExposure = isMobile ? 1.5 : 2.0;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     
     document.getElementById('game-container').appendChild(renderer.domElement);

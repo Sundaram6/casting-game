@@ -145,11 +145,11 @@ const renderer = getRenderer();
 const skyGeo = new THREE.SphereGeometry(450, 32, 32);
 const skyMat = new THREE.ShaderMaterial({
     uniforms: {
-        topColor: { value: new THREE.Color(0x0a1628) },
-        horizonColor: { value: new THREE.Color(0x7ec8e3) },
+        topColor: { value: new THREE.Color(0x5b8ec9) },
+        horizonColor: { value: new THREE.Color(0x87ceeb) },
         bottomColor: { value: new THREE.Color(0xf5d7a3) },
         offset: { value: 20 },
-        exponent: { value: 0.5 }
+        exponent: { value: 0.4 }
     },
     vertexShader: `
         varying vec3 vWorldPosition;
@@ -180,8 +180,8 @@ const skyMat = new THREE.ShaderMaterial({
 });
 const skyDome = new THREE.Mesh(skyGeo, skyMat);
 scene.add(skyDome);
-scene.background = null; // Remove canvas texture background
-scene.fog = new THREE.FogExp2(0x7ec8e3, isMobile ? 0.006 : 0.0035);
+scene.background = new THREE.Color(0x87ceeb); // Match fog color for seamless background
+scene.fog = new THREE.FogExp2(0x87ceeb, isMobile ? 0.003 : 0.002);
 
 // Sun sphere (decorative)
 const sunGeo = new THREE.SphereGeometry(12, 32, 32);
@@ -205,29 +205,10 @@ for(let i=1; i<=3; i++) {
     scene.add(haloMesh);
 }
 
-// Post-processing setup
-function initPostProcessing() {
-    composer = new EffectComposer(renderer);
-    
-    const renderPass = new RenderPass(scene, camera);
-    composer.addPass(renderPass);
-    
-    // Bloom for emissive glow (neon signs, sun, lamps)
-    const bloomPass = new UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
-        isMobile ? 0.3 : 0.6,  // strength
-        0.4,  // radius
-        0.85  // threshold
-    );
-    composer.addPass(bloomPass);
-    
-    // FXAA anti-aliasing
-    const fxaaPass = new ShaderPass(FXAAShader);
-    fxaaPass.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight);
-    composer.addPass(fxaaPass);
-}
-
-initPostProcessing();
+// Post-processing disabled — was causing black background below horizon.
+// scene.background + renderer handles the sky correctly.
+// To re-enable, fix EffectComposer clear color to match scene.background.
+composer = null;
 
 
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
@@ -266,6 +247,10 @@ screens.start.addEventListener('click', () => {
 });
 controls.addEventListener('unlock', () => {
     if (gameState === 'PLAYING') crosshair.style.display = 'none';
+});
+controls.addEventListener('lock', () => {
+    camera.rotation.set(0, 0, 0);
+    crosshair.style.display = 'block';
 });
 document.getElementById('restart-btn').addEventListener('click', () => { initGame(); lockOrShowMobileControls(); });
 document.getElementById('play-again-btn').addEventListener('click', () => { initGame(); lockOrShowMobileControls(); });
@@ -442,7 +427,7 @@ function createOfficeBuilding(config, isNepo = false) {
     const bodyMat = new THREE.MeshStandardMaterial({
         map: brickTex,
         normalMap: brickNorm,
-        normalScale: new THREE.Vector2(2.0, 2.0),
+        normalScale: new THREE.Vector2(0.6, 0.6),
         roughness: 0.8,
         metalness: 0.04,
         envMapIntensity: 0.5
@@ -1251,12 +1236,18 @@ function initGame() {
     score = 0;
     officesCompleted = 0;
     if (buzzLayer) buzzLayer.innerHTML = '';
+    document.body.classList.remove('shake-severe');
     updateHUD();
     createOffices();
     createCrowds();
     initSundaramChapter(scene);
     camera.position.set(0, 2, 0);
+    camera.rotation.set(0, 0, 0);
+    camera.quaternion.set(0, 0, 0, 1);
+    camera.rotation.order = 'YXZ';
     velocity.set(0, 0, 0);
+    velocityY = 0;
+    isGrounded = true;
     screens.gameOver.classList.remove('flashing');
     gameState = 'PLAYING';
     setState(STATES.EXPLORING);
@@ -1677,16 +1668,16 @@ function animate() {
     const _rimLight = getRimLight();
     if (_dirLight) {
         _dirLight.position.set(Math.cos(dayTime) * 300, Math.max(0, Math.sin(dayTime)) * 350 + 50, Math.sin(dayTime) * 300);
-        _dirLight.intensity = Math.max(0, Math.sin(dayTime)) * 1.8;
+        _dirLight.intensity = Math.max(0.3, Math.sin(dayTime)) * 2.0;
     }
     if (_ambientLight) {
-        _ambientLight.intensity = Math.max(0.1, blend * 0.35);
+        _ambientLight.intensity = Math.max(0.3, blend * 0.5);
     }
     if (_hemiLight) {
-        _hemiLight.intensity = Math.max(0.1, blend * 0.5);
+        _hemiLight.intensity = Math.max(0.3, blend * 0.8);
     }
     if (_rimLight) {
-        _rimLight.intensity = Math.max(0.1, blend * 0.6);
+        _rimLight.intensity = Math.max(0.2, blend * 0.7);
     }
 
     // Drift clouds
