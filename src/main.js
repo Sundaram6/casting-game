@@ -118,7 +118,7 @@ for(let i=1; i<=3; i++) {
     scene.add(haloMesh);
 }
 
-composer = initPostProcessing(renderer, scene, camera, isMobile);
+composer = null; // EffectComposer disabled — HalfFloat targets don't propagate scene.background
 
 // ─── CONTROLS ────────────────────────────────────────────────────────────────
 const controls = new PointerLockControls(camera, document.body);
