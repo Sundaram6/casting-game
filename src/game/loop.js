@@ -8,6 +8,7 @@ import { updateTyping } from '../legacy/typing-game.js';
 import { getInputState, setInputState } from './input.js';
 import { getOffices } from './buildings.js';
 import { updateFlashback } from '../flashback/system.js';
+import { updateColorGrading } from '../effects/colorGrading.js';
 
 // --- DAY/NIGHT CONSTANTS ---
 const dayTop = new THREE.Color(0x3a66a8);
@@ -291,6 +292,9 @@ function animate() {
 
     // Update flashback system
     updateFlashback(dt);
+
+    // Update color grading transitions
+    updateColorGrading(dt);
 
     // Update Sundaram chapter
     updateSundaramChapter(dt);
