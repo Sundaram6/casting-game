@@ -9,6 +9,10 @@ import { updateRelationship } from '../relationship.js';
 import { setColorGrading } from '../effects/colorGrading.js';
 import { startAmbientForCharacter } from '../audio/ambient.js';
 import { setEnvironmentPreset } from '../environment.js';
+import { initSundaramChapter } from '../chapters/sundaram.js';
+import { initArjunChapter } from '../chapters/arjun.js';
+import { initRekhaChapter } from '../chapters/rekha.js';
+import { getScene, getCamera } from '../scene.js';
 
 const switcherEl = document.getElementById('character-switcher');
 
@@ -23,6 +27,29 @@ const CHARACTER_ORDER = ['sundaram', 'arjun', 'rekha'];
 let unlockedCharacters = new Set(['sundaram']);
 let currentCharacter = 'sundaram';
 let switchingInProgress = false;
+const initializedChapters = new Set();
+
+export function resetChapterInit() {
+  initializedChapters.clear();
+}
+
+function initChapterForCharacter(charId) {
+  if (initializedChapters.has(charId)) return;
+  const scene = getScene();
+  const camera = getCamera();
+  switch (charId) {
+    case 'sundaram':
+      initSundaramChapter(scene);
+      break;
+    case 'arjun':
+      initArjunChapter(scene, camera);
+      break;
+    case 'rekha':
+      initRekhaChapter(scene, camera);
+      break;
+  }
+  initializedChapters.add(charId);
+}
 
 function getCharacterTitle(characterId) {
   return CHARACTER_TITLES[characterId] || { hindi: characterId, english: characterId };
@@ -71,6 +98,7 @@ function switchToCharacter(charId) {
 
   fadeToBlack(() => {
     setCharacter(charId);
+    initChapterForCharacter(charId);
     setColorGrading(charId);
     startAmbientForCharacter(charId);
 
