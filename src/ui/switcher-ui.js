@@ -2,6 +2,7 @@
 
 import { getCharacterConfig, getAllCharacters } from '../characters.js';
 import { getCharacter, getState, setCharacter, STATES } from '../state.js';
+import { stopAllSounds } from '../game/sounds.js';
 import { fadeToBlack, fadeFromBlack, showTitleCard } from '../effects/transitions.js';
 import { initConvergence, getConvergenceState } from '../convergence/system.js';
 import { addJournalByTrigger } from '../journal/system.js';
@@ -97,6 +98,7 @@ function switchToCharacter(charId) {
   const titles = getCharacterTitle(charId);
 
   fadeToBlack(() => {
+    stopAllSounds();
     setCharacter(charId);
     initChapterForCharacter(charId);
     setColorGrading(charId);
