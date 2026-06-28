@@ -4,8 +4,9 @@
 
 ### Fixed
 - **Dual state systems unified** — Merged `gameState` from loop.js into `state.js` STATES enum. Single source of truth eliminates Tab handler bug and state sync issues.
-- **Sound cleanup on all transitions** — Added `stopAllSounds()` function called before every state transition (game start, character switch, typing win/loss). Victory/careless whisper sounds now properly stopped.
+- **Sound cleanup on all transitions** — Added `stopAllSounds()` function called before every state transition (game start, character switch, typing win/loss). Victory/careful whisper sounds now properly stopped.
 - **Tab handler fixed** — Character switcher now correctly blocks switching during typing minigames (fixed by state unification).
+- **Input.js state mismatch** — Player controls were broken because `input.js` compared against `'PLAYING'` while state enum changed to `'EXPLORING'`. Updated to use `STATES.EXPLORING`.
 
 ### Added
 - **Satirical victory awards** — Each character receives 3 ironic awards after completing all offices. Arjun gets nepotism awards, Sundaram gets "nobody noticed" awards, Rekha gets "looking the other way" awards.
