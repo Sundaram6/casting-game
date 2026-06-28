@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { getState, setState, STATES } from './state.js';
 import { startDialogue } from './dialogue/engine.js';
+import { showExamine } from './ui/examine-ui.js';
 
 const raycaster = new THREE.Raycaster();
 const interactables = [];
@@ -55,7 +56,7 @@ export function interact() {
     if (data.type === 'dialogue') {
         startDialogue(data.dialogue, data.startNode);
     } else if (data.type === 'examine') {
-        setState(STATES.INTERACTING);
+        showExamine(data.text);
     } else if (data.type === 'flashback') {
         setState(STATES.FLASHBACK);
     }

@@ -659,6 +659,42 @@ p {
     font-size: 0.9rem;
 }
 
+/* Examine UI */
+#examine-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 250;
+}
+
+#examine-box {
+    max-width: 600px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 8px;
+    padding: 30px;
+}
+
+#examine-text {
+    color: #fff;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+#examine-hint {
+    color: #888;
+    font-size: 0.8rem;
+    text-align: right;
+}
+
+.examine-hi { margin-bottom: 8px; }
+.examine-en { margin-bottom: 8px; color: #aaa; font-size: 0.95rem; }
+.examine-ta { margin-bottom: 8px; color: #999; font-size: 0.9rem; }
+
 /* Dialogue UI */
 #dialogue-overlay {
     position: fixed;
