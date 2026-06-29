@@ -30,20 +30,28 @@ export function fadeFromBlack(callback) {
   }, 800);
 }
 
-export function showTitleCard(hindi, english, callback) {
+export function showTitleCard(hindi, english, callback, role) {
+  if (!overlay) return;
+  
+  let roleHtml = '';
+  if (role) {
+    roleHtml = `<div style="font-family: 'Outfit', sans-serif; font-size: 0.9rem; color: rgba(255,255,255,0.5); font-style: italic; margin-top: 0.5rem; letter-spacing: 1px;">${role}</div>`;
+  }
+  
   overlay.innerHTML = `
-    <div style="text-align: center; color: white; font-family: 'Outfit', sans-serif;">
-      <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">${hindi}</div>
-      <div style="font-size: 1.2rem; opacity: 0.7;">${english}</div>
+    <div style="text-align: center;">
+      <div style="font-family: 'Noto Sans Devanagari', sans-serif; font-size: 2.5rem; color: white; text-shadow: 0 0 20px rgba(0,0,0,0.8);">${hindi}</div>
+      <div style="font-family: 'Outfit', sans-serif; font-size: 1.2rem; color: rgba(255,255,255,0.7); letter-spacing: 2px; margin-top: 0.3rem;">${english}</div>
+      ${roleHtml}
     </div>
   `;
+  
+  overlay.style.transition = 'opacity 0.8s ease';
   overlay.style.opacity = '1';
-  overlay.style.pointerEvents = 'all';
+  
   setTimeout(() => {
     overlay.style.opacity = '0';
-    overlay.style.pointerEvents = 'none';
     setTimeout(() => {
-      overlay.innerHTML = '';
       if (callback) callback();
     }, 800);
   }, 3000);
