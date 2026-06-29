@@ -150,9 +150,15 @@ function createSwitcherUI() {
     nameHiEl.className = 'switcher-name-hi';
     nameHiEl.textContent = titles.hindi;
 
+    const roleEl = document.createElement('span');
+    roleEl.className = 'switcher-role';
+    const charConfig = getCharacterConfig(charId);
+    roleEl.textContent = charConfig.role;
+
     btn.appendChild(lockEl);
     btn.appendChild(nameEl);
     btn.appendChild(nameHiEl);
+    btn.appendChild(roleEl);
 
     btn.addEventListener('click', () => {
       switchToCharacter(charId);

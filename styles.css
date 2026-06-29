@@ -1053,6 +1053,14 @@ p {
     font-family: 'Noto Sans Devanagari', sans-serif;
 }
 
+.switcher-role {
+    font-size: 0.55rem;
+    color: rgba(255, 215, 0, 0.5);
+    font-style: italic;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
 .switcher-btn.locked .switcher-name {
     color: #888;
 }
