@@ -18,9 +18,15 @@ export function updateDialogueUI() {
     // Speaker name
     const speakerNames = {
         'Sundaram': 'Sundaram Sharma',
+        'Arjun': 'Arjun Malhotra',
         'Rekha': 'Rekha Iyer',
+        'Vikram': 'Vikram Malhotra',
+        'Auto Driver': 'Auto Driver',
+        'Office Staff': 'Office Staff',
+        'Another Staff': 'Office Staff',
         'Actor': 'Fellow Actor',
         'Assistant': 'Casting Assistant',
+        'Raksh': 'Raksh Chhabra',
         'Narrator': ''
     };
     speakerEl.textContent = speakerNames[node.speaker] || node.speaker;
