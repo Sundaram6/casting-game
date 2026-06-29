@@ -55,9 +55,9 @@ export const sundaramDialogue = {
         look_around: {
             speaker: 'Sundaram',
             text: {
-                hi: 'पहले थोड़ा इधर-उधर देख लेते हैं... यहाँ का माहौल कैसा है।',
-                en: 'Let me look around first... see what the place is like.',
-                bhojpuri: 'पहिले थोड़ा इधर-उधर देख लेव... यहाँ का माहौल कैसा है।'
+                hi: 'पहले इधर-उधर देखते हैं... दादर से यहाँ तक 16 घंटे की ट्रेन थी। पटना से मुंबई... वही सपना, बस शहर बदल गया।',
+                en: 'Let me look around first... 16 hours by train from Dadar. Patna to Mumbai... same dream, just a different city.',
+                bhojpuri: 'पहिले इधर-उधर देखते हैं... दादर से यहाँ तक 16 घंटे की ट्रेन थी। पटना से मुंबई... वही सपना, बस शहर बदल गया।'
             },
             options: [
                 {
@@ -81,9 +81,35 @@ export const sundaramDialogue = {
         chai: {
             speaker: 'Sundaram',
             text: {
-                hi: 'चाय वाला भी यहीं है... चलो एक चाय पीते हैं।',
-                en: 'The chai wallah is here too... let me get some tea.',
-                bhojpuri: 'चाय वाला भी यहीं है... चलो एक चाय पीते हैं।'
+                hi: 'चाय वाला: "चाय लोगे?" ... लगता है बिहारी है। एहसान हो जाएगा।',
+                en: 'Chai wallah: "Want some tea?" ... Looks like he\'s from Bihar. A familiar connection.',
+                bhojpuri: 'चाय वाला: "चाय लेव?" ... लगता है बिहारी है। एहसान हो जाएगा।'
+            },
+            options: [
+                {
+                    text: {
+                        hi: '"बिहारी हो?"',
+                        en: '"Are you from Bihar?"',
+                        bhojpuri: '"बिहारी हो?"'
+                    },
+                    next: 'chai_bihar'
+                },
+                {
+                    text: {
+                        hi: 'बस चाय लो',
+                        en: 'Just take the tea',
+                        bhojpuri: 'बस चाय लेव'
+                    },
+                    next: 'enter_office'
+                }
+            ]
+        },
+        chai_bihar: {
+            speaker: 'Sundaram',
+            text: {
+                hi: 'चाय वाला: "हाँ भैया, पटना से। यहाँ चाय बेचते हैं, सपने देखते हैं।" ... अच्छा लगा कोई अपना मिला।',
+                en: 'Chai wallah: "Yes brother, from Patna. Sell tea here, dream here." ... Nice to find someone from home.',
+                bhojpuri: 'चाय वाला: "हाँ भैया, पटना से। यहाँ चाय बेचते हैं, सपने देखते हैं।" ... अच्छा लगा कोई अपना मिला।'
             },
             options: [
                 {
@@ -99,26 +125,26 @@ export const sundaramDialogue = {
         waiting_room: {
             speaker: 'Sundaram',
             text: {
-                hi: 'वेटिंग रूम में बैठते हैं... यहाँ और भी लोग हैं।',
-                en: 'Let me sit in the waiting room... there are other people here too.',
-                bhojpuri: 'वेटिंग रूम में बैठते हैं... यहाँ और भी लोग हैं।'
+                hi: 'वेटिंग रूम में बैठे हैं... सब मुंबई वाले लगते हैं। मैं अकेला बिहारी हूँ शायद। पटना में थिएटर करता था, अब यहाँ ऑडिशन दे रहा हूँ।',
+                en: 'Sitting in the waiting room... everyone looks like they\'re from Mumbai. Maybe I\'m the only one from Bihar. Used to do theater in Patna, now giving auditions here.',
+                bhojpuri: 'वेटिंग रूम में बैठे हैं... सब मुंबई वाले लगते हैं। मैं अकेला बिहारी हूँ शायद। पटना में थिएटर करता था, अब यहाँ ऑडिशन दे रहा हूँ।'
             },
             options: [
                 {
                     text: {
-                        hi: 'दूसरे एक्टर से बात करो',
-                        en: 'Talk to another actor',
-                        bhojpuri: 'दूसरे एक्टर से बात करव'
+                        hi: 'चुपचाप बैठो',
+                        en: 'Sit quietly',
+                        bhojpuri: 'चुपचाप बैठव'
                     },
-                    next: 'talk_actor'
+                    next: 'sit_and_wait'
                 },
                 {
                     text: {
-                        hi: 'बस बैठकर इंतज़ार करो',
-                        en: 'Just sit and wait',
-                        bhojpuri: 'बस बैठकर इंतज़ार करव'
+                        hi: 'किसी से बात करो',
+                        en: 'Talk to someone',
+                        bhojpuri: 'किसी से बात करव'
                     },
-                    next: 'sit_and_wait'
+                    next: 'talk_actor'
                 }
             ]
         },
