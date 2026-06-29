@@ -1193,3 +1193,32 @@ p {
     font-weight: 300;
     letter-spacing: 2px;
 }
+
+#hud-character {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 150;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    pointer-events: none;
+}
+
+#hud-char-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(255, 215, 0, 0.9);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+#hud-char-role {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.45);
+    font-style: italic;
+    margin-top: 2px;
+}

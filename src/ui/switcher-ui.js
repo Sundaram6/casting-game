@@ -88,6 +88,15 @@ function updateSwitcherDisplay() {
   });
 }
 
+function updateHudCharacter(charId) {
+    const nameEl = document.getElementById('hud-char-name');
+    const roleEl = document.getElementById('hud-char-role');
+    if (!nameEl || !roleEl) return;
+    const config = getCharacterConfig(charId);
+    nameEl.textContent = config.name;
+    roleEl.textContent = config.role;
+}
+
 function switchToCharacter(charId) {
   if (switchingInProgress) return;
   if (!isCharacterUnlocked(charId)) return;
@@ -119,6 +128,7 @@ function switchToCharacter(charId) {
         switchingInProgress = false;
         currentCharacter = charId;
         updateSwitcherDisplay();
+        updateHudCharacter(charId);
       });
     }, charConfig.role);
   });
@@ -175,6 +185,7 @@ export function initSwitcherUI() {
   createSwitcherUI();
   currentCharacter = getCharacter();
   updateSwitcherDisplay();
+  updateHudCharacter(currentCharacter);
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Tab') {
