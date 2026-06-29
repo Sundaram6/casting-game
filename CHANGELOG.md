@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.2.0] - Character Identity & Relationship Visibility
+
+### Added
+- **HUD character indicator** — Persistent display of current character name and role in top-left corner.
+- **Role labels on switcher buttons** — Character switcher now shows role labels ("The Outsider", "The Nepo Kid", "The Gatekeeper") below each name.
+- **Role label on title cards** — Character switch title cards now include the role label below the name.
+- **Journal character profiles** — Biographical entries for each character unlock on first switch: Sundaram (Bihar theater artist), Arjun (nepo kid), Rekha (30-year gatekeeper).
+- **Relationship tracking in journal** — Visual bars showing trust, respect, empathy, guilt, complicity per character.
+- **Flashback activation** — Three flashback scenes now trigger at key story moments: Sundaram's mother's shop in Patna, Arjun's childhood on a film set, Rekha's 1998 fight for Geeta. Skippable with Escape/click.
+- **Flashback journal entries** — Each flashback adds a bilingual journal entry.
+
+### Fixed
+- **Dialogue speaker names** — Completed speaker name map in dialogue UI. Arjun, Vikram, Auto Driver, Office Staff, Raksh now show full names instead of raw strings.
+- **Sundaram's Bihar identity** — Added dialogue lines revealing Sundaram's background in his own chapter (Patna reference, chai wallah connection, waiting room monologue).
+
 ## [2.1.0] - Bug Fixes, State Unification, and Victory Redesign
 
 ### Fixed
