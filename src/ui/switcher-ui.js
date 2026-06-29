@@ -5,7 +5,7 @@ import { getCharacter, getState, setCharacter, STATES } from '../state.js';
 import { stopAllSounds } from '../game/sounds.js';
 import { fadeToBlack, fadeFromBlack, showTitleCard } from '../effects/transitions.js';
 import { initConvergence, getConvergenceState } from '../convergence/system.js';
-import { addJournalByTrigger } from '../journal/system.js';
+import { addJournalByTrigger, hasEntry } from '../journal/system.js';
 import { updateRelationship } from '../relationship.js';
 import { setColorGrading } from '../effects/colorGrading.js';
 import { startAmbientForCharacter } from '../audio/ambient.js';
@@ -225,6 +225,12 @@ export function isDialogueActive() {
 
 window.addEventListener('chapterComplete', (e) => {
   const { chapter } = e.detail;
+
+  // Trigger character profile on first switch
+  const profileTrigger = `character_profile_${chapter}`;
+  if (!hasEntry(profileTrigger)) {
+    addJournalByTrigger(profileTrigger);
+  }
 
   switch (chapter) {
     case 'sundaram':

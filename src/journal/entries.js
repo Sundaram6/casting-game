@@ -82,6 +82,33 @@ export const JOURNAL_ENTRIES = {
       hi: 'कॉन्ट्रैक्ट साइन हो गया। फ़ैसला हो गया। लेकिन कौन सा? जो वो चाहते थे, या जो मुझे करना चाहिए था?'
     },
     trigger: 'rekha_signs_contract'
+  },
+  sundaram_profile: {
+    character: 'sundaram',
+    title: { en: 'Sundaram Sharma — The Outsider', hi: 'सुंदरम शर्मा — बाहरी' },
+    content: {
+      en: 'Theater artist from Patna, Bihar. Fluent in Hindi, English, and Bhojpuri. Came to Mumbai with dreams and a train ticket. No contacts, no surname that opens doors. Just talent and hunger.',
+      hi: 'बिहार के पटना से थिएटर कलाकार। हिंदी, अंग्रेजी और भोजपुरी में धाराप्रवाह। मुंबई सपनों और ट्रेन के टिकट के साथ आया। कोई संपर्क नहीं, कोई ऐसा उपनाम नहीं जो दरवाज़े खोले। बस प्रतिभा और भूख।'
+    },
+    trigger: 'character_profile_sundaram'
+  },
+  arjun_profile: {
+    character: 'arjun',
+    title: { en: 'Arjun Malhotra — The Nepo Kid', hi: 'अर्जुन मल्होत्रा — नेपो किड' },
+    content: {
+      en: 'Son of Vikram Malhotra, one of Bollywood\'s biggest producers. Grew up on film sets. Everyone knows his father\'s name — not his. The industry calls it privilege. He calls it pressure.',
+      hi: 'बॉलीवुड के सबसे बड़े निर्माताओं में से एक विक्रम मल्होत्रा के बेटे। फिल्म के सेट पर पले-बढ़े। सबको उनके पिता का नाम पता है — उनका नहीं। इंडस्ट्री इसे फ़ायदा कहती है। वो इसे दबाव कहते हैं।'
+    },
+    trigger: 'character_profile_arjun'
+  },
+  rekha_profile: {
+    character: 'rekha',
+    title: { en: 'Rekha Iyer — The Gatekeeper', hi: 'रेखा अय्यर — द्वारपाल' },
+    content: {
+      en: 'Thirty years in casting. She\'s seen a thousand hopefuls walk through that door. Some she fought for. Some she let go. The question is which ones she remembers.',
+      hi: 'कास्टिंग में तीस साल। उसने हज़ारों उम्मीदवारों को उस दरवाज़े से जाते देखा है। कुछ के लिए लड़ी। कुछ को जाने दिया। सवाल यह है कि उसे कौन याद हैं।'
+    },
+    trigger: 'character_profile_rekha'
   }
 };
 
