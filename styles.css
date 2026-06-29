@@ -1222,3 +1222,65 @@ p {
     font-style: italic;
     margin-top: 2px;
 }
+
+/* ─── JOURNAL RELATIONSHIPS ─── */
+.journal-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 215, 0, 0.15);
+}
+
+.journal-section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    color: rgba(255, 215, 0, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.journal-relationship {
+    margin-bottom: 15px;
+}
+
+.journal-rel-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 6px;
+}
+
+.journal-rel-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.journal-rel-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    min-width: 80px;
+}
+
+.journal-rel-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.journal-rel-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.6), rgba(255, 215, 0, 0.9));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.journal-rel-value {
+    font-size: 0.65rem;
+    color: rgba(255, 215, 0, 0.6);
+    min-width: 30px;
+    text-align: right;
+}

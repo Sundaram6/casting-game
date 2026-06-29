@@ -17,3 +17,7 @@ export function getRelationship(character) {
 export function getRelationshipSummary() {
     return JSON.parse(JSON.stringify(relationships));
 }
+
+export function getRelationshipData() {
+    return JSON.parse(JSON.stringify(relationships));
+}
