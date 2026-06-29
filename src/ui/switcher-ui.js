@@ -113,13 +113,14 @@ function switchToCharacter(charId) {
       setEnvironmentPreset(envPresets[charId]);
     }
 
+    const charConfig = getCharacterConfig(charId);
     showTitleCard(titles.hindi, titles.english, () => {
       fadeFromBlack(() => {
         switchingInProgress = false;
         currentCharacter = charId;
         updateSwitcherDisplay();
       });
-    });
+    }, charConfig.role);
   });
 }
 
