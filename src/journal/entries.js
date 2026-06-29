@@ -109,6 +109,33 @@ export const JOURNAL_ENTRIES = {
       hi: 'कास्टिंग में तीस साल। उसने हज़ारों उम्मीदवारों को उस दरवाज़े से जाते देखा है। कुछ के लिए लड़ी। कुछ को जाने दिया। सवाल यह है कि उसे कौन याद हैं।'
     },
     trigger: 'character_profile_rekha'
+  },
+  sundaram_flashback: {
+    character: 'sundaram',
+    title: { en: 'Patna — Mother\'s Shop', hi: 'पटना — माँ की दुकान' },
+    content: {
+      en: 'The smell of incense and old books. Mother\'s small shop near Patna Junction. She said: "Go to Mumbai. Learn. Come back and teach." I never went back.',
+      hi: 'अगरबत्ती और पुरानी किताबों की खुशबू। पटना जंक्शन के पास माँ की छोटी दुकान। उन्होंने कहा: "मुंबई जाओ। सीखो। वापस आकर सिखाओ।" मैं कभी वापस नहीं गया।'
+    },
+    trigger: 'flashback_sundaram_patna'
+  },
+  arjun_flashback: {
+    character: 'arjun',
+    title: { en: 'The Film Set — Age 8', hi: 'फिल्म का सेट — उम्र 8 साल' },
+    content: {
+      en: 'Dad lifted me onto his shoulders. The director said "He has your face." I got the role before I knew what acting was. That\'s when I learned: in this family, doors open themselves.',
+      hi: 'पापा ने मुझे कंधों पर उठाया। निर्देशक ने कहा "उसके चेहरे में तुम हो।" मुझे भूमिका मिल गई इससे पहले कि मैं अभिनय का मतलब जानता। तभी सीखा: इस परिवार में दरवाज़े अपने आप खुलते हैं।'
+    },
+    trigger: 'flashback_arjun_childhood'
+  },
+  rekha_flashback: {
+    character: 'rekha',
+    title: { en: '1998 — Geeta', hi: '1998 — गीता' },
+    content: {
+      en: 'Geeta. An Adivasi actress from Jharkhand. Raw talent, no connections. I fought for her. The producer said "Who is she?" I said "She\'s better than your star." He said "Then find another project." I stayed quiet.',
+      hi: 'गीता। झारखंड की एक आदिवासी अभिनेत्री। कच्ची प्रतिभा, कोई संपर्क नहीं। मैंने उसके लिए लड़ा। निर्माता ने कहा "वो कौन है?" मैंने कहा "वो आपकी स्टार से बेहतर है।" उसने कहा "तो कोई और प्रोजेक्ट ढूंढो।" मैं चुप रही।'
+    },
+    trigger: 'flashback_rekha_1998'
   }
 };
 

@@ -20,6 +20,7 @@ import { initGameLoop, animate, getScore, addScore, getOfficesCompleted, increme
 import { sounds, playSound, stopAllSounds } from './game/sounds.js';
 import { initProximityAudio, spawnBuzzBubble, initProximityAudioIntervals } from './game/proximity-audio.js';
 import { initPostProcessing, resizePostProcessing } from './effects/postProcessing.js';
+import { ensureSkipListeners } from './flashback/system.js';
 
 // --- Post-Processing ---
 let composer;
@@ -177,6 +178,7 @@ function initGame() {
     initTypingUI();
     initJournalUI();
     initSwitcherUI();
+    ensureSkipListeners();
     initTypingGame({
         addScore, incrementOfficesCompleted,
         getScore, getOfficesCompleted, getTotalOffices,

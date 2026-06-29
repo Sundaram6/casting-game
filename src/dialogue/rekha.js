@@ -166,7 +166,15 @@ export const REKHA_DIALOGUE = {
                         hi: 'सुंदरम का टेप देखो',
                         en: 'Watch Sundaram\'s tape'
                     },
-                    next: 'tapes_sundaram'
+                    next: 'tapes_sundaram',
+                    effect: () => {
+                        import('../flashback/system.js').then(m => {
+                            m.triggerFlashback('rekha_1998', 8);
+                            m.setOnFlashbackComplete(() => {
+                                import('../journal/system.js').then(j => j.addJournalByTrigger('flashback_rekha_1998'));
+                            });
+                        });
+                    }
                 }
             ]
         },

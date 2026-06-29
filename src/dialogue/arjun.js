@@ -218,7 +218,15 @@ export const arjunDialogue = {
                         hi: 'शुक्रिया',
                         en: 'Thank you'
                     },
-                    next: 'arrival_recognition'
+                    next: 'arrival_recognition',
+                    effect: () => {
+                        import('../flashback/system.js').then(m => {
+                            m.triggerFlashback('arjun_childhood', 8);
+                            m.setOnFlashbackComplete(() => {
+                                import('../journal/system.js').then(j => j.addJournalByTrigger('flashback_arjun_childhood'));
+                            });
+                        });
+                    }
                 }
             ]
         },

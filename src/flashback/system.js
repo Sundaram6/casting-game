@@ -43,7 +43,8 @@ export function updateFlashback(dt) {
       }
     }
   }
-  if (phase === 'playing' && flashbackTimer >= flashbackDuration) {
+  if (phase === 'playing' && (flashbackTimer >= flashbackDuration || skipRequested)) {
+    skipRequested = false;
     phase = 'fading_out';
     const el = overlay();
     if (el) el.style.opacity = '0';
@@ -63,6 +64,41 @@ function endFlashback() {
   setState(STATES.EXPLORING);
   if (onFlashbackComplete) onFlashbackComplete();
   onFlashbackComplete = null;
+}
+
+let skipRequested = false;
+
+export function requestSkip() {
+    skipRequested = true;
+}
+
+export function isSkipRequested() {
+    return skipRequested;
+}
+
+export function resetSkip() {
+    skipRequested = false;
+}
+
+function initSkipListeners() {
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isFlashbackActive()) {
+            requestSkip();
+        }
+    });
+    document.addEventListener('click', () => {
+        if (isFlashbackActive()) {
+            requestSkip();
+        }
+    });
+}
+
+let listenersInitialized = false;
+export function ensureSkipListeners() {
+    if (!listenersInitialized) {
+        initSkipListeners();
+        listenersInitialized = true;
+    }
 }
 
 export function isFlashbackActive() { return flashbackActive; }

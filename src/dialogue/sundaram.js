@@ -40,7 +40,15 @@ export const sundaramDialogue = {
                         en: 'Sit in the waiting room',
                         bhojpuri: 'वेटिंग रूम में बैठव'
                     },
-                    next: 'waiting_room'
+                    next: 'waiting_room',
+                    effect: () => {
+                        import('../flashback/system.js').then(m => {
+                            m.triggerFlashback('sundaram_patna', 8);
+                            m.setOnFlashbackComplete(() => {
+                                import('../journal/system.js').then(j => j.addJournalByTrigger('flashback_sundaram_patna'));
+                            });
+                        });
+                    }
                 },
                 {
                     text: {
